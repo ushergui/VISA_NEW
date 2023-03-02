@@ -1,0 +1,93 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Controle dos autos de infração
+<a href="{% url 'cadastrar-defesa' %}" class="btn btn-primary btn-sm float-right">Adicionar defesa</a>
+</h3>
+
+<hr>
+<div class="table responsive">
+<table class="table table-striped table-hover table-condensed" id="tabela-listar">
+    <thead>
+    <tr>
+        <th style="font-size:12px" class="text-center">Auto</th>
+        <th style="font-size:12px" class="text-center">Imóvel / Endereço / Proprietário</th>
+       <th style="font-size:12px" class="text-center">Protocolo</th>
+        <th style="font-size:12px" class="text-center">Defesa</th>
+	<th style="font-size:12px" class="text-center">Quem?</th>
+        <th style="font-size:12px" class="text-center">Grau</th>
+	<th style="font-size:12px" class="text-center">Prazo manifesto</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for defesa in object_list %}
+    <tr>
+        <td style="font-size:11px" class=text-center">{{ defesa.infracao.numero_format_ano }}</td>
+	<td style="font-size:11px" >{{ defesa.infracao.inspecao.terreno.inscricao }} - {{ defesa.infracao.inspecao.terreno.logradouro_terreno.tipo }} {{ defesa.infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }} - {{ defesa.infracao.inspecao.terreno.proprietario }}</td>
+	<th style="font-size:12px" class="text-center">{{ defesa.protocolo }}</th>
+      	<td class="text-center">{{ defesa.entrada_protocolo|date:"d/m/Y" }}</td>
+	<td class="text-center">{{ defesa.quem }}</td>
+	<td class="text-center">{{ defesa.grau }}</td>
+	<td class="text-center">{{ defesa.prazo_manifesto|date:"d/m/Y" }}</td>
+
+
+
+
+
+
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 555,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registos",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registos",
+                "infoFiltered": "(filtrado de _MAX_ registos no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registos",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

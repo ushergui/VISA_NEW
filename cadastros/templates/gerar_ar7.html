@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" >
+<head>
+<title>AR</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<style>@page { size: A4 }</style>
+<style type="text/css">
+<!--
+	p {margin: 0; padding: 0;}	.ft00{font-size:15px;font-family:BAAAAA+LiberationSans;color:#000000;-moz-transform: matrix(         0,         -1,          1,          0, 0, 0);-webkit-transform: matrix(         0,         -1,          1,          0, 0, 0);-o-transform: matrix(         0,         -1,          1,          0, 0, 0);-ms-transform: matrix(         0,         -1,          1,          0, 0, 0);-moz-transform-origin: left 75%;-webkit-transform-origin: left 75%;-o-transform-origin: left 75%;-ms-transform-origin: left 75%;}
+	.ft01{font-size:30px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft02{font-size:11px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft03{font-size:10px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft04{font-size:15px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft05{font-size:9px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft06{font-size:7px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft07{font-size:17px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft08{font-size:21px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft09{font-size:21px;font-family:CAAAAA+LiberationSans;color:#000000;}
+	.ft010{font-size:11px;line-height:14px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft011{font-size:10px;line-height:15px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft012{font-size:17px;line-height:20px;font-family:BAAAAA+LiberationSans;color:#000000;}
+	.ft013{font-size:17px;line-height:22px;font-family:BAAAAA+LiberationSans;color:#000000;}
+-->
+</style>
+</head>
+<body bgcolor="#A0A0A0" vlink="blue" link="blue" class="A4">
+<div id="page1-div" style="position:relative;width:892px;height:1262px;">
+<img width="892" height="1262" src="{% static 'c.png' %}" alt="background image"/>
+
+<p style="position:absolute;top:368px;left:82px;white-space:nowrap" class="ft00">(Á</p>
+<p style="position:absolute;top:353px;left:82px;white-space:nowrap" class="ft00">R</p>
+<p style="position:absolute;top:342px;left:82px;white-space:nowrap" class="ft00">E</p>
+<p style="position:absolute;top:332px;left:82px;white-space:nowrap" class="ft00">A</p>
+<p style="position:absolute;top:322px;left:82px;white-space:nowrap" class="ft00">&#160;D</p>
+<p style="position:absolute;top:307px;left:82px;white-space:nowrap" class="ft00">E</p>
+<p style="position:absolute;top:297px;left:82px;white-space:nowrap" class="ft00">&#160;C</p>
+<p style="position:absolute;top:282px;left:82px;white-space:nowrap" class="ft00">O</p>
+<p style="position:absolute;top:270px;left:82px;white-space:nowrap" class="ft00">L</p>
+<p style="position:absolute;top:262px;left:82px;white-space:nowrap" class="ft00">A</p>
+<p style="position:absolute;top:252px;left:82px;white-space:nowrap" class="ft00">&#160;N</p>
+<p style="position:absolute;top:237px;left:82px;white-space:nowrap" class="ft00">O</p>
+<p style="position:absolute;top:225px;left:82px;white-space:nowrap" class="ft00">&#160;V</p>
+<p style="position:absolute;top:211px;left:82px;white-space:nowrap" class="ft00">E</p>
+<p style="position:absolute;top:201px;left:82px;white-space:nowrap" class="ft00">R</p>
+<p style="position:absolute;top:190px;left:82px;white-space:nowrap" class="ft00">S</p>
+<p style="position:absolute;top:180px;left:82px;white-space:nowrap" class="ft00">O</p>
+<p style="position:absolute;top:168px;left:82px;white-space:nowrap" class="ft00">)</p>
+<p style="position:absolute;top:46px;left:438px;white-space:nowrap" class="ft01">AR</p>
+<p style="position:absolute;top:44px;left:608px;white-space:nowrap" class="ft02">&#160;DATA&#160;DE&#160;POSTAGEM</p>
+<p style="position:absolute;top:84px;left:608px;white-space:nowrap" class="ft02">&#160;UNIDADE&#160;DE&#160;POSTAGEM</p>
+<p style="position:absolute;top:87px;left:107px;white-space:nowrap" class="ft010">&#160;DESTINATÁRIO<br/>&#160;{{ infracao.inspecao.terreno.proprietario }}&#160;<br/>
+&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_correspondencia }}{% if infracao.inspecao.terreno.complemento_correspondencia is None %}
+&#160;{% else %}&#160;-&#160;{{ infracao.inspecao.terreno.complemento_correspondencia }}&#160;&#160;
+{% endif %} <br/>&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.nome_bairro }}&#160;-&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.cep }}</p>
+<p style="position:absolute;top:132px;left:675px;white-space:nowrap" class="ft02">CARIMBO</p>
+<p style="position:absolute;top:146px;left:107px;white-space:nowrap" class="ft02">&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.cidade.nome_cidade }}&#160;-&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.cidade.estado }}</p>
+<p style="position:absolute;top:146px;left:636px;white-space:nowrap" class="ft02">UNIDADE&#160;DE&#160;ENTREGA</p>
+<p style="position:absolute;top:178px;left:214px;white-space:nowrap" class="ft03">(CÓDIGO&#160;DE&#160;BARRAS&#160;OU&#160;Nº&#160;DE&#160;REGISTRO&#160;DO&#160;OBJETO)</p>
+<p style="position:absolute;top:206px;left:107px;white-space:nowrap" class="ft010">&#160;ENDEREÇO&#160;PARA&#160;DEVOLUÇÃO&#160;DO&#160;AR<br/>&#160;PREFEITURA&#160;DE&#160;SÃO&#160;SEBASTIÃO&#160;DO&#160;PARAÍSO<br/>&#160;DIVISÃO&#160;DE&#160;VIGILÂNCIA&#160;SANITÁRIA<br/>&#160;RUA&#160;TIRADENTES,&#160;1011&#160;–&#160;CENTRO<br/>&#160;37950-000&#160;–&#160;SÃO&#160;SEBASTIÃO&#160;DO&#160;PARAÍSO&#160;–&#160;MG</p>
+<p style="position:absolute;top:297px;left:178px;white-space:nowrap" class="ft03">TENTATIVAS&#160;DE&#160;ENTREGA</p>
+<p style="position:absolute;top:296px;left:388px;white-space:nowrap" class="ft02">&#160;OBSERVAÇÃO</p>
+<p style="position:absolute;top:313px;left:388px;white-space:nowrap" class="ft02">&#160;Julgamento dos Autos de Infrações nº</p>
+<p style="position:absolute;top:333px;left:107px;white-space:nowrap" class="ft03">&#160;1ª&#160;_______/_______/20_______&#160;&#160;&#160;&#160;&#160;________:________h</p>
+<p style="position:absolute;top:333px;left:432px;white-space:nowrap" class="ft03">MOTIVO&#160;DA&#160;DEVOLUÇÃO</p>
+<p style="position:absolute;top:333px;left:608px;white-space:nowrap" class="ft011">&#160;RUBRICA&#160;E&#160;MATRICULA&#160;DO&#160;<br/>&#160;CARTEIRO</p>
+<p style="position:absolute;top:353px;left:393px;white-space:nowrap" class="ft05">1</p>
+<p style="position:absolute;top:354px;left:407px;white-space:nowrap" class="ft06">MUDOU-SE</p>
+<p style="position:absolute;top:353px;left:520px;white-space:nowrap" class="ft05">6</p>
+<p style="position:absolute;top:354px;left:534px;white-space:nowrap" class="ft06">NÃO&#160;PROCURADO</p>
+<p style="position:absolute;top:371px;left:107px;white-space:nowrap" class="ft03">&#160;2ª&#160;_______/_______/20_______&#160;&#160;&#160;&#160;&#160;________:________h</p>
+<p style="position:absolute;top:372px;left:393px;white-space:nowrap" class="ft05">2</p>
+<p style="position:absolute;top:372px;left:407px;white-space:nowrap" class="ft06">ENDEREÇO&#160;INSUFICIENTE</p>
+<p style="position:absolute;top:372px;left:520px;white-space:nowrap" class="ft05">7</p>
+<p style="position:absolute;top:372px;left:534px;white-space:nowrap" class="ft06">AUSENTE</p>
+<p style="position:absolute;top:390px;left:393px;white-space:nowrap" class="ft05">3</p>
+<p style="position:absolute;top:391px;left:407px;white-space:nowrap" class="ft06">NÃO&#160;EXISTE&#160;O&#160;NÚMERO</p>
+<p style="position:absolute;top:390px;left:520px;white-space:nowrap" class="ft05">8</p>
+<p style="position:absolute;top:391px;left:534px;white-space:nowrap" class="ft06">FALECIDO</p>
+<p style="position:absolute;top:407px;left:107px;white-space:nowrap" class="ft03">&#160;3ª&#160;_______/_______/20_______&#160;&#160;&#160;&#160;&#160;________:________h</p>
+<p style="position:absolute;top:408px;left:393px;white-space:nowrap" class="ft05">4</p>
+<p style="position:absolute;top:409px;left:407px;white-space:nowrap" class="ft06">DESCONHECIDO</p>
+<p style="position:absolute;top:408px;left:520px;white-space:nowrap" class="ft05">9</p>
+<p style="position:absolute;top:409px;left:534px;white-space:nowrap" class="ft06">OUTROS</p>
+<p style="position:absolute;top:426px;left:393px;white-space:nowrap" class="ft05">5</p>
+<p style="position:absolute;top:427px;left:407px;white-space:nowrap" class="ft06">RECUSADO</p>
+<p style="position:absolute;top:444px;left:107px;white-space:nowrap" class="ft02">&#160;ASSINATURA&#160;DO&#160;RECEBEDOR</p>
+<p style="position:absolute;top:444px;left:608px;white-space:nowrap" class="ft02">&#160;DATA&#160;DE&#160;ENTREGA</p>
+<p style="position:absolute;top:480px;left:107px;white-space:nowrap" class="ft02">&#160;NOME&#160;LEGÍVEL&#160;DO&#160;RECEBEDOR</p>
+<p style="position:absolute;top:480px;left:608px;white-space:nowrap" class="ft02">&#160;Nº&#160;DOC.&#160;DE&#160;IDENTIDADE</p>
+<p style="position:absolute;top:556px;left:58px;white-space:nowrap" class="ft07">&#160;&#160;{{ infracao.inspecao.terreno.proprietario }}</p>
+<p style="position:absolute;top:694px;left:58px;white-space:nowrap" class="ft07">&#160;&#160;PREFEITURA&#160;DE&#160;SÃO&#160;SEBASTIÃO&#160;DO&#160;PARAÍSO</p>
+<p style="position:absolute;top:739px;left:58px;white-space:nowrap" class="ft07">&#160;&#160;RUA&#160;TIRADENTES,&#160;1011&#160;-&#160;CENTRO&#160;</p>
+<p style="position:absolute;top:43px;left:237px;white-space:nowrap" class="ft012">AVISO&#160;DE&#160;<br/>RECEBIMENTO</p>
+<p style="position:absolute;top:530px;left:58px;white-space:nowrap" class="ft08">&#160;</p>
+<p style="position:absolute;top:530px;left:64px;white-space:nowrap" class="ft09"><b>DESTINATÁRIO</b></p>
+<p style="position:absolute;top:578px;left:58px;white-space:nowrap" class="ft013">&#160;&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_correspondencia }}
+    {% if infracao.inspecao.terreno.complemento_correspondencia is None %}
+{% else %}&#160;-&#160;{{ infracao.inspecao.terreno.complemento_correspondencia }}&#160;&#160;
+{% endif %}<br/>
+    &#160;&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.nome_bairro }}&#160;-&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.cidade.nome_cidade }}
+    &#160;&#160;<br/>&#160;&#160;{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.cidade.estado }} - {{ infracao.inspecao.terreno.logradouro_correspondencia.cep }}</p>
+<p style="position:absolute;top:668px;left:58px;white-space:nowrap" class="ft08">&#160;</p>
+<p style="position:absolute;top:668px;left:64px;white-space:nowrap" class="ft09"><b>REMETENTE</b></p>
+<p style="position:absolute;top:716px;left:58px;white-space:nowrap" class="ft07">&#160;&#160;DIVISÃO&#160;DE&#160;VIGILÂNCIA&#160;SANITÁRIA&#160;</p>
+<p style="position:absolute;top:761px;left:58px;white-space:nowrap" class="ft07">&#160;&#160;SÃO&#160;SEBASTIÃO&#160;DO&#160;PARAÍSO&#160;-&#160;MG&#160;37950-000&#160;</p>
+</div>
+</body>
+</html>
+

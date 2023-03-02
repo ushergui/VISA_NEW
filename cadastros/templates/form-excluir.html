@@ -1,0 +1,30 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Excluir registros</h3>
+<p class="lead">
+    Confirme para excluir o registro definitivamente.
+</p>
+
+
+<hr>
+<form action="" method="POST">
+
+    <p>
+        <!-- Por padrão o django trata as views como objetos, daí este object
+        ele traz nesta variável object, ela sai conforme fizemos no str do models-->
+        Deseja excluir o registro: <strong>{{ object }}?</strong>
+
+    </p>
+
+    {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
+
+    {{ form.as_p }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
+    fields, por isto escrever desta forma. -->
+
+    <button type="submit" class="btn btn-danger">Excluir </button>
+
+</form>
+{% endblock %}

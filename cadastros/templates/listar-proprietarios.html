@@ -1,0 +1,87 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Lista de proprietários
+
+<a href="{% url 'cadastrar-proprietario' %}" class="btn btn-primary btn-sm">Adicionar proprietário</a>
+</h3>
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+	<thead>
+	<tr>
+        <th>Proprietário</th>
+        <th>Logradouro</th>
+        <th>Opções</th>
+
+    </tr>
+	</thead>
+	<tbody>
+    {% for proprietario in object_list %}
+    <tr>
+        <td>{{ proprietario.nome_proprietario }}</td>
+	<td>{{ proprietario.logradouro_proprietario.tipo }} {{ proprietario.logradouro_proprietario.nome_logradouro }}, {{proprietario.numero_proprietario}} {%if proprietario.complemento_proprietario is None %} {% else %} - {{ proprietario.complemento_proprietario}} {% endif %}- {{proprietario.logradouro_proprietario.bairro.nome_bairro}}</td>
+        <td>
+            <a href="{% url 'editar-proprietario' proprietario.pk %}" class="btn btn-warning btn-sm" title="Editar">
+            Editar
+            </a>
+            <a href="{% url 'deletar-proprietario' proprietario.pk %}" class="btn btn-danger btn-sm" title="Excluir">
+            Excluir
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,14 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Detalhe do estado
+<a href="{% url 'cadastrar-estado' %}" class="btn btn-primary btn-sm float-right">Adicionar Estado</a>
+</h3>
+<hr>
+
+<p>Estado: {{ estado.nome_estado }}</p>
+<p>Sigla: {{ estado.sigla_estado }}</p>
+
+{% endblock %}
