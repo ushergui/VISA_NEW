@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 #Pra deixar cada um ver somente aquilo que cadastrou, exemplo pra usar: Produtividade
 
 # Create your models here.
+from django.urls import reverse
+
 
 class Estado (models.Model):
     nome_estado=models.CharField(max_length=25, verbose_name="Estado")
@@ -189,6 +191,8 @@ class Protocolo(models.Model):
 
         super(Protocolo, self).save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse('detalhes-protocolo', args=[str(self.id)])
 
 
 class Fiscal(models.Model):

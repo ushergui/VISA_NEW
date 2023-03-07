@@ -1,0 +1,68 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<h1>Detalhes do Protocolo: {{ protocolo.protocolo }}</h1>
+
+{% if inspecoes %}
+  <h2>Inspeções:</h2>
+<div class="table responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>DATA</th>
+        <th>TERRENO</th>
+        <th>PROPRIETARIO</th>
+        <th>ENDEREÇO</th>
+        <th>FISCAL</th>
+        <th>CONDIÇÃO</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inspecao in inspecoes %}
+      {% if inspecao.limpo is not None %}
+        <tr>
+          <td>{{ inspecao.data_inspecao1|date:"d/m/Y" }}</td>
+          <td>{{ inspecao.terreno.inscricao }}</td>
+          <td>{{ inspecao.terreno.proprietario }}</td>
+          <td>{{ inspecao.terreno.logradouro_terreno }}</td>
+          <td>{{ inspecao.fiscal }}</td>
+          <td>{{ inspecao.start}}</td>
+        </tr>
+
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+{% else %}
+  <p>Nenhuma inspeção encontrada para este protocolo.</p>
+{% endif %}
+
+{% if infracoes %}
+  <h2>Infrações:</h2>
+<div class="table responsive">
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Número</th>
+        <th>Descrição</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for infracao in infracoes %}
+        <tr>
+          <td>{{ infracao.numero_format_ano }}</td>
+          <td>{{ infracao.inspecao.fiscal }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Nenhuma infração encontrada para este protocolo.</p>
+{% endif %}
+</div>
+{% endblock %}

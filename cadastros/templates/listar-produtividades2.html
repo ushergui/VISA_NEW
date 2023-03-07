@@ -5,6 +5,7 @@
 {% block conteudo %}
 <h3>Produtividade terrenos sujos
 </h3>
+
 <hr>
 <div class="table responsive">
 
@@ -130,6 +131,26 @@
         });
 
     });
+function copiarDados() {
+  var tabela = document.getElementById("tabela-listar"); // substitua "tabela-dados" pelo id da sua tabela
+  var linhas = tabela.rows;
+  var dados = "";
+
+  for (var i = 0; i < linhas.length; i++) {
+    var colunas = linhas[i].cells;
+    for (var j = 0; j < colunas.length; j++) {
+      dados += colunas[j].innerText + "\t";
+    }
+    dados += "\n";
+  }
+
+  var el = document.createElement("textarea");
+  el.value = dados;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+}
 
 </script>
 

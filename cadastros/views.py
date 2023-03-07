@@ -1,3 +1,4 @@
+from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView,  BaseDetailView
 from django.views.generic.list import ListView
 
@@ -56,6 +57,22 @@ def get_queryset(self):
         terrenos = Terreno.objects.all()
 
     return terrenos
+
+class ProtocoloDetalhes(DetailView):
+    model = Protocolo
+    template_name = 'detalhes-protocolo.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        protocolo = self.object
+
+        inspecoes = Inspecao.objects.filter(protocolo=protocolo).order_by('-data_inspecao1')
+        infracoes = Infracao.objects.filter(inspecao__protocolo=protocolo).order_by('-id')
+
+        context['inspecoes'] = inspecoes
+        context['infracoes'] = infracoes
+
+        return context
 
 
 
@@ -611,6 +628,16 @@ class InfracaoList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')
     model = Infracao
     template_name = 'listar-infracoes.html'
+
+class InfracaoListFilterAtivos(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('login')
+    model = Infracao
+    template_name = 'listar-infracoes-ativos.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(julgamento__isnull=True)
+        return queryset
 
 class ProdutividadeList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')

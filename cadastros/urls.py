@@ -11,9 +11,9 @@ from .views import EstadoDelete, CidadeDelete, BairroDelete, LogradouroDelete, \
     ProprietarioDelete, TerrenoDelete, ProtocoloDelete, FiscalDelete, InspecaoDelete, InfracaoDelete, DefesaDelete, ReinspecaoDelete
 
 from .views import EstadoList, CidadeList, BairroList, LogradouroList, \
-    ProprietarioList, TerrenoList, ProtocoloList, FiscalList, InspecaoList, InfracaoList, InfracaoList2, InformacoesList, ReinspecaoList, ProdutividadeList, GerenciarList, ProdutividadeList2
+    ProprietarioList, TerrenoList, ProtocoloList, FiscalList, InspecaoList, InfracaoList, InfracaoList2, InformacoesList, ReinspecaoList, ProdutividadeList, GerenciarList, ProdutividadeList2, InfracaoListFilterAtivos
 
-from .views import gerar_relatorio, gerar_ar1, gerar_ar2, gerar_auto, gerar_ar3, gerar_ar4, gerar_ar5, gerar_ar6, gerar_ar7, gerar_manifestacao, gerar_julgamento
+from .views import gerar_relatorio, gerar_ar1, gerar_ar2, gerar_auto, gerar_ar3, gerar_ar4, gerar_ar5, gerar_ar6, gerar_ar7, gerar_manifestacao, gerar_julgamento, ProtocoloDetalhes
 
 from . import views
 
@@ -53,6 +53,9 @@ urlpatterns = [
     path('cadastrar/defesa/<int:pk>/', DefesasCreate.as_view(), name="cadastrar-defesa"),
     path('cadastrar/reinspecao/<int:pk>/', ReinspecoesCreate.as_view(), name="cadastrar-reinspecao"),
     path('cadastrar/AR2/<int:pk>/', ARJulgamento.as_view(), name="cadastrar-AR2"),
+    path('protocolo/<int:pk>/', ProtocoloDetalhes.as_view(), name='detalhes-protocolo'),
+
+
 
     # Para deletar é necessário colocar o ID
 
@@ -83,6 +86,7 @@ urlpatterns = [
     path('listar-fiscais/', FiscalList.as_view(), name="listar-fiscais"),
     path('listar-inspecoes/', InspecaoList.as_view(), name="listar-inspecoes"),
     path('listar-infracoes/', InfracaoList.as_view(), name="listar-infracoes"),
+    path('listar-infracoes-ativos/', InfracaoListFilterAtivos.as_view(), name="listar-infracoes-ativos"),
     path('listar-produtividades/', ProdutividadeList.as_view(), name="listar-produtividades"),
     path('listar-produtividades2/', ProdutividadeList2.as_view(), name="listar-produtividades2"),
     path('listar-informacoes/', InformacoesList.as_view(), name="listar-informacoes"),

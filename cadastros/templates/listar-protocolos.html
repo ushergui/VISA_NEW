@@ -28,7 +28,7 @@
     <tbody>
     {% for protocolo in object_list %}
     <tr> 
-        <td style="font-size:14px">{{ protocolo.protocolo }}</td>
+        <td style="font-size:14px"><a href="{% url 'detalhes-protocolo' pk=protocolo.pk %}" class="text-center">{{ protocolo.protocolo }}</a>   </td>
         <td style="font-size:14px">{{ protocolo.logradouro.nome_logradouro }} - {{ protocolo.logradouro.bairro.nome_bairro }}</td>
         <td style="font-size:14px">{{ protocolo.descricao_protocolo }}</td>
         <td style="font-size:14px">{{ protocolo.status_protocolo }}</td>
