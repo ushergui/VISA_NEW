@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-b%2i3hyv54$vykv+^^j45=d2d$nbb7#%t6_=so84g#(s(o+7d*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.1.1.16']
+ALLOWED_HOSTS = ['10.1.1.16','127.0.0.1']
 
 
 # Application definition
@@ -83,11 +83,21 @@ WSGI_APPLICATION = 'Vigilancia.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+   'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#  'default': {
+#       'ENGINE': 'django.db.backends.postgresql',
+#       'NAME': 'vigilancia',
+#       'USER': 'postgres',
+#       'PASSWORD': 'postgre',
+#       'HOST': 'localhost',
+#       'PORT': '5432',
+#   }
+#}
 
 
 # Password validation

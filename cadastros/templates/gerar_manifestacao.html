@@ -233,15 +233,69 @@
          <p style="position:absolute;top:797px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
   {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
 
+    {% elif infracao.situacao == "13" %}
+
+
+<p style="position:absolute;top:198px;left:10px;white-space:nowrap" class="ft01">A notificação do Auto de Infração nº {{ infracao.numero_format_ano }} foi &#160;entregue &#160;no endereço &#160;de correspondência do imóvel em</p>
+    <p style="position:absolute;top:224px;left:10px;white-space:nowrap" class="ft01">{{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para protocolar a defesa. </p>
+    <p style="position:absolute;top:250px;left:10px;white-space:nowrap" class="ft01">De &#160;acordo &#160;com &#160;nossos &#160;registros, &#160;não houve apresentação &#160;de defesa, &#160;porém, ao trafegar &#160;pelo &#160;endereço do</p>
+
+<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">terreno durante a rotina de fiscalização na data de {{ infracao.data_inspecao2|date:"d/m/Y" }} às {{ infracao.horario_inspecao2 }}, &#160;constatou-se &#160;que foi feito limpeza de</p>
+
+<p style="position:absolute;top:302px;left:10px;white-space:nowrap" class="ft01">forma parcial do terreno.</p>
+<p style="position:absolute;top:328px;left:10px;white-space:nowrap" class="ft01">Considerando que o objetivo da autuação é que o responsável limpe o seu terreno, &#160;diminuindo ou eliminando</p>
+<p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft01">o risco de proliferação de insetos e animais peçonhentos nas residências dos vizinhos, &#160;sou pelo arquivamento</p>
+
+<p style="position:absolute;top:380px;left:10px;white-space:nowrap" class="ft01">do Auto de Infração sem aplicação da penalidade.</p>
+
+  <img src='{{ infracao.foto_inspecao_2.url }}' style="position:absolute;left:100px;top:428px;height:350px;width:520px" />
+
+    <p style="position:absolute;top:771px;left:10px;white-space:nowrap" class="ft01">Esta é a manifestação.</p>
+
+         <p style="position:absolute;top:797px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "10" %}
+
+<h1 style="position:absolute;top:302px;left:138px">Processo anulado devido perda de prazos.</h1>
+
+     {% elif infracao.situacao == "11" %}
+
+<p style="position:absolute;top:198px;left:10px;white-space:nowrap" class="ft01">A notificação do Auto de Infração nº {{ infracao.numero_format_ano }} foi &#160;entregue &#160;no endereço &#160;de correspondência do imóvel em</p>
+    <p style="position:absolute;top:224px;left:10px;white-space:nowrap" class="ft01">{{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }}&#160; para &#160;protocolar &#160;a &#160;defesa, porém, verificamos que houve</p>
+    <p style="position:absolute;top:250px;left:10px;white-space:nowrap" class="ft01">falha ao identificar os terrenos, gerando assim notificação/autuação indevida (proprietário errado). </p>
+
+<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">Considerando a necessidade de notificar/autuar o proprietário correto,&#160; e &#160;corrigir o engano, sou pela anulação</p>
+
+<p style="position:absolute;top:302px;left:10px;white-space:nowrap" class="ft01">deste auto de infração e encaminhamento de novo auto de infração para o proprietário correto.</p>
+<p style="position:absolute;top:328px;left:10px;white-space:nowrap" class="ft01">Esta é a manifestação.</p>
+
+         <p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "12" %}
+
+<p style="position:absolute;top:198px;left:10px;white-space:nowrap" class="ft01">A notificação do Auto de Infração nº {{ infracao.numero_format_ano }} foi &#160;entregue &#160;no endereço &#160;de correspondência do imóvel em</p>
+    <p style="position:absolute;top:224px;left:10px;white-space:nowrap" class="ft01">{{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }}&#160; para &#160;protocolar &#160;a &#160;defesa, porém, verificamos que houve</p>
+    <p style="position:absolute;top:250px;left:10px;white-space:nowrap" class="ft01">mudança de propriedade do terreno no decorrer do processo. </p>
+
+<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">Considerando a necessidade de notificar/autuar&#160; o proprietário correto, &#160;sou pela anulação deste auto de &#160;infra-</p>
+
+<p style="position:absolute;top:302px;left:10px;white-space:nowrap" class="ft01">ção e encaminhamento de novo auto de infração para o proprietário novo.</p>
+<p style="position:absolute;top:328px;left:10px;white-space:nowrap" class="ft01">Esta é a manifestação.</p>
+
+         <p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
+
 	 {% endif %}
 
 
 
 
-     {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
-        <p style="position:absolute;top:942px;left:10px;white-space:nowrap" class="ft02">A/C Referência Técnica da Vigilância Sanitária</p>
-        <p style="position:absolute;top:968px;left:10px;white-space:nowrap" class="ft02">Sr. Guilherme Firmino Duarte</p>
-    {% elif infracao.inspecao.fiscal.nome_fiscal == "GUILHERME FIRMINO DUARTE" %}
+     {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" and infracao.situacao == "11" %}
+<p style="position:absolute;top:942px;left:10px;white-space:nowrap" class="ft02">A/C Referência Técnica da Vigilância Sanitária</p>
+<p style="position:absolute;top:968px;left:10px;white-space:nowrap" class="ft02">Sr. Guilherme Firmino Duarte</p>
+    {% elif infracao.inspecao.fiscal.nome_fiscal == "GUILHERME FIRMINO DUARTE" and infracao.situacao == "11" %}
 
 <p style="position:absolute;top:879px;left:270px;white-space:nowrap" class="ft02">{{ infracao.inspecao.fiscal.nome_fiscal|lower|title }} </p>
 <p style="position:absolute;top:905px;left:276px;white-space:nowrap" class="ft01">{{ infracao.inspecao.fiscal.nivel }} </p>
@@ -249,14 +303,13 @@
 
         <p style="position:absolute;top:942px;left:10px;white-space:nowrap" class="ft02">A/C Coordenadora de Vigilância em Saúde</p>
         <p style="position:absolute;top:968px;left:10px;white-space:nowrap" class="ft02">Sra. Fernanda Amorim Spósito Scarano </p>
-
-
      {% endif %}
 
 
 
-<p style="position:absolute;top:1010px;left:65px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Tiradentes,&#160;1011&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
-<p style="position:absolute;top:1030px;left:140px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
+
+<p style="position:absolute;top:1010px;left:35px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Tiradentes,&#160;1011&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
+<p style="position:absolute;top:1030px;left:110px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
   <img style="position:absolute;top:10.76in;left:0.090in;width:7.40in;height:0.02in" src="{% static 'ci_2.png' %}" />
 
 </section>

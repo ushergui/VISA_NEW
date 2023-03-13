@@ -413,13 +413,17 @@ class Infracao(models.Model):
     SITUACAO_CHOICES = (
         ("1", "Defendeu e limpou"),
         ("2", "Não defendeu e limpou"),
+        ("13", "Não defendeu e limpou meia boca"),
         ("3", "Não defendeu e não limpou"),
         ("4", "Manifesto e julgamento fora do sistema"),
         ("5", "Defendeu após o prazo e limpou"),
         ("6", "Não recebeu e limpou"),
         ("7", "Edital"),
         ("8", "Não defendeu e não limpou via Edital"),
-        ("9", "Não defendeu e limpou via Edital")
+        ("9", "Não defendeu e limpou via Edital"),
+        ("10", "Perda de prazo"),
+        ("11", "Erro na identificação"),
+        ("12", "Mudança do proprietário no decorrer do processo")
 
     )
     situacao = models.CharField(blank=True, null=True, max_length=25, choices=SITUACAO_CHOICES, verbose_name="Situação")
@@ -518,7 +522,7 @@ class Defesa(models.Model):
     def __str__(self):
         return "{} - {}".format(self.infracao, self.protocolo)
 
-class Reinspecao (models.Model):
+"""class Reinspecao (models.Model):
     defesa = models.ForeignKey(Defesa, on_delete=models.CASCADE, null=False ,verbose_name="Defesa")
     data_inspecao2 = models.DateField(null = False, verbose_name = "Data da reinspeção")
     horario_inspecao2 = models.TimeField(null=False, verbose_name="Horário de reinspeção")
@@ -534,3 +538,4 @@ class Reinspecao (models.Model):
     situacao = models.CharField(max_length=25, choices=SITUACAO_CHOICES, verbose_name="Situação")
     
 
+"""

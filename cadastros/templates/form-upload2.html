@@ -104,5 +104,31 @@
 }
 
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+<script>
+    document.getElementById("id_foto_inspecao_2").addEventListener("change", function() {
+  var fileInput = this;
+  var file = fileInput.files[0];
+  var reader = new FileReader();
+  reader.onload = function() {
+    EXIF.getData(file, function() {
+      var dateTime = EXIF.getTag(this, "DateTimeOriginal");
+      if (dateTime) {
+        var date = dateTime.substring(0, 10);
+        var dateCorrigida = new Date(date.replace(/:/g, "/"));
+        var dateCorrigidaBr = dateCorrigida.toLocaleDateString("pt-BR");
+        var time = dateTime.substring(11, 16);
+        document.getElementById("id_data_inspecao2").value = dateCorrigidaBr;
+        console.log(date);
+        console.log(dateCorrigidaBr);
+        document.getElementById("id_horario_inspecao2").value = time;
+        console.log(time);
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+</script>
 
 {% endblock %}

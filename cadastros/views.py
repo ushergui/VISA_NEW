@@ -1,9 +1,10 @@
+from django.forms import forms
 from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView,  BaseDetailView
 from django.views.generic.list import ListView
 
 
-from .models import Estado, Cidade, Bairro, Logradouro, Proprietario, Terreno, Protocolo, Infracao, Inspecao, Fiscal, Defesa, Reinspecao #Produtividade
+from .models import Estado, Cidade, Bairro, Logradouro, Proprietario, Terreno, Protocolo, Infracao, Inspecao, Fiscal, Defesa #Reinspecao #Produtividade
 
 #Método para redirecionar o usuário após ele efetuar um cadastro
 from django.urls import reverse_lazy
@@ -204,7 +205,7 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     model = Infracao
     fields = ['inspecao','data_auto', 'produtividade_infracao']
     template_name = 'form.html'
-    success_url = reverse_lazy('listar-infracoes')
+    success_url = reverse_lazy('listar-infracoes-ativos')
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -228,19 +229,19 @@ class DefesaCreate (LoginRequiredMixin, CreateView):
         return context
 
 
-class ReinspecaoCreate (LoginRequiredMixin, CreateView):
-    login_url = reverse_lazy('login')
-    model = Reinspecao
-    fields = ['defesa', 'data_inspecao2','horario_inspecao2','foto_inspecao_2','data_manifesto','produtividade_manifesto','situacao']
-    template_name = 'form-upload2.html'
-    success_url = reverse_lazy('listar-reinspecoes')
-    ordering = ['defesa']
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-
-        context['titulo'] = "Cadastro de Reinspeção"
-        context['botao'] = "Cadastrar"
-        return context
+#class ReinspecaoCreate (LoginRequiredMixin, CreateView):
+ #  login_url = reverse_lazy('login')
+ #  model = Reinspecao
+ #   fields = ['defesa', 'data_inspecao2','horario_inspecao2','foto_inspecao_2','data_manifesto','produtividade_manifesto','situacao']
+ #   template_name = 'form-upload2.html'
+ #   success_url = reverse_lazy('listar-reinspecoes')
+ #   ordering = ['defesa']
+  #  def get_context_data(self, *args, **kwargs):
+  #      context = super().get_context_data(*args, **kwargs)
+#
+  #      context['titulo'] = "Cadastro de Reinspeção"
+ #       context['botao'] = "Cadastrar"
+  #      return context
 
 ########################### UPDATE ###########################
 #class ProdutividadeUpdate(LoginRequiredMixin, UpdateView):
@@ -408,7 +409,7 @@ class ARCreate(LoginRequiredMixin, UpdateView):
     model = Infracao
     fields = ['numero_format_ano','rastreio_infracao','status_rastreio','data_entrega_autuacao','nome_recebedor', 'prazo_defesa']
     template_name = 'form.html'
-    success_url = reverse_lazy('listar-infracoes')
+    success_url = reverse_lazy('listar-infracoes-ativos')
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -421,7 +422,7 @@ class DefesasCreate(LoginRequiredMixin, UpdateView):
     model = Infracao
     fields = ['numero_format_ano','protocolo_defesa','entrada_protocolo','quem', 'prazo_manifesto','email']
     template_name = 'form.html'
-    success_url = reverse_lazy('listar-infracoes')
+    success_url = reverse_lazy('listar-infracoes-ativos')
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -435,6 +436,45 @@ class ReinspecoesCreate(LoginRequiredMixin, UpdateView):
     fields = ['numero_format_ano','foto_inspecao_2','data_inspecao2','horario_inspecao2','data_manifesto','produtividade_manifesto','situacao','julgamento']
     template_name = 'form-upload2.html'
     success_url = reverse_lazy('listar-infracoes')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if form.instance.status_rastreio != 'ENTREGUE':
+            form.fields['situacao'].choices = (
+                ("", "---------"),
+                ("6", "Não recebeu e limpou"),
+                ("4", "Manifesto e julgamento fora do sistema"),
+                ("7", "Edital"),
+                ("9", "Não defendeu e limpou via Edital"),
+                ("10", "Perda de prazo")
+            )
+        elif form.instance.status_rastreio == 'ENTREGUE' and not form.instance.protocolo_defesa:
+            form.fields['situacao'].choices = (
+                ("", "---------"),
+                ("2", "Não defendeu e limpou"),
+                ("13", "Não defendeu e limpou meia boca"),
+                ("3", "Não defendeu e não limpou"),
+                ("4", "Manifesto e julgamento fora do sistema"),
+                ("8", "Não defendeu e não limpou via Edital"),
+                ("9", "Não defendeu e limpou via Edital"),
+                ("10", "Perda de prazo"),
+                ("11", "Erro na identificação"),
+                ("12", "Mudança do proprietário no decorrer do processo")
+            )
+        else:
+            form.fields['situacao'].choices = (
+                ("", "---------"),
+                ("1", "Defendeu e limpou"),
+                ("4", "Manifesto e julgamento fora do sistema"),
+                ("5", "Defendeu após o prazo e limpou"),
+                ("10", "Perda de prazo"),
+                ("11", "Erro na identificação"),
+                ("12", "Mudança do proprietário no decorrer do processo")
+            )
+        return form
+
+
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -447,7 +487,7 @@ class ARJulgamento(LoginRequiredMixin, UpdateView):
     model = Infracao
     fields = ['numero_format_ano','rastreio_julgamento','status_rastreio_julgamento','data_entrega_julgamento']
     template_name = 'form.html'
-    success_url = reverse_lazy('listar-infracoes')
+    success_url = reverse_lazy('listar-infracoes-ativos')
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -470,18 +510,18 @@ class DefesaUpdate(LoginRequiredMixin, UpdateView):
         context['botao'] = "Atualizar"
         return context
 
-class ReinspecaoUpdate(LoginRequiredMixin, UpdateView):
-    login_url = reverse_lazy('login')
-    model = Reinspecao
-    fields = ['defesa', 'data_inspecao2','horario_inspecao2','foto_inspecao_2','data_manifesto','situacao']
-    template_name = 'form-upload.html'
-    success_url = reverse_lazy('listar-reinspecoes')
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-
-        context['titulo'] = "Edição de reinspeção"
-        context['botao'] = "Atualizar"
-        return context
+#class ReinspecaoUpdate(LoginRequiredMixin, UpdateView):
+   # login_url = reverse_lazy('login')
+  #  model = Reinspecao
+   # fields = ['defesa', 'data_inspecao2','horario_inspecao2','foto_inspecao_2','data_manifesto','situacao']
+   # template_name = 'form-upload.html'
+   # success_url = reverse_lazy('listar-reinspecoes')
+  #  def get_context_data(self, *args, **kwargs):
+   #     context = super().get_context_data(*args, **kwargs)
+#
+   #     context['titulo'] = "Edição de reinspeção"
+   #     context['botao'] = "Atualizar"
+   #     return context
 
 
 
@@ -559,7 +599,7 @@ class InfracaoDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('login')
     model = Infracao
     template_name = 'form-excluir.html'
-    success_url = reverse_lazy('listar-infracoes')
+    success_url = reverse_lazy('listar-infracoes-ativos')
 
 class DefesaDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('login')
@@ -567,11 +607,11 @@ class DefesaDelete(LoginRequiredMixin, DeleteView):
     template_name = 'form-excluir.html'
     success_url = reverse_lazy('gerenciar-infracoes')
     
-class ReinspecaoDelete(LoginRequiredMixin, DeleteView):
-    login_url = reverse_lazy('login')
-    model = Reinspecao
-    template_name = 'form-excluir.html'
-    success_url = reverse_lazy('listar-reinspecoes')
+#class ReinspecaoDelete(LoginRequiredMixin, DeleteView):
+  #  login_url = reverse_lazy('login')
+  #  model = Reinspecao
+  #  template_name = 'form-excluir.html'
+  #  success_url = reverse_lazy('listar-reinspecoes')
  
 
 
@@ -672,10 +712,10 @@ class InformacoesList(LoginRequiredMixin, ListView):
     model = Infracao
     template_name = 'listar-infracoes2.html'
 
-class ReinspecaoList(LoginRequiredMixin, ListView):
-    login_url = reverse_lazy('login')
-    model = Reinspecao
-    template_name = 'listar-reinspecoes.html'
+#class ReinspecaoList(LoginRequiredMixin, ListView):
+   # login_url = reverse_lazy('login')
+  #  model = Reinspecao
+  #  template_name = 'listar-reinspecoes.html'
 
 
 def gerar_relatorio(request,pk,template_name="gerar_relatorio.html"):

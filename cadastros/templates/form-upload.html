@@ -16,7 +16,7 @@
 
     {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
 
-    {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
+        {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
     fields, por isto escrever desta forma. -->
 
     <button type="submit" onclick="return Verificar()" class="btn btn-primary">
@@ -29,6 +29,14 @@
 {% block scripts %}
 <script src="{% static 'js/jquery.mask.min.js' %}"></script>
 <script>
+function preencherDataAtual() {
+        var dataRelatorio1 = document.getElementById("id_data_relatorio1");
+        var dataAtual = new Date().toLocaleDateString('pt-BR');
+        dataRelatorio1.value = dataAtual;
+    }
+
+
+
     $(document).ready(function(){
         $("#id_cep").mask("00.000-000");
         $("#id_inscricao").mask("00.00.000.0000.000");
@@ -122,9 +130,55 @@
 
    }
 
+var dataRelatorio1 = document.getElementById("id_data_relatorio1");
+var produtidade_inspecao = document.getElementById("id_produtidade_inspecao");
+var dataAtual = new Date();
+var dia = dataAtual.getDate().toString().padStart(2, '0');
+var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
+var ano = dataAtual.getFullYear();
+var dataFormatada = dia + '/' + mes + '/' + ano;
+
+dataRelatorio1.value = dataFormatada;
+produtidade_inspecao.value = dataFormatada;
+console.log(dataRelatorio1);
+console.log(produtidade_inspecao);
+
+
+
 
 
 
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+<script>
+document.getElementById("id_foto_inspecao_1").addEventListener("change", function() {
+  var fileInput = this;
+  var file = fileInput.files[0];
+  var reader = new FileReader();
+  reader.onload = function() {
+    EXIF.getData(file, function() {
+      var dateTime = EXIF.getTag(this, "DateTimeOriginal");
+      if (dateTime) {
+        var date = dateTime.substring(0, 10);
+        var dateCorrigida = new Date(date.replace(/:/g, "/"));
+        var dateCorrigidaBr = dateCorrigida.toLocaleDateString("pt-BR");
+        var time = dateTime.substring(11, 16);
+        document.getElementById("id_data_inspecao1").value = dateCorrigidaBr;
+        console.log(date);
+        console.log(dateCorrigidaBr);
+        document.getElementById("id_horario_inspecao1").value = time;
+        console.log(time);
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+
+
+</script>
+
+
 
 {% endblock %}

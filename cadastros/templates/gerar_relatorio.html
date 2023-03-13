@@ -98,12 +98,12 @@
 
 
  {% elif inspecao.terreno.tipo_de_imovel == "CASA ABANDONADA" and inspecao.limpo == "LIMPO" %}
- <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+<p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
 <p style="position:absolute;top:316px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao imóvel acima identificado, &#160;foi constatado que o mesmo está limpo conforme critérios defini-</p>
- <p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01">dos na Lei Municipal nº 4778/2011 e demonstrado na foto abaixo.</p>
- <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
- <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local foi considerado limpo, &#160;no que diz respeito a este imóvel, o protocolo </p>
-  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01"><b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
+<p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01">dos na Lei Municipal nº 4778/2011 e demonstrado na foto abaixo.</p>
+<img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+<p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local foi considerado limpo, &#160;no que diz respeito a este imóvel, o protocolo </p>
+<p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01"><b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
 
  {% elif inspecao.terreno.tipo_de_imovel == "CASA ABANDONADA" and inspecao.limpo == "RAZOAVEL" %}
  <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
@@ -113,11 +113,14 @@
  <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local não foi considerado sujo, &#160;no que diz respeito a este imóvel, o proto- </p>
   <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">colo <b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
 
-
-
-
-
-
+ <!-- >{% elif inspecao.terreno.tipo_de_imovel == "TERRENO" and inspecao.limpo == "CALCADA SUJA" %}
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+ <p style="position:absolute;top:318px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao imóvel acima identificado, &#160;foi constatado que o mesmo se encontra em condições razoáveis, </p>
+ <p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01">não sendo compatível agora a medida de autuação, porém não existe passeio construído e o mesmo encontra-se sujo,
+  desta forma sugiro o encaminhamento conforme foto abaixo:</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+ <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local não foi considerado sujo, &#160;no que diz respeito a este imóvel, o proto- </p>
+  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">colo <b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p> -->
 
 {% else %}
  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">ERRO -> Fale com o Guilherme</p>

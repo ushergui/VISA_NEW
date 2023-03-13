@@ -2,3 +2,10 @@
 *.jpg
 *.png
 uploads/*
+*.pyc
+.idea/
+cadastros/migrations/*
+data.sql
+db.json
+db_utf8.json
+db.sqlite3
