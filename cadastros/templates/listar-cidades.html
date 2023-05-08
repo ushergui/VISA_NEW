@@ -1,0 +1,39 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Lista de cidades</h3>
+<a href="{% url 'cadastrar-cidade' %}" class="btn btn-primary btn-sm">Adicionar cidade</a>
+<hr>
+<div class="table responsive">
+<table class="table table-striped">
+    <tr>
+        <th>Nome da Cidade</th>
+        <th>Estado</th>
+        <th>Opções</th>
+
+    </tr>
+    {% for cidade in object_list %}
+    <tr>
+        <td>{{ cidade.nome_cidade }}</td>
+        <td>{{ cidade.estado }}</td>
+        <td>
+            <a href="{% url 'editar-cidade' cidade.pk %}" class="btn btn-warning btn-sm" title="Editar">
+            Editar
+            </a>
+            <a href="{% url 'deletar-cidade' cidade.pk %}" class="btn btn-danger btn-sm" title="Excluir">
+            Excluir
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+
+</table>
+
+</div>
+{% endblock %}

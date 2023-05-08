@@ -1,0 +1,40 @@
+{% extends 'modelo-ifpr.html' %}
+{% load static %}
+{% block conteudo %}
+
+<div class="table responsive">
+<table class="table table-striped table-hover table-condensed" id="tabela-listar">
+    <thead>
+        <tr>
+            <th class="text-center" style="font-size:12px">Auto </th>
+            <th class="text-center" style="font-size:12px">Terreno </th>
+            <th class="text-center" style="font-size:12px">Rastreio Infração</th>
+            <th class="text-center" style="font-size:12px">Data da entrega</th>
+            <th class="text-center" style="font-size:12px">Prazo de defesa</th>
+            <th class="text-center" style="font-size:12px">Quem recebeu?</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for infracao in object_list %}
+            <tr>
+                <td style="font-size:11px" class="ditable" data-id="{{ infracao.pk }}">{{ infracao.numero_format_ano }}</td>
+                <td style="font-size:11px" class="ditable" data-id="{{ infracao.pk }}">{{ infracao.inspecao.terreno }}</td>
+                <td style="font-size:11px" class="text-center editable" data-id="{{ infracao.pk }}">{{ infracao.status_rastreio }}</td>
+                <td style="font-size:11px" class="text-center editable" data-id="{{ infracao.pk }}">{{ infracao.data_entrega_autuacao }}</td>
+                <td style="font-size:11px" class="text-center editable" data-id="{{ infracao.pk }}">{{ infracao.prazo_defesa }}</td>
+                <td style="font-size:11px" class="text-center editable" data-id="{{ infracao.pk }}">{{ infracao.nome_recebedor }}</td>
+
+            </tr>
+
+        {% empty %}
+            <tr>
+                <td colspan="3">Nenhum campo registrado.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
+

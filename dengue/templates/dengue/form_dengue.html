@@ -1,0 +1,204 @@
+{% extends 'bases.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if form.instance.pk %}
+<h3 style="text-align: center;"> Editar notificação </h3>
+{% else %}
+<h3 style="text-align: center;"> Cadastrar notificação </h3>
+{% endif %}
+<hr>
+<div class="col-md-6 mx-auto">
+    <form action="" method="POST">
+
+        {% csrf_token %}
+
+        {{ form|crispy }}
+
+        <button type="submit" class="btn btn-primary" id="submit-button">
+        {% if form.instance.pk %}
+        Gravar
+        {% else %}
+        Cadastrar
+            {% endif %}
+        </button>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+    let submitButton = document.querySelector("#submit-button");
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let form = document.querySelector("form");
+
+        submitButton.addEventListener("click", async function(event) {
+            event.preventDefault();
+
+            let obitoInput = document.getElementById('id_obito');
+            let statusObitoSelect = document.getElementById('id_status_obito');
+
+            if (obitoInput.value && statusObitoSelect.value === '') {
+                alert('Por favor, selecione o status do óbito.');
+                return;
+            }
+
+            if (!obitoInput.value && statusObitoSelect.value !== '') {
+                alert('Por favor, preencha a data do óbito.');
+                return;
+            }
+
+            let nome = document.querySelector("#id_nome").value;
+            let logradouro_paciente = document.querySelector("#id_logradouro_paciente").value;
+            let notificacao_id = "{{ form.instance.pk }}";
+
+            let checkUrl = `{% url 'check_duplicate' %}?nome=${encodeURIComponent(nome)}&logradouro=${encodeURIComponent(logradouro_paciente)}&notificacao_id=${encodeURIComponent(notificacao_id)}`;
+
+    let response = await fetch(checkUrl);
+    let data = await response.json();
+
+    if (data.exists) {
+        let isConfirmed = confirm(data.message); // Modifique esta linha
+        if (isConfirmed) {
+            let observacoes = document.querySelector("#id_observacoes");
+            if (observacoes.value === "") {
+                alert("Por favor, justifique no campo observações.");
+            } else {
+                form.submit();
+            }
+        }
+    } else {
+        form.submit();
+    }
+});
+    });
+
+
+    async function fetchSemanas() {
+    const response = await fetch("{% url 'api_semanas' %}");
+    const semanas = await response.json();
+    return semanas;
+}
+
+function findSemanaEpidemiologica(semanas, dataNotificacao) {
+    for (const semana of semanas) {
+        const dataInicio = new Date(semana.data_inicio_semana);
+        const dataFim = new Date(semana.data_fim_semana);
+        if (dataNotificacao >= dataInicio && dataNotificacao <= dataFim) {
+            return semana.id;
+        }
+    }
+    return null;
+}
+
+$(document).ready(function() {
+    let semanas;
+
+    (async () => {
+        semanas = await fetchSemanas();
+    })();
+
+    $("#id_data_notificacao").on("change", function() {
+        const dataNotificacao = new Date($(this).val().split("/").reverse().join("-"));
+        const semanaEpidemiologicaId = findSemanaEpidemiologica(semanas, dataNotificacao);
+
+        if (semanaEpidemiologicaId) {
+            $("#id_semana_epidemiologica").val(semanaEpidemiologicaId).trigger("change");
+        } else {
+            alert("Semana epidemiológica não encontrada para a data de notificação informada.");
+        }
+    });
+});
+</script>
+<!-- Restante dos scripts -->
+<script>
+    $(document).ready(function() {
+        function formatDate(date) {
+            let d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+
+            return [day, month, year].join('/');
+        }
+
+        $("#id_data_inicio_sintomas").on("change", function() {
+            const dataInicioSintomas = new Date($(this).val().split("/").reverse().join("-"));
+            const dataLimiteColeta = new Date(dataInicioSintomas.getTime() + 30 * 24 * 60 * 60 * 1000);
+            $("#id_data_limite_coleta").val(formatDate(dataLimiteColeta));
+        });
+
+        $('#id_data_recebimento').mask("00/00/0000");
+        $('#id_data_notificacao').mask("00/00/0000");
+        $('#id_data_inicio_sintomas').mask("00/00/0000");
+        $('#id_data_limite_coleta').mask("00/00/0000");
+        $('#id_internacao').mask("00/00/0000");
+        $('#id_data_agendamento').mask("00/00/0000");
+        $('#id_obito').mask("00/00/0000");
+        $('#id_usf').select2();
+        $('#id_semana_epidemiologica').select2();
+        $('#id_logradouro_paciente').select2();
+        $('#id_notificadora').select2();
+        $('#id_usf').select2();
+        $('#id_resultado').select2();
+		});
+    var behavior = function (val) {
+    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+    },
+    options = {
+        onKeyPress: function (val, e, field, options) {
+            field.mask(behavior.apply({}, arguments), options);
+        }
+    };
+    $('#id_telefone').mask(behavior, options);
+    $('#id_telefone2').mask(behavior, options);
+
+
+    $(document).ready(function() {
+        $('#id_nome').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+        $(this).val(textoSemAcentos);
+        });
+    });
+
+
+    $(document).ready(function() {
+        $('#id_observacoes').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+        $(this).val(textoSemAcentos);
+        });
+    });
+
+    $(document).ready(function() {
+        $('#id_responsavel_legal').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+        $(this).val(textoSemAcentos);
+        });
+    });
+
+    $(document).ready(function() {
+  $('#id_email').on('keyup', function() {
+    var textoSemAcentos = $(this).val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9@._-]/gi, '');
+    $(this).val(textoSemAcentos);
+  });
+});
+</script>
+{% endblock %}

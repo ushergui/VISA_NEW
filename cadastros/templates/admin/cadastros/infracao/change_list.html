@@ -1,0 +1,66 @@
+{% extends "admin/change_list.html" %}
+{% block scripts %}
+(function($) {
+    'use strict';
+
+    $(document).ready(function() {
+        $('#changelist-form').on('submit', function() {
+            var action = $('#action').val();
+            if (action === 'replicar_info_ajax') {
+                var ids = $('.action-select:checked').map(function() { return $(this).val(); }).get();
+                $.ajax({
+                    url: '{% url "admin:cadastros_infracao_replicar_info_ajax" %}',
+                    type: 'POST',
+                    data: {'ids[]': ids},
+                    success: function(data) {
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            alert('Não foi possível replicar as informações.');
+                        }
+                    },
+                    error: function() {
+                        alert('Não foi possível replicar as informações.');
+                    }
+                });
+                return false;
+            }
+        });
+    });
+
+})(django.jQuery);
+
+    {% endblock %}
+{% block search %}
+
+<div class="search-form">
+  <form method="get" action=".">
+    <input type="text" name="{{ search_var }}" value="{{ search_term }}" placeholder="Search">
+    <button type="submit" class="search-btn">Search</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block result_list %}
+<div class="results">
+  <table id="{{ cl.opts.model_name }}-list" class="listing">
+    <thead>
+      <tr>
+        {% for field in result_headers %}
+        <th>{{ field }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in results %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        {% for item in row %}
+        <td>{{ item }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

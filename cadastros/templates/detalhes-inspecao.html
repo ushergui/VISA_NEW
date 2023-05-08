@@ -1,0 +1,72 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<div class="container-fluid py-5 ">
+<h1 style="position:absolute;top:70px;">Detalhes da inspeção <a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 " >Voltar</a> </h1>
+    <br>
+
+<h4 style="position:absolute;top:125px;">Inscrição Imobiliária: {{ inspecao.terreno.inscricao }}&#160;&#160;
+    Proprietário: {{ inspecao.terreno.proprietario }}&#160;&#160; Lote: {{ inspecao.terreno.lote }}&#160;&#160;
+    Quadra: {{ inspecao.terreno.quadra }}&#160;&#160;Área: {{ inspecao.terreno.area }}&#160;&#160;
+
+
+    </h4>
+
+<h4 style="position:absolute;top:170px;">Endereço {{ inspecao.terreno.logradouro_terreno.tipo }}
+    {{ inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ inspecao.terreno.numero_terreno }} -
+    {{ inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}
+
+
+    </h4>
+
+    <h4 style="position:absolute;top:215px;">Protocolo {{ inspecao.protocolo }}&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+    Fiscal {{ inspecao.fiscal }}    &#160;&#160;&#160;&#160;&#160;&#160;&#160;Data da inspeção
+    {{ inspecao.data_inspecao1|date:"d/m/Y" }}&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+    <a href="{% url 'gerar_relatorio' pk=inspecao.pk %}" target="_blank">Imprimir relatório</a>&#160;&#160;&#160;&#160;
+        &#160;&#160;&#160;<a href="{% url 'editar-inspecao' inspecao.pk %}"
+    target="_blank">Editar inspeção</a>
+
+    </h4>
+
+
+    <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:590px;top:350px;height:450px;width:700px" />
+    <h4 style="position:absolute;top:260px;">
+    Situação do terreno:
+        {% if inspecao.limpo == "LIMPO" %}
+        Limpo
+        {% elif inspecao.limpo == "RAZOAVEL" %}
+        Razoável
+        {% else %}
+        {% if inspecao.mato %}
+        Mato alto ( X )&#160;
+        {% if inspecao.entulho %}
+        Entulho ( X )&#160;
+        {% if inspecao.material %}
+        Material ( X )&#160;
+        {% if inspecao.lixo %}
+        Lixo ( X )&#160;
+        {% if inspecao.carcaca %}
+        Carcaça ( X )&#160;
+        {% if inspecao.pneu %}
+        Pneu ( X )&#160;
+        {% if inspecao.movel %}
+        Móvel ( X )&#160;
+        {% if inspecao.outros %}
+        Outros ( X )&#160;
+
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        </h4>
+
+</div>
+{% endblock %}

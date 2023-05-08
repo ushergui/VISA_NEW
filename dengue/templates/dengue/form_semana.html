@@ -1,0 +1,62 @@
+{% extends 'bases.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+{% if form.instance.pk %}
+<h3 style="text-align: center;"> Editar semana </h3>
+{% else %}
+<h3 style="text-align: center;"> Cadastrar semana </h3>
+{% endif %}
+<hr>
+<div class="col-md-6 mx-auto">
+    <form action="" method="POST">
+
+        {% csrf_token %}
+
+        {{ form|crispy }}
+
+        <button type="submit" class="btn btn-primary" id="submit-button">
+        {% if form.instance.pk %}
+        Gravar
+        {% else %}
+        Cadastrar
+            {% endif %}
+        </button>
+
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+
+<!-- Restante dos scripts -->
+<script>
+
+    $(document).ready(function() {
+        function formatDate(date) {
+            let d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+
+            return [day, month, year].join('/');
+        }
+
+        $("#id_data_inicio_semana").on("change", function() {
+            const dataInicioSemana = new Date($(this).val().split("/").reverse().join("-"));
+            const dataFimSemana = new Date(dataInicioSemana.getTime() + 7 * 24 * 60 * 60 * 1000);
+            $("#id_data_fim_semana").val(formatDate(dataFimSemana));
+        });
+    $('#id_data_inicio_semana').mask("00/00/0000");
+    $('#id_data_fim_semana').mask("00/00/0000");
+});
+</script>
+{% endblock %}

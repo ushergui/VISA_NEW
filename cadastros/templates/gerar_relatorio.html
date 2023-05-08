@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns: lang="pt-br">
+<head>
+<title>Relatório de Inspeção</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<style>@page { size: A4 }</style>
+<style type="text/css">
+ .ft06{font-size:20px;font-family:BAAAAA+Arial;color:#000000;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+</style>
+<!--<style type="text/css">
+	p {margin: 0; padding: 0;}	.ft00{font-size:18px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft01{font-size:15px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft03{font-size:14px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft02{font-size:15px;font-family:CAAAAA+ArialMT;color:#000000;
+	body {
+  background-color: #FFFFFF;
+}}
+</style>-->
+</head>
+<body class="A4">
+<section class="sheet padding-10mm">
+<img src="{% static 'a.png' %}" style="float:left;width:70px"/>
+
+
+
+
+<div id="page1-div" style="position:relative;width:793px;height:1122px;">
+<p style="position:absolute;top:-30px;left:131px;white-space:nowrap" class="ft00"><b>PREFEITURA MUNICIPAL DE SÃO SEBASTIÃO DO PARAÍSO</b></p>
+
+
+<p style="position:absolute;top:-13px;left:260px;white-space:nowrap" class="ft00"><b>Secretaria Municipal de Saúde</b></p>
+<p style="position:absolute;top:04px;left:233px;white-space:nowrap" class="ft00"><b>Departamento de Vigilância em Saúde</b></p>
+<p style="position:absolute;top:22px;left:260px;white-space:nowrap" class="ft00"><b>Divisão de Vigilância Sanitária</b></p>
+<p style="position:absolute;top:46px;left:232px;white-space:nowrap" class="ft06"><b>RELATÓRIO DE INSPEÇÃO</b></p>
+<p style="position:absolute;top:90px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:90px;left:156px;white-space:nowrap" class="ft03">{{ inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ inspecao.terreno.numero_terreno }} {{ inspecao.terreno.complemento_terreno.complemento }} - {{ inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:116px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:116px;left:149px;white-space:nowrap" class="ft02">{{ inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:116px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:116px;left:369px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:116px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:116px;left:477px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:116px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:116px;left:590px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:142px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:142px;left:104px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:168px;left:10px;white-space:nowrap" class="ft01"><b>Protocolo:</b></p>
+<p style="position:absolute;top:168px;left:84px;white-space:nowrap" class="ft02"> {{ inspecao.protocolo }} </p>
+<p style="position:absolute;top:168px;left:305px;white-space:nowrap" class="ft01"><b>Dia:</b></p>
+<p style="position:absolute;top:168px;left:338px;white-space:nowrap" class="ft02"> {{ inspecao.data_inspecao1|date:"d/m/Y" }} </p>
+<p style="position:absolute;top:168px;left:435px;white-space:nowrap" class="ft01"><b>Horário:</b></p>
+<p style="position:absolute;top:168px;left:499px;white-space:nowrap" class="ft02"> {{ inspecao.horario_inspecao1 }}h </p>
+
+<p style="position:absolute;top:204px;left:10px;white-space:nowrap" class="ft01"><b>Fundamentação Legal:</b></p>
+<p style="position:absolute;top:230px;left:10px;white-space:nowrap" class="ft01">Lei Municipal nº 4778/2011 – Dispõe sobre a Limpeza de Terrenos Baldios no Município de São Sebastião do </p>
+<p style="position:absolute;top:256px;left:10px;white-space:nowrap" class="ft01">Paraíso e dá outras providências.</p>
+
+ {% if inspecao.terreno.tipo_de_imovel == "TERRENO" and inspecao.limpo == None %}
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+<p style="position:absolute;top:318px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao terreno acima identificado, foi constatado a presença de:</p>
+ <p style="position:absolute;top:344px;left:10px;white-space:nowrap" class="ft01">(&#160;{{ inspecao.matos }}&#160;)&#160;Mato alto&#160;&#160;&#160;
+  (&#160;{{ inspecao.entulhos }}&#160;)&#160;Entulho&#160;&#160;&#160;(&#160;{{ inspecao.materiais }}
+  &#160;)&#160;Material&#160;&#160;&#160;(&#160;{{ inspecao.pneus }}&#160;)&#160;Pneu&#160;&#160;&#160;(&#160;{{ inspecao.lixos }}&#160;)&#160;Lixo&#160;&#160;&#160;
+  (&#160;{{ inspecao.carcacas }}&#160;)&#160;Veículo&#160;&#160;&#160;(&#160;{{ inspecao.moveis }}&#160;)&#160;Móvel&#160;&#160;&#160;(&#160;{{ inspecao.outros }}&#160;)&#160;Outros&#160;&#160;&#160;</p>
+  <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:400px;height:450px;width:700px" />
+   <p style="position:absolute;top:852px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> Considerando que o terreno está sujo, será lavrado o auto de infração.</p>
+  <div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+  {% elif inspecao.terreno.tipo_de_imovel == "CASA ABANDONADA" and inspecao.limpo == None %}
+
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+ <p style="position:absolute;top:318px;left:10px;white-space:nowrap" class="ft01">Em inspeção à casa abandonada acima identificada, foi constatado a presença de:</p>
+   <p style="position:absolute;top:344px;left:10px;white-space:nowrap" class="ft01">(&#160;{{ inspecao.matos }}&#160;)&#160;Mato alto&#160;&#160;&#160;
+  (&#160;{{ inspecao.entulhos }}&#160;)&#160;Entulho&#160;&#160;&#160;(&#160;{{ inspecao.materiais }}
+  &#160;)&#160;Material&#160;&#160;&#160;(&#160;{{ inspecao.pneus }}&#160;)&#160;Pneu&#160;&#160;&#160;(&#160;{{ inspecao.lixos }}&#160;)&#160;Lixo&#160;&#160;&#160;
+  (&#160;{{ inspecao.carcacas }}&#160;)&#160;Veículo&#160;&#160;&#160;(&#160;{{ inspecao.moveis }}&#160;)&#160;Móvel&#160;&#160;&#160;(&#160;{{ inspecao.outros }}&#160;)&#160;Outros&#160;&#160;&#160;</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:400px;height:450px;width:700px" />
+  <p style="position:absolute;top:852px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> Considerando que o imóvel está sujo, será lavrado o auto de infração.</p>
+ <div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+ {% elif inspecao.terreno.tipo_de_imovel == "TERRENO" and inspecao.limpo == "LIMPO" %}
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+<p style="position:absolute;top:316px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao terreno acima identificado, &#160;foi constatado que o mesmo está limpo conforme critérios defini&#160;-</p>
+ <p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01">dos na Lei Municipal nº 4778/2011 e demonstrado na foto abaixo.</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+ <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> Considerando que o terreno foi considerado limpo, no que diz respeito a este imóvel, o protocolo </p>
+  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01"><b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
+
+  <div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+ {% elif inspecao.terreno.tipo_de_imovel == "TERRENO" and inspecao.limpo == "RAZOAVEL" %}
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+ <p style="position:absolute;top:318px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao terreno acima identificado, &#160;foi constatado que o mesmo se encontra em condições razoáveis, </p>
+ <p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01"> não sendo compatível agora a medida de autuação conforme foto abaixo:</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+ <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> Considerando que o terreno não foi considerado sujo, no que diz respeito a este imóvel, o proto- </p>
+  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">colo <b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
+
+ <div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+
+
+ {% elif inspecao.terreno.tipo_de_imovel == "CASA ABANDONADA" and inspecao.limpo == "LIMPO" %}
+<p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+<p style="position:absolute;top:316px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao imóvel acima identificado, &#160;foi constatado que o mesmo está limpo conforme critérios defini-</p>
+<p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01">dos na Lei Municipal nº 4778/2011 e demonstrado na foto abaixo.</p>
+<img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+<p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local foi considerado limpo, &#160;no que diz respeito a este imóvel, o protocolo </p>
+<p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01"><b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
+
+ <div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+ {% elif inspecao.terreno.tipo_de_imovel == "CASA ABANDONADA" and inspecao.limpo == "RAZOAVEL" %}
+ <p style="position:absolute;top:292px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento:</b></p>
+ <p style="position:absolute;top:318px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao imóvel acima identificado, &#160;foi constatado que o mesmo se encontra em condições razoáveis, </p>
+ <p style="position:absolute;top:342px;left:10px;white-space:nowrap" class="ft01"> não sendo compatível agora a medida de autuação conforme foto abaixo:</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;left:10px;top:390px;height:450px;width:700px" />
+ <p style="position:absolute;top:840px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> &#160;Considerando que o local não foi considerado sujo, &#160;no que diz respeito a este imóvel, o proto- </p>
+  <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">colo <b>{{ inspecao.protocolo }}</b> poderá ser encerrado.</p>
+
+<div style="position: absolute; top: 950px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    {{ inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 971px; left: 44px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 45%; transform: translate(-50%, -27%);">
+    Mat.{{ inspecao.fiscal.matricula_fiscal }} - {{ inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+
+{% else %}
+ <p style="position:absolute;top:866px;left:10px;white-space:nowrap" class="ft01">ERRO -> Fale com o Guilherme</p>
+ {% endif %}
+ <p style="position:absolute;top:900px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,&#160;
+
+{{ inspecao.data_relatorio1|date:"d" }}&#160;de&#160;{{ inspecao.data_relatorio1|date:"F" }}&#160;de&#160;{{ inspecao.data_relatorio1|date:"Y" }}</p>
+
+
+<p style="position:absolute;top:1010px;left:40px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Tiradentes,&#160;1011&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
+<p style="position:absolute;top:1030px;left:130px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
+  <img style="position:absolute;top:10.76in;left:0.090in;width:7.40in;height:0.02in" src="{% static 'ci_2.png' %}" />
+
+</section>
+</div>
+</body>
+</html>

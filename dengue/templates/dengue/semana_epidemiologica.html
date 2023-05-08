@@ -1,0 +1,123 @@
+{% extends 'bases.html' %}
+{% block extra_css %}
+<style>
+    .chart-container {
+        height: 400px;
+        width: {% if termo_pesquisa and ano_pesquisa %}20{% else %}80{% endif %}%;
+    }
+</style>
+{% endblock %}
+
+{% block conteudo %}
+{% if termo_pesquisa and ano_pesquisa %}
+    <div align="center"><h3>Você pesquisou pelas últimas 4 semanas a partir da semana: "{{ termo_pesquisa }}" do ano {{ ano_pesquisa }}</h3></div>
+{% endif %}
+
+    <div align="center"><h3>Notificações por semana epidemiológica</h3></div>
+
+<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
+
+<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Semana</th>
+                            {% for notificacao in notificacoes %}
+                                <th>{{ notificacao.semana_epidemiologica }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Quantidade</td>
+                            {% for notificacao in notificacoes %}
+                                <td>{{ notificacao.quantidade }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-12 d-flex justify-content-center">
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<<script>
+    // Função para criar o gráfico
+    function createChart(labels, data, chartTitle) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quantidade',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: chartTitle,
+                    fontSize: 16
+                },
+                plugins: {
+                    datalabels: {
+                        color: '#000',
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: function (value, context) {
+                            return value;
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            max: Math.max(...data) + 3
+                        }
+                    }]
+                }
+            }
+        });
+    }
+
+    // Carregar os dados do Django para o gráfico
+    const labels = [];
+    const data = [];
+
+    {% for notificacao in notificacoes %}
+    labels.push("{{ notificacao.semana_epidemiologica }} ({{ notificacao.semana_epidemiologica__data_inicio_semana|date:"d/m" }} a {{ notificacao.semana_epidemiologica__data_fim_semana|date:"d/m" }})");
+    data.push("{{ notificacao.quantidade }}");
+    {% endfor %}
+
+    // Define o título do gráfico com base na condição
+    const chartTitle = {% if termo_pesquisa and ano_pesquisa %}"Notificações de dengue recebidas nas últimas 4 semanas epidemiológicas"{% else %}"Notificações de dengue por semanas epidemiológicas"{% endif %};
+
+    createChart(labels, data, chartTitle);
+</script>
+{% endblock %}

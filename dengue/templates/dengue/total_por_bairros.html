@@ -1,0 +1,107 @@
+{% extends 'bases.html' %}
+{% block css %}
+<style>
+    .chart-container {
+        height: 100%; /* Altere para 100% para ocupar todo o espaço disponível */
+    }
+    .table-container {
+        float: left; /* Adicione para alinhar a tabela à esquerda */
+    }
+</style>
+
+{% endblock %}
+{% block conteudo %}
+{% if termo_pesquisa %}
+    <div align="center"><h3>Você pesquisou pela semana: {{ termo_pesquisa }}, mostrando dados desta semana e das 3 anteriores.</h3></div>
+{% endif %}
+<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
+
+<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 table-container">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Bairro</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notificacao in notificacoes|slice:":20" %}
+                        <tr>
+                            <td>{{ notificacao.logradouro_paciente__bairro__nome_bairro }}</td>
+                            <td>{{ notificacao.quantidade }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<script>
+    // Função para criar o gráfico
+    function createChart(labels, data, options) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quantidade',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: options
+        });
+    }
+
+    // Carregar os dados do Django para o gráfico
+    const labels = [];
+    const data = [];
+
+    {% for notificacao in notificacoes|slice:":20" %}
+        labels.push("{{ notificacao.logradouro_paciente__bairro__nome_bairro }}");
+        data.push("{{ notificacao.quantidade }}");
+    {% endfor %}
+
+    // Adicione o plugin de rótulos aos options do gráfico
+    const chartOptions = {
+        plugins: {
+            datalabels: {
+                color: '#000',
+                font: {
+                    weight: 'bold'
+                },
+                formatter: (value) => {
+                    return value;
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+
+    };
+    createChart(labels, data);
+
+</script>
+{% endblock %}

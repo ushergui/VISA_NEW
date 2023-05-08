@@ -1,0 +1,171 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<div align="center"><h3>Você pesquisou pelo termo: "{{ termo_pesquisa }}"</h3></div>
+<h3>Produtividade terrenos sujos <a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
+</h3>
+
+<hr>
+<div class="table responsive">
+
+<table class="table table-striped table-hover table-condensed" id="tabela-listar">
+    <thead>
+    <tr>
+        <th class="text-center">Protocolo</th>
+        <th class="text-center">Entrada</th>
+        <th class="text-center">Início</th>
+        <th class="text-center">Procedimentos</th>
+        <th class="text-center">Código</th>
+        <th class="text-center">Tempo</th>
+        <th class="text-center">Pontos</th>
+        <th class="text-center">Saida</th>
+		<th class="text-center">Fiscal</th>
+		<th class="text-center">Lançar em</th>
+		<th class="text-center">Editar</th>
+        <th class="text-center" style="font-size:1px; width=1%">ID</th>
+
+
+
+    </tr>
+    </thead>
+    <tbody>
+
+{% for infracao in object_list %}
+            {% if infracao.data_manifesto is not none %}
+                {% if infracao.produtividade_manifesto and infracao.produtividade_infracao %}
+
+		<tr>
+		<td class="text-center">{{ infracao.inspecao.protocolo }}</td>
+        <td class="text-center">{{ infracao.inspecao.protocolo.entrada_protocolo|date:"d/m/Y" }}</td>
+		<td class="text-center">{{ infracao.inspecao.data_inspecao1|date:"d/m/Y" }}</td>
+        <td class="text-center">Inspeção, relatório e Auto de Infração nº {{ infracao.numero_format_ano }}</td>
+        <td class="text-center">2.1 + 2.4 + 4.3</td>
+        <td class="text-center">00:30</td>
+        <td class="text-center">51</td>
+        <td class="text-center">{{ infracao.data_auto|date:"d/m/Y" }}</td>
+        <td class="text-center">{{ infracao.inspecao.fiscal }} </td>
+		<td class="text-center">{{ infracao.produtividade_infracao|date:"F" }}/{{ infracao.produtividade_infracao|date:"Y" }} </td>
+		<td class="text-center"><a href="{% url 'produtividade' infracao.pk %}" >
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+            </a></td>
+        <td style="font-size:1px"  class="text-center">{{ infracao.id }} </td>
+
+		</tr>
+		<tr>
+		<td class="text-center">{{ infracao.inspecao.protocolo }}</td>
+        <td class="text-center">{{ infracao.inspecao.protocolo.entrada_protocolo|date:"d/m/Y" }}</td>
+		<td class="text-center">{{ infracao.data_manifesto|date:"d/m/Y" }}</td>
+        <td class="text-center">Manifesto referente ao Auto de Infração nº {{ infracao.numero_format_ano }}</td>
+        <td class="text-center">2.1 + 6.1</td>
+        <td class="text-center">01:00</td>
+        <td class="text-center">102</td>
+        <td class="text-center">{{ infracao.data_manifesto|date:"d/m/Y" }}</td>
+        <td class="text-center">{{ infracao.inspecao.fiscal }} </td>
+		<td class="text-center">{{ infracao.produtividade_manifesto|date:"F" }}/{{ infracao.produtividade_manifesto|date:"Y" }} </td>
+		<td class="text-center"><a href="{% url 'produtividade' infracao.pk %}" >
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+            </a> </td>
+        <td style="font-size:1px"  class="text-center">{{ infracao.id }} </td>
+		</tr>
+    {% endif %}
+    {% else %}
+     {% if infracao.produtividade_infracao %}
+		<tr>
+		<td class="text-center">{{ infracao.inspecao.protocolo }}</td>
+        <td class="text-center">{{ infracao.inspecao.protocolo.entrada_protocolo|date:"d/m/Y" }}</td>
+		<td class="text-center">{{ infracao.inspecao.data_inspecao1|date:"d/m/Y" }}</td>
+        <td class="text-center">Inspeção, relatório e Auto de Infração nº {{ infracao.numero_format_ano }}</td>
+        <td class="text-center">2.1 + 2.4 + 4.3</td>
+        <td class="text-center">00:30</td>
+        <td class="text-center">51</td>
+        <td class="text-center">{{ infracao.data_auto|date:"d/m/Y" }}</td>
+        <td class="text-center">{{ infracao.inspecao.fiscal }} </td>
+		<td class="text-center">{{ infracao.produtividade_infracao|date:"F" }}/{{ infracao.produtividade_infracao|date:"Y" }} </td>
+		<td class="text-center"><a href="{% url 'produtividade' infracao.pk %}" >
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+            </a> </td>
+        <td style="font-size:1px"  class="text-center">{{ infracao.id }} </td>
+		</tr>		
+    {% endif %}
+	{% endif %}
+
+	
+	
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+
+		
+
+</tbody>
+</table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [ 11, "desc" ],
+            "pageLength":100,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+function copiarDados() {
+  var tabela = document.getElementById("tabela-listar"); // substitua "tabela-dados" pelo id da sua tabela
+  var linhas = tabela.rows;
+  var dados = "";
+
+  for (var i = 0; i < linhas.length; i++) {
+    var colunas = linhas[i].cells;
+    for (var j = 0; j < colunas.length; j++) {
+      dados += colunas[j].innerText + "\t";
+    }
+    dados += "\n";
+  }
+
+  var el = document.createElement("textarea");
+  el.value = dados;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+}
+
+</script>
+
+{% endblock %}
+

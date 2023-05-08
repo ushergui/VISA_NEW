@@ -1,0 +1,589 @@
+{% load static %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns: lang="pt-br">
+<head>
+<title>Julgamento</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<style>@page { size: A4 }</style>
+<style type="text/css">
+ .ft06{font-size:20px;font-family:BAAAAA+Arial;color:#000000;
+}
+
+</style>
+<!--<style type="text/css">
+
+	p {margin: 0; padding: 0;}	.ft00{font-size:18px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft01{font-size:15px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft03{font-size:14px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft02{font-size:15px;font-family:CAAAAA+ArialMT;color:#000000;
+	body {
+  background-color: #FFFFFF;
+}}
+
+</style>-->
+</head>
+<body class="A4">
+<section class="sheet padding-10mm">
+<img src="{% static 'a.png' %}" style="position:absolute;left:50px;top:20px;width:60px"/>
+
+
+
+
+<div id="page1-div" style="position:relative;width:793px;height:1122px;">
+<p style="position:absolute;top:-30px;left:131px;white-space:nowrap" class="ft00"><b>PREFEITURA MUNICIPAL DE SÃO SEBASTIÃO DO PARAÍSO</b></p>
+<p style="position:absolute;top:-13px;left:260px;white-space:nowrap" class="ft00"><b>Secretaria Municipal de Saúde</b></p>
+<p style="position:absolute;top:04px;left:233px;white-space:nowrap" class="ft00"><b>Departamento de Vigilância em Saúde</b></p>
+<p style="position:absolute;top:22px;left:260px;white-space:nowrap" class="ft00"><b>Divisão de Vigilância Sanitária</b></p>
+
+
+     {% if infracao.situacao == "1" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+
+
+<p style="position:absolute;top:200px;left:10px;white-space:nowrap" class="ft01"><b>Responsável por apresentar a defesa:</b></p>
+<p style="position:absolute;top:200px;left:268px;white-space:nowrap" class="ft02"> {{ infracao.quem }} </p>
+
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do &#160;Auto &#160;de &#160;Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
+
+
+    <p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">no endereço &#160;de correspondência do imóvel em&#160; {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+    <p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+    <p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">O responsável acima apresentou defesa ao Auto de Inf. nº &#160;{{ infracao.numero_format_ano }}, conforme requerimento {{ infracao.protocolo_defesa }}</p>
+<p style="position:absolute;top:404px;left:10px;white-space:nowrap" class="ft01">de {{ infracao.entrada_protocolo|date:"d/m/Y" }}, contendo os documentos relacionados &#160;no art. 9º da Lei Municipal nº 4778/2021. &#160;A defesa foi</p>
+<p style="position:absolute;top:430px;left:10px;white-space:nowrap" class="ft01">encaminhada para a autoridade &#160;autuante, &#160;a &#160;fim de se manifestar sobre as razões oferecidas, de acordo com o </p>
+<p style="position:absolute;top:456px;left:10px;white-space:nowrap" class="ft01">parágrafo 3º do art. 9º da Lei Municipal nº 4778/2021.</p>
+
+<p style="position:absolute;top:496px;left:10px;white-space:nowrap" class="ft01">Emitida &#160;a &#160;manifestação da autoridade autuante em {{ infracao.data_manifesto|date:"d/m/Y" }} e considerando toda a documentação até aqui</p>
+<p style="position:absolute;top:522px;left:10px;white-space:nowrap" class="ft01">apresentada, resta-nos dizer:</p>
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">Apresentados os requisitos para acolhimento da defesa, quais sejam, o prazo máximo e os documentos neces-</p>
+<p style="position:absolute;top:588px;left:10px;white-space:nowrap" class="ft01">sários, &#160;conforme &#160;os &#160;arts. 8º e 9º da &#160;Lei &#160;Municipal &#160;nº 4778/2021 e constatada a limpeza posterior feita pelo</p>
+<p style="position:absolute;top:614px;left:10px;white-space:nowrap" class="ft01">responsável, &#160;e &#160;de &#160;acordo &#160;com &#160;o &#160;relatado &#160;pela &#160;autoridade autuante, acolho a manifestação da autoridade e</p>
+<p style="position:absolute;top:640px;left:10px;white-space:nowrap" class="ft01"><b>JULGO</b> procedente a defesa, para que o Auto de Infração seja arquivado, conforme art. 10º da Lei Municipal </p>
+<p style="position:absolute;top:666px;left:10px;white-space:nowrap" class="ft01">nº 4778/2021.</p>
+
+
+ <p style="position:absolute;top:706px;left:10px;white-space:nowrap" class="ft01">Assim, determino: a) o arquivamento do presente processo; b) o encaminhamento desta decisão ao autuado.</p>
+
+    {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:810px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:836px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:746px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "14" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+
+
+<p style="position:absolute;top:200px;left:10px;white-space:nowrap" class="ft01"><b>Responsável por apresentar a defesa:</b></p>
+<p style="position:absolute;top:200px;left:268px;white-space:nowrap" class="ft02"> {{ infracao.quem }} </p>
+
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do &#160;Auto &#160;de &#160;Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
+
+
+    <p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">no endereço &#160;de correspondência do imóvel em&#160; {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+    <p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+    <p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">O responsável acima apresentou defesa ao Auto de Inf. nº &#160;{{ infracao.numero_format_ano }}, conforme requerimento {{ infracao.protocolo_defesa }}</p>
+<p style="position:absolute;top:404px;left:10px;white-space:nowrap" class="ft01">de {{ infracao.entrada_protocolo|date:"d/m/Y" }}, contendo os documentos relacionados &#160;no art. 9º da Lei Municipal nº 4778/2021. &#160;A defesa foi</p>
+<p style="position:absolute;top:430px;left:10px;white-space:nowrap" class="ft01">encaminhada para a autoridade &#160;autuante, &#160;a &#160;fim de se manifestar sobre as razões oferecidas, de acordo com o </p>
+<p style="position:absolute;top:456px;left:10px;white-space:nowrap" class="ft01">parágrafo 3º do art. 9º da Lei Municipal nº 4778/2021.</p>
+
+<p style="position:absolute;top:496px;left:10px;white-space:nowrap" class="ft01">Emitida &#160;a &#160;manifestação da autoridade autuante em {{ infracao.data_manifesto|date:"d/m/Y" }} e considerando toda a documentação até aqui</p>
+<p style="position:absolute;top:522px;left:10px;white-space:nowrap" class="ft01">apresentada, resta-nos dizer:</p>
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">Apresentados os requisitos para acolhimento da defesa, quais sejam, o prazo máximo e os documentos neces-</p>
+<p style="position:absolute;top:588px;left:10px;white-space:nowrap" class="ft01">sários, &#160;conforme&#160; os&#160; arts.&#160; 8º &#160;e 9º da Lei Municipal nº 4778/2021 e constatada que a limpeza não foi feita de</p>
+<p style="position:absolute;top:614px;left:10px;white-space:nowrap" class="ft01">acordo&#160; com o Art. 4º da Lei Municipal nº4.778/2021, porém foi considerado razoável ao ponto de não ser ca-</p>
+<p style="position:absolute;top:640px;left:10px;white-space:nowrap" class="ft01">bível prosseguir com a medida de penalidade de multa de&#160;acordo &#160;com &#160;o &#160;relatado &#160;pela &#160;autoridade autuante.
+    </p>
+<p style="position:absolute;top:666px;left:10px;white-space:nowrap" class="ft01"><b>JULGO</b> procedente a defesa, para que o Auto de Infração seja arquivado, conforme art. 10º da Lei Municipal </p>
+<p style="position:absolute;top:692px;left:10px;white-space:nowrap" class="ft01">nº 4778/2021.</p>
+
+
+ <p style="position:absolute;top:718px;left:10px;white-space:nowrap" class="ft01">Assim, determino: a) o arquivamento do presente processo; b) o encaminhamento desta decisão ao autuado.</p>
+{% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:810px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:836px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:744px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+  {% elif infracao.situacao == "2" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção no terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:352px;left:10px;white-space:nowrap" class="ft01">Não houve apresentação de defesa até a presente data, porém, conforme manifesto da autoridade autuante, foi</p>
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">constatada a limpeza no dia {{ infracao.data_inspecao2|date:"d/m/Y" }}  &#160;as {{ infracao.horario_inspecao2 }}.</p>
+<p style="position:absolute;top:418px;left:10px;white-space:nowrap" class="ft01">Considerando &#160;que &#160;o objetivo da autuação do terreno, conforme descrito pela autoridade autuante é que o res-</p>
+<p style="position:absolute;top:444px;left:10px;white-space:nowrap" class="ft01">ponsável&#160; limpe&#160; o&#160; seu&#160; terreno,&#160; diminuindo&#160; ou eliminando o risco de proliferação de insetos e animais peço-</p>
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">nhentos nas residências dos vizinhos. </p>
+
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft01">Considerando que o responsável pelo terreno agiu de boa fé ao limpar o terreno após recebimento da autuação</p>
+<p style="position:absolute;top:536px;left:10px;white-space:nowrap" class="ft01">e por algum motivo não apresentou a defesa no prazo previsto.</p>
+<p style="position:absolute;top:576px;left:10px;white-space:nowrap" class="ft01">Considerando que um dos princípios &#160;da administração pública conforme artigo 37 da Constituição Federal de</p>
+<p style="position:absolute;top:602px;left:10px;white-space:nowrap" class="ft01">1988 &#160;é &#160;a &#160;moralidade e s.m.j., se aplica a este caso, acolho a manifestação da autoridade autuante e <b>DECIDO</b></p>
+<p style="position:absolute;top:630px;left:10px;white-space:nowrap" class="ft01">pelo arquivamento do Auto de Infração nº {{ infracao.numero_format_ano }} sem aplicação de multa.</p>
+
+       {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:725px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:755px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:670px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "13" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção no terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:352px;left:10px;white-space:nowrap" class="ft01">Não houve apresentação de defesa até a presente data, porém, conforme manifesto da autoridade autuante, foi</p>
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">constatada melhoria quanto a limpeza no dia {{ infracao.data_inspecao2|date:"d/m/Y" }}  &#160;as {{ infracao.horario_inspecao2 }}.</p>
+<p style="position:absolute;top:418px;left:10px;white-space:nowrap" class="ft01">Considerando &#160;que &#160;o objetivo da autuação do terreno, conforme descrito pela autoridade autuante é que o res-</p>
+<p style="position:absolute;top:444px;left:10px;white-space:nowrap" class="ft01">ponsável&#160; limpe&#160; o&#160; seu&#160; terreno,&#160; diminuindo&#160; ou eliminando o risco de proliferação de insetos e animais peço-</p>
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">nhentos nas residências dos vizinhos. </p>
+
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft01">Considerando que o responsável pelo terreno agiu de boa fé ao limpar o terreno &#160;(mesmo&#160; que&#160; não &#160;completa-</p>
+<p style="position:absolute;top:536px;left:10px;white-space:nowrap" class="ft01">mente) após recebimento da autuação e por algum motivo não apresentou a defesa no prazo previsto.</p>
+<p style="position:absolute;top:576px;left:10px;white-space:nowrap" class="ft01">Considerando que um dos princípios &#160;da administração pública conforme artigo 37 da Constituição Federal de</p>
+<p style="position:absolute;top:602px;left:10px;white-space:nowrap" class="ft01">1988 &#160;é &#160;a &#160;moralidade e s.m.j., se aplica a este caso, acolho a manifestação da autoridade autuante e <b>DECIDO</b></p>
+<p style="position:absolute;top:630px;left:10px;white-space:nowrap" class="ft01">pelo arquivamento do Auto de Infração nº {{ infracao.numero_format_ano }} sem aplicação de multa.</p>
+
+           {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:725px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:755px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:670px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "10" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">Foi verificado que houve perda dos prazos constantes na lei, e para evitar erros e injustiças DECIDO pelo ar-</p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">quivamento desta autuação e DETERMINO nova inspeção/ avaliação do terreno para novas providências.</p>
+ {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:355px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:385px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:300px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "3" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do&#160; Auto&#160; de Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente&#160; à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:352px;left:10px;white-space:nowrap" class="ft01">Porém, conforme consultado em nossos registros, o autuado não apresentou defesa ao Auto de Infração.</p>
+
+<p style="position:absolute;top:392px;left:10px;white-space:nowrap" class="ft01">Emitida a manifestação&#160; da autoridade autuante &#160;em {{ infracao.data_manifesto|date:"d/m/Y" }} e considerando toda a documentação até aqui</p>
+
+<p style="position:absolute;top:418px;left:10px;white-space:nowrap" class="ft01">apresentada, resta-me dizer:</p>
+
+
+<p style="position:absolute;top:458px;left:10px;white-space:nowrap" class="ft01">Considerando que não foi apresentada a defesa e de acordo com o relatado pela autoridade &#160;autuante &#160;determi-</p>
+
+<p style="position:absolute;top:484px;left:10px;white-space:nowrap" class="ft01">no: a) a aplicação de penalidade de multa na proporção &#160;de 1% (um por cento) do Valor de Referência do Mu-</p>
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft01">nicípio (VRM) por metro quadrado de terreno, &#160;utilizando com base o Cadastro Imobiliário da Prefeitura; b) o </p>
+<p style="position:absolute;top:536px;left:10px;white-space:nowrap" class="ft01">encaminhamento dos dados do imóvel &#160;ao &#160;setor competente da Prefeitura para a realização da limpeza do ter-</p>
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">reno por meios de serviço de capina mecânica e/ou manual e/ou roçagem do mato manual e/ou mecânica e/ou </p>
+<p style="position:absolute;top:588px;left:10px;white-space:nowrap" class="ft01">remoção de detritos, entulhos, lixos, &#160;pneus, materiais, móveis, carcaças de veículo ou outros objetos que pos-</p>
+<p style="position:absolute;top:614px;left:10px;white-space:nowrap" class="ft01">sam ser fonte de acúmulo de água ou proliferação de &#160;animais peçonhentos, ficando o seu proprietário obriga-</p>
+<p style="position:absolute;top:640px;left:10px;white-space:nowrap" class="ft01">do ao pagamento das despesas efetuadas sem prejuízo &#160;das &#160;penalidades pecuniárias cabíveis; c) o encaminha-</p>
+<p style="position:absolute;top:666px;left:10px;white-space:nowrap" class="ft01">mento desta decisão ao autuado.</p>
+
+               {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:760px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:790px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:706px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "11" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do&#160; Auto&#160; de Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente&#160; à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">Porém, &#160;verificamos &#160;que &#160;houve falha ao identificar os terrenos, gerando assim notificação/autuação indevida </p>
+<p style="position:absolute;top:364px;left:10px;white-space:nowrap" class="ft01">(proprietário errado).</p>
+
+<p style="position:absolute;top:392px;left:10px;white-space:nowrap" class="ft01">Emitida&#160; a&#160; manifestação&#160; da&#160; autoridade autuante &#160;em {{ infracao.data_manifesto|date:"d/m/Y" }} e considerando a necessidade de notificar o</p>
+
+<p style="position:absolute;top:418px;left:10px;white-space:nowrap" class="ft01">proprietário&#160; correto,&#160; DECIDO&#160; pela&#160; anulação deste Auto de Infração e nova autuação para o proprietário do</p>
+<p style="position:absolute;top:444px;left:10px;white-space:nowrap" class="ft01">terreno sujo.</p>
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">Pedimos desculpa pelo ocorrido e transtornos causados.</p>
+
+{% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:575px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:605px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "12" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do&#160; Auto&#160; de Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente&#160; à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">Porém, verificamos que houve transferência de propriedade do terreno no decorrer deste processo.</p>
+<p style="position:absolute;top:364px;left:10px;white-space:nowrap" class="ft01">Considerando a necessidade de notificar o proprietário atual, DECIDO&#160; pela&#160; anulação deste Auto de Infração</p>
+    <p style="position:absolute;top:390px;left:10px;white-space:nowrap" class="ft01">e encaminhamento de nova autuação para o proprietário correto.</p>
+
+    {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:505px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:545px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:440px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+      {% elif infracao.situacao == "4" %}
+
+
+      <h1 style="position:absolute;top:302px;left:200px">Julgamento feito fora do sistema</h1>
+
+
+
+      {% elif infracao.situacao == "5" %}
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; endereço &#160;de correspondência do imóvel em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção no terreno para arquivamento do Auto de Infração.</p>
+
+<p style="position:absolute;top:352px;left:10px;white-space:nowrap" class="ft01">Não &#160;havia sido apresentada defesa até a data de {{ infracao.data_inspecao2|date:"d/m/Y" }}, quando a autoridade autuante constatou a limpe-</p>
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">za do terreno, conforme sua manifestação.</p>
+<p style="position:absolute;top:418px;left:10px;white-space:nowrap" class="ft01">Entretanto, &#160;no&#160; dia&#160; {{ infracao.entrada_protocolo|date:"d/m/Y" }},&#160; o responsável pelo imóvel apresentou defesa ao Auto de Infração, conforme</p>
+<p style="position:absolute;top:444px;left:10px;white-space:nowrap" class="ft01">requerimento {{ infracao.protocolo_defesa }}. </p>
+<p style="position:absolute;top:484px;left:10px;white-space:nowrap" class="ft01">Assim, considerando que o terreno já havia sido limpo em data anterior ao protocolo de defesa, conforme ma-</p>
+
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft01">nifestação&#160; da autoridade autuante, e que o objetivo da autuação do terreno, conforme descrito pela autoridade</p>
+<p style="position:absolute;top:536px;left:10px;white-space:nowrap" class="ft01">autuante é que o responsável limpe o seu terreno, diminuindo ou eliminando o risco de proliferação de insetos</p>
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">e animais peçonhentos nas residências dos vizinhos.</p>
+
+<p style="position:absolute;top:602px;left:10px;white-space:nowrap" class="ft01">Considerando&#160; que o responsável pelo terreno agiu de boa fé ao limpar o terreno após o recebimento da autua- </p>
+<p style="position:absolute;top:630px;left:10px;white-space:nowrap" class="ft01">ção e por algum motivo apresentou a defesa poucos dias após o prazo previsto por lei.</p>
+
+<p style="position:absolute;top:670px;left:10px;white-space:nowrap" class="ft01">Acolho a manifestação da autoridade autuante e <b>DECIDO</b> pelo arquivamento do Auto de Infração sem aplica-</p>
+<p style="position:absolute;top:696px;left:10px;white-space:nowrap" class="ft01">ção da penalidade de multa.</p>
+
+ <p style="position:absolute;top:736px;left:10px;white-space:nowrap" class="ft01">Assim, determino: a) o arquivamento do presente processo; b) o encaminhamento desta decisão ao autuado.</p>
+
+    {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:840px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:876px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:776px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+
+
+{% elif infracao.situacao == "6" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do Auto de Infração nº {{ infracao.numero_format_ano }}  não foi entregue no endereço de correspondência do imóvel</p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">pelo motivo “{{ infracao.status_rastreio }}” segundo AR devolvida pelo Correios. </p>
+
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">Nas situações onde não foi possível entregar a correspondência, é previsto a publicação da notificação através </p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">de &#160;edital &#160; público&#160; no Jornal Oficial do Município. Entretanto conforme manifesto da autoridade autuante foi</p>
+
+<p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">constatada a limpeza no dia {{ infracao.data_inspecao2|date:"d/m/Y" }} as {{ infracao.horario_inspecao2 }}.</p>
+<p style="position:absolute;top:378px;left:10px;white-space:nowrap" class="ft01">Considerando &#160;que &#160;o objetivo da autuação do terreno, conforme descrito pela autoridade autuante é que o res-</p>
+<p style="position:absolute;top:404px;left:10px;white-space:nowrap" class="ft01">ponsável&#160; limpe&#160; o&#160; seu&#160; terreno,&#160; diminuindo&#160; ou eliminando o risco de proliferação de insetos e animais peço-</p>
+<p style="position:absolute;top:430px;left:10px;white-space:nowrap" class="ft01">nhentos nas residências dos vizinhos. </p>
+
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">Acolho a manifestação da autoridade autuante e <b>DECIDO</b> pelo arquivamento do Auto de Infração.</p>
+
+    {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:600px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:636px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+<p style="position:absolute;top:510px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+
+    {% elif infracao.situacao == "7" %}
+
+
+      <h1 style="position:absolute;top:302px;left:200px">Feito edital.</h1>
+
+    {% elif infracao.situacao == "8" %}
+    	<h1 style="position:absolute;top:302px;left:200px">Julgamento no Jornal Oficial</h1>
+
+
+	{% elif infracao.situacao == "9" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;publicada </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; Jornal Oficial do Município em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }} visto que o Correios não conseguiu entregar a carta contendo a </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">Notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; no&#160; endereço&#160; de&#160; correspondência&#160; do&#160; imóvel.&#160; O proprietário teria até dia</p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">{{ infracao.prazo_defesa|date:"d/m/Y" }} para proceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º</p>
+<p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">da Lei Municipal nº 4778/2021 e apresentar defesa solicitando nova inspeção no terreno para arquivamento do</p>
+<p style="position:absolute;top:364px;left:10px;white-space:nowrap" class="ft01">Auto de Infração.
+
+<p style="position:absolute;top:404px;left:10px;white-space:nowrap" class="ft01">Não houve apresentação de defesa até a presente data, porém, conforme manifesto da autoridade autuante, foi</p>
+
+<p style="position:absolute;top:430px;left:10px;white-space:nowrap" class="ft01">constatada a limpeza no dia {{ infracao.data_inspecao2|date:"d/m/Y" }}  &#160;as {{ infracao.horario_inspecao2 }}.</p>
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">Considerando &#160;que &#160;o objetivo da autuação do terreno, conforme descrito pela autoridade autuante é que o res-</p>
+<p style="position:absolute;top:496px;left:10px;white-space:nowrap" class="ft01">ponsável&#160; limpe&#160; o&#160; seu&#160; terreno,&#160; diminuindo&#160; ou eliminando o risco de proliferação de insetos e animais peço-</p>
+<p style="position:absolute;top:522px;left:10px;white-space:nowrap" class="ft01">nhentos nas residências dos vizinhos. </p>
+
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">Considerando que o responsável pelo terreno agiu de boa fé ao limpar o terreno após recebimento da autuação</p>
+<p style="position:absolute;top:588px;left:10px;white-space:nowrap" class="ft01">e por algum motivo não apresentou a defesa no prazo previsto.</p>
+<p style="position:absolute;top:628px;left:10px;white-space:nowrap" class="ft01">Considerando que um dos princípios &#160;da administração pública conforme artigo 37 da Constituição Federal de</p>
+<p style="position:absolute;top:654px;left:10px;white-space:nowrap" class="ft01">1988 &#160;é &#160;a &#160;moralidade e s.m.j., se aplica a este caso, acolho a manifestação da autoridade autuante e <b>DECIDO</b></p>
+<p style="position:absolute;top:680px;left:10px;white-space:nowrap" class="ft01">pelo arquivamento do Auto de Infração nº {{ infracao.numero_format_ano }} sem aplicação de multa.</p>
+{% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:790px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:820px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+
+<p style="position:absolute;top:720px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+    {% elif infracao.situacao == "15" %}
+
+<p style="position:absolute;top:90px;left:170px;white-space:nowrap" class="ft01"><b>JULGAMENTO - AUTO DE INFRAÇÃO Nº {{ infracao.numero_format_ano }}</b></p>
+<p style="position:absolute;top:122px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:122px;left:156px;white-space:nowrap" class="ft03">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} {{ infracao.inspecao.terreno.complemento_terreno.complemento }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</p>
+<p style="position:absolute;top:148px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:148px;left:149px;white-space:nowrap" class="ft02">{{ infracao.inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:148px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:148px;left:369px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:148px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:148px;left:477px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:148px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:148px;left:590px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:174px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:174px;left:104px;white-space:nowrap" class="ft02"> {{ infracao.inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:234px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;publicada </p>
+<p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">no&#160; Jornal Oficial do Município em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }} visto que o Correios não conseguiu entregar a carta contendo a </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">Notificação&#160; do&#160; Auto&#160; de&#160; Infração&#160; no&#160; endereço&#160; de&#160; correspondência&#160; do&#160; imóvel.&#160; O proprietário teria até dia</p>
+<p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">{{ infracao.prazo_defesa|date:"d/m/Y" }}&#160; para&#160; proceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º</p>
+<p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">da Lei Municipal nº 4778/2021 e apresentar defesa solicitando nova inspeção no terreno para arquivamento do</p>
+<p style="position:absolute;top:364px;left:10px;white-space:nowrap" class="ft01">Auto de Infração.
+
+<p style="position:absolute;top:404px;left:10px;white-space:nowrap" class="ft01">Não houve apresentação de defesa até a presente data, porém, conforme manifesto da autoridade autuante, foi</p>
+
+<p style="position:absolute;top:430px;left:10px;white-space:nowrap" class="ft01">constatado que o terreno estava em condições razoáveis no dia {{ infracao.data_inspecao2|date:"d/m/Y" }}  &#160;as {{ infracao.horario_inspecao2 }}.</p>
+<p style="position:absolute;top:470px;left:10px;white-space:nowrap" class="ft01">Considerando &#160;que &#160;o objetivo da autuação do terreno, conforme descrito pela autoridade autuante é que o res-</p>
+<p style="position:absolute;top:496px;left:10px;white-space:nowrap" class="ft01">ponsável&#160; limpe&#160; o&#160; seu&#160; terreno,&#160; diminuindo&#160; ou eliminando o risco de proliferação de insetos e animais peço-</p>
+<p style="position:absolute;top:522px;left:10px;white-space:nowrap" class="ft01">nhentos nas residências dos vizinhos. </p>
+
+<p style="position:absolute;top:562px;left:10px;white-space:nowrap" class="ft01">Considerando que um dos princípios &#160;da administração pública conforme artigo 37 da Constituição Federal de</p>
+<p style="position:absolute;top:588px;left:10px;white-space:nowrap" class="ft01">1988 &#160;é &#160;a &#160;moralidade e s.m.j., se aplica a este caso, acolho a manifestação da autoridade autuante e <b>DECIDO</b></p>
+<p style="position:absolute;top:614px;left:10px;white-space:nowrap" class="ft01">pelo arquivamento do Auto de Infração nº {{ infracao.numero_format_ano }} sem aplicação de multa.</p>
+
+    {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" %}
+
+    <p style="position:absolute;top:720px;left:276px;white-space:nowrap" class="ft02">Guilherme Firmino Duarte</p>
+    <p style="position:absolute;top:750px;left:225px;white-space:nowrap" class="ft02">Referência Técnica da Vigilância Sanitária</p>
+
+    {% endif %}
+
+
+<p style="position:absolute;top:657px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.julgamento|date:"d" }}&#160;de&#160;{{ infracao.julgamento|date:"F" }}&#160;de&#160;{{ infracao.julgamento|date:"Y" }}</p>
+
+
+{% endif %}
+
+
+
+
+<p style="position:absolute;top:1010px;left:48px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Tiradentes,&#160;1011&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
+<p style="position:absolute;top:1030px;left:127px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
+  <img style="position:absolute;top:10.76in;left:0.090in;width:7.40in;height:0.02in" src="{% static 'ci_2.png' %}" />
+
+</section>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,87 @@
+{% extends 'basy.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Lista de Cnaes
+
+<a href="{% url 'criar_cnae' %}" class="btn btn-primary btn-sm">Adicionar cnae</a>
+</h3>
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+	<thead>
+	<tr>
+        <th>Código</th>
+        <th>Descrição</th>
+        <th>Risco</th>
+        <th>Ações</th>
+
+    </tr>
+	</thead>
+	<tbody>
+    {% for cnae in cnaes %}
+    <tr>
+    <td>{{ cnae.codigo_cnae }}</td>
+	<td>{{ cnae.descricao }}</td>
+	<td>{{ cnae.risco_cnae }}</td>
+    <td style="text-align: center">
+            <a href="{% url 'editar_cnae' cnae.id %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a>
+            <a href="{% url 'excluir_cnae' cnae.id %}" class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px;">Deletar</a>
+
+        </td>
+        
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

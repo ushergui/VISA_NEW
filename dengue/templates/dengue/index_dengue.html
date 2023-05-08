@@ -1,0 +1,110 @@
+{% extends 'bases.html' %}
+{% load static %}
+{% block conteudo %}
+
+
+{% if user.perfil.nome_completo %}
+<h3>Bem vindo ao sistema {{ user.perfil.nome_completo }}</h3>
+{% else %}
+<h3>Você precisa completar seu cadastro. Acesse os <a href="{% url 'atualizar-dados' %}">meus dados</a> para atualizar.</h3>
+{% endif %}
+<br>
+
+<div class="row">
+  <div class="col-6">
+    <h4>Agendados por dia</h4>
+    <form class="form-inline" action="{% url 'agendados' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" id="agendados" placeholder="Digite a data do agendamento" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+
+    <br>
+    <h4>Total de notificações das últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'listar_notificacoes_gerais' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+    <br>
+      <h4>Agendamentos motorista</h4>
+<form class="form-inline" action="{% url 'motorista' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-sm" type="text" id="motorista" name="q" placeholder="Digite a data do agendamento" size="58">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+  </div>
+
+  <div class="col-6">
+    <h4>Positivos das últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'listar_notificacoes' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+
+    <br>
+    <h4>Notificações por bairro nas últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'total_bairros' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+
+      <br>
+    <h4>Pesquisar por nome, endereço ou SINAM</h4>
+    <form class="form-inline" action="{% url 'pesquisar_notificacoes' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite o nome ou endereço ou ou SINAM" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+
+  </div>
+</div>
+<br>
+<h4>Boletim de dengue</h4>
+<form class="form-inline" action="{% url 'boletim_resumo' %}" method="get">
+    <div class="form-group">
+        <label for="year" class="mr-2">Ano:</label>
+        <input type="number" name="year" id="year" value="{{ ano_pesquisa }}" class="form-control-sm mr-4">
+    </div>
+    <div class="form-group">
+        <label for="q" class="mr-2">Semana epidemiológica:</label>
+        <input type="number" name="q" id="q" value="{{ termo_pesquisa }}" class="form-control-sm mr-4">
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<br>
+
+<h4>Notificações nas últimas 4 semanas epidemiológicas</h4>
+<form class="form-inline" action="{% url 'semana_epidemiologica' %}" method="get">
+    <div class="form-group">
+        <label for="year" class="mr-2">Ano:</label>
+        <input type="number" name="year2" id="year2" value="{{ ano_pesquisa }}" class="form-control-sm mr-4">
+    </div>
+    <div class="form-group">
+        <label for="week" class="mr-2">Semana:</label>
+        <input type="number" name="week" id="week" min="1" max="52" value="{{ semana_pesquisa }}" class="form-control-sm mr-4">
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Pesquisar</button>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+        $('#motorista').mask("00/00/0000");
+        $('#agendados').mask("00/00/0000");
+});
+</script>
+{% endblock %}

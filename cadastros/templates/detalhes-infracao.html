@@ -1,0 +1,33 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+
+<div class="container-fluid py-5 ">
+<h1 style="position:absolute;top:70px;">Detalhes do Auto de Infração nº {{ infracao.numero_format_ano }} <a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 " >Voltar</a> </h1>
+    <br>
+
+<h4 style="position:absolute;top:140px;">Inscrição Imobiliária: {{ infracao.inspecao.terreno.inscricao }}&#160;&#160;&#160;&#160;
+    Proprietário: {{ infracao.inspecao.terreno.proprietario }}&#160;&#160;&#160;&#160;Endereço: {{ infracao.inspecao.terreno.logradouro_terreno.tipo }}
+    {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} -
+    {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}
+ </h4>
+
+    <h4 style="position:absolute;top:175px;">Protocolo: {{ infracao.inspecao.protocolo }}&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+    Fiscal: {{ infracao.inspecao.fiscal }}    &#160;&#160;&#160;&#160;&#160;&#160;&#160;Data da inspeção:
+    {{ infracao.inspecao.data_inspecao1|date:"d/m/Y" }}&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+    <a href="{% url 'gerar_auto' pk=infracao.pk %}" target="_blank">Auto de Infração</a>&#160;&#160;&#160;&#160;
+        &#160;&#160;&#160;<a href="{% url 'cadastrar-AR' infracao.pk %}"
+    target="_blank">Cadastrar AR individual</a>
+
+    </h4>
+    <h4 style="position:absolute;top:210px;">Data de recebimento da AR: {% if infracao.data_entrega_autuacao == None %} Não entregue {% else %} {{ infracao.data_entrega_autuacao }} {% endif %}&#160;&#160;&#160;&#160;Protocolo de defesa: {% if infracao.protocolo_defesa == None %} Não defendeu {% else %} {{ infracao.protocolo_defesa }} {% endif %}
+
+    </h4>
+
+    <img src='{{ infracao.inspecao.foto_inspecao_1.url }}' style="position:absolute;left:590px;top:350px;height:450px;width:700px" />
+
+
+</div>
+{% endblock %}

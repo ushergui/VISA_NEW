@@ -1,0 +1,77 @@
+{% extends 'modelo-ifpr.html' %}
+{% load static %}
+{% block conteudo %}
+<h3>Feriados e Recessos
+
+<a href="{% url 'novo_feriado' %}" class="btn btn-primary btn-sm">Novo Feriado/Recesso</a>
+</h3>
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feriado in object_list %}
+                <tr>
+                    <td>{{ feriado.data|date:"d/m/Y" }}</td>
+                    <td>{{ feriado.descricao }}</td>
+                    <td>{{ feriado.tipo }}</td>
+                    <td>
+                        <a href="{% url 'editar_feriado' feriado.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                        <a href="{% url 'excluir_feriado' feriado.pk %}" class="btn btn-danger btn-sm">Excluir</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+</div>
+
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

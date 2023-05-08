@@ -1,0 +1,49 @@
+{% extends 'bases.html' %}
+{% block extra_css %}
+<style>
+    .custom-table tr td, .custom-table tr th {
+        height: 25px; /* Ajuste esse valor conforme a altura desejada */
+        padding: 2px 8px; /* Ajuste o espaçamento interno das células */
+    }
+    h3 {
+        margin-top: -25px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
+    }
+    h4 {
+        margin-top: 30px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
+    }
+    .small-table {
+        width: auto; /* Ajusta a largura da tabela para se ajustar ao conteúdo */
+        margin: 0 auto; /* Centraliza a tabela na página */
+    }
+</style>
+{% endblock %}
+
+{% block conteudo %}
+
+<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a></h3></div>
+<div align="center"><h3>USF com pacientes agendados na data {{ termo_pesquisa }}</h3></div>
+<br><br>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped custom-table small-table">
+    <thead>
+        <tr>
+            <th>USF</th>
+            <th>Total Agendamentos</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for agendamento in agendamentos %}
+            <tr>
+                <td>{{ agendamento.usf }}</td>
+                <td>{{ agendamento.total_agendamentos }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

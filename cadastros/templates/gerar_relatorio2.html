@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" >
+<head>
+<title>Relatório de Inspeção</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+<style>@page { size: A4 }</style>
+<style type="text/css">
+ .ft06{font-size:20px;font-family:BAAAAA+Arial;color:#000000;
+}
+
+</style>
+<!--<style type="text/css">
+
+	p {margin: 0; padding: 0;}	.ft00{font-size:18px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft01{font-size:15px;font-family:BAAAAA+Arial;color:#000000;}
+	.ft02{font-size:15px;font-family:CAAAAA+ArialMT;color:#000000;body {
+  background-color: #FFFFFF;
+}}
+
+</style>-->
+</head>
+<body class="A4">
+<section class="sheet padding-10mm">
+<img src="{% static 'a.png' %}" style="float:left;width:70px"/>
+
+
+
+
+<div id="page1-div" style="position:relative;width:793px;height:1122px;">
+<p style="position:absolute;top:-30px;left:131px;white-space:nowrap" class="ft00"><b>PREFEITURA MUNICIPAL DE SÃO SEBASTIÃO DO PARAÍSO</b></p>
+<p style="position:absolute;top:-11px;left:260px;white-space:nowrap" class="ft00"><b>Secretaria Municipal de Saúde</b></p>
+<p style="position:absolute;top:09px;left:233px;white-space:nowrap" class="ft00"><b>Departamento de Vigilância em Saúde</b></p>
+<p style="position:absolute;top:32px;left:260px;white-space:nowrap" class="ft00"><b>Divisão de Vigilância Sanitária</b></p>
+<p style="position:absolute;top:61px;left:232px;white-space:nowrap" class="ft06"><b>RELATÓRIO DE INSPEÇÃO</b></p>
+<p style="position:absolute;top:106px;left:10px;white-space:nowrap" class="ft01"><b>Endereço do imóvel: </b></p>
+<p style="position:absolute;top:106px;left:156px;white-space:nowrap" class="ft02">{{ inspecao.terreno.logradouro_terreno.tipo }}&#160;{{ inspecao.terreno.logradouro_terreno.logradouro }}, {{ inspecao.terreno.numero_terreno }} {{ inspecao.terreno.complemento_terreno }} - {{ inspecao.terreno.logradouro_terreno.bairro.bairro }}</p>
+<p style="position:absolute;top:132px;left:10px;white-space:nowrap" class="ft01"><b>Inscrição cadastral: </b></p>
+<p style="position:absolute;top:132px;left:149px;white-space:nowrap" class="ft02">{{ inspecao.terreno.inscricao}}</p>
+<p style="position:absolute;top:132px;left:305px;white-space:nowrap" class="ft01"><b>Quadra:</b></p>
+<p style="position:absolute;top:132px;left:369px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.quadra }} </p>
+<p style="position:absolute;top:132px;left:435px;white-space:nowrap" class="ft01"><b>Lote:</b></p>
+<p style="position:absolute;top:132px;left:477px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.lote }}</p>
+<p style="position:absolute;top:132px;left:544px;white-space:nowrap" class="ft01"><b>Área:</b></p>
+<p style="position:absolute;top:132px;left:590px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.area }} m²</p>
+<p style="position:absolute;top:158px;left:10px;white-space:nowrap" class="ft01"><b>Proprietário:</b></p>
+<p style="position:absolute;top:158px;left:104px;white-space:nowrap" class="ft02"> {{ inspecao.terreno.proprietario.nome_proprietario }} </p>
+<p style="position:absolute;top:186px;left:10px;white-space:nowrap" class="ft01"><b>Protocolo:</b></p>
+<p style="position:absolute;top:186px;left:84px;white-space:nowrap" class="ft02"> {{ inspecao.protocolo }} </p>
+<p style="position:absolute;top:186px;left:305px;white-space:nowrap" class="ft01"><b>Dia:</b></p>
+<p style="position:absolute;top:186px;left:338px;white-space:nowrap" class="ft02"> {{ inspecao.data_inspecao1|date:"d/m/Y" }} </p>
+<p style="position:absolute;top:186px;left:435px;white-space:nowrap" class="ft01"><b>Horário:</b></p>
+<p style="position:absolute;top:186px;left:499px;white-space:nowrap" class="ft02"> {{ inspecao.horario_inspecao1 }}h </p>
+
+<p style="position:absolute;top:220px;left:10px;white-space:nowrap" class="ft01"><b>Fundamentação Legal:</b></p>
+<p style="position:absolute;top:246px;left:10px;white-space:nowrap" class="ft01">Lei Municipal nº 4778/2011 – Dispõe sobre a Limpeza de Terrenos Baldios no Município de São Sebastião do </p>
+<p style="position:absolute;top:271px;left:10px;white-space:nowrap" class="ft01">Paraíso e dá outras providências.</p>
+<p style="position:absolute;top:305px;left:10px;white-space:nowrap" class="ft01"><b>Desenvolvimento</b></p>
+ <p style="position:absolute;top:329px;left:10px;white-space:nowrap" class="ft01">Em inspeção ao terreno acima identificado, ficou constatado presença de mato alto caracterizando terreno sujo.</p>
+ <img src='{{ inspecao.foto_inspecao_1.url }}' style="position:absolute;top:400px;left:80px;height:400px" />
+ <p style="position:absolute;top:824px;left:10px;white-space:nowrap" class="ft01"><b>Conclusão: </b> Considerando que o terreno está sujo, será lavrado o auto de infração.</p>
+ <p style="position:absolute;top:865px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,&#160;
+  {{ inspecao.data_relatorio1|date:"d" }}&#160;de&#160;{{ inspecao.data_relatorio1|date:"F" }}&#160;de&#160;{{ inspecao.data_relatorio1|date:"Y" }}</p>
+{% if inspecao.fiscal.nome_fiscal == "GUILHERME FIRMINO DUARTE" %}
+ <p style="position:absolute;top:930px;left:220px;white-space:nowrap" class="ft02"><b>{{ inspecao.fiscal.nome_fiscal }} </b></p>
+<p style="position:absolute;top:956px;left:259px;white-space:nowrap" class="ft02"><b>{{ inspecao.fiscal.nivel }} </b></p>
+{% endif %}
+
+<p style="position:absolute;top:1022px;left:8px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Dr.&#160;Placidino&#160;Brigagão,&#160;1230&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
+<p style="position:absolute;top:1040px;left:140px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
+  <img style="position:absolute;top:10.76in;left:0.090in;width:7.40in;height:0.02in" src="{% static 'ci_2.png' %}" />
+
+</section>
+</div>
+</body>
+</html>

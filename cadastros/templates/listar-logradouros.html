@@ -1,0 +1,93 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Lista de logradouros</h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
+
+<a href="{% url 'cadastrar-logradouro' %}" class="btn btn-primary btn-sm">Adicionar logradrouro</a>
+
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+    <thead>
+    <tr>
+        <th>Tipo</th>
+        <th>Logradouro</th>
+        <th>Bairro</th>
+        <th>CEP</th>
+        <th>Opções</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for logradouro in object_list %}
+    <tr>
+        <td>{{ logradouro.tipo }}</td>
+        <td>{{ logradouro.nome_logradouro }}</td>
+        <td>{{ logradouro.bairro.nome_bairro }}</td>
+        <td>{{ logradouro.cep }}</td>
+        <td>
+            <a href="{% url 'editar-logradouro' logradouro.pk %}" class="btn btn-warning btn-sm" title="Editar">
+            Editar
+            </a>
+            <a href="{% url 'deletar-logradouro' logradouro.pk %}" class="btn btn-danger btn-sm" title="Excluir">
+            Excluir
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,57 @@
+{% extends 'bases.html' %}
+{% block conteudo %}
+{% if termo_pesquisa %}
+    <div align="center"><h3>Você pesquisou pelas últimas 4 semanas a partir da semana: "{{ termo_pesquisa }}"</h3></div>
+{% endif %}
+<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a></h3></div>
+<div align="center"><h3>Boletim Dengue</h3></div>
+<style>
+    .custom-table {
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .custom-table th {
+        width: 50%;
+    }
+</style>
+    <table class="table table-striped custom-table">
+        <thead>
+            <tr>
+                <th>Motivo</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Casos positivos</td>
+                <td>{{ total_casos_positivos }}</td>
+            </tr>
+            <tr>
+                <td>Casos negativos</td>
+                <td>{{ total_casos_negativos }}</td>
+            </tr>
+            <tr>
+                <td>Aguardando (coleta, agendamento e resultado)</td>
+                <td>{{ total_aguardando }}</td>
+            </tr>
+            <tr>
+                <td>Faltas/recusas</td>
+                <td>{{ total_faltas_recusa }}</td>
+            </tr>
+            <tr>
+                <td>Internações</td>
+                <td>{{ total_internacao }}</td>
+            </tr>
+            <tr>
+                <td>Óbitos</td>
+                <td>{{ total_obito }}</td>
+            </tr>
+            <tr>
+                <td>Total de notificações</td>
+                <td>{{ total_notificacoes }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

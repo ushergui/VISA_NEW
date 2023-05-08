@@ -1,0 +1,89 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+<h3>Terrenos que foram multados
+
+</h3>
+
+<hr>
+<div class="table responsive">
+<table class="table table-striped table-hover table-condensed" id="tabela-listar">
+    <thead>
+    <tr>
+        <th style="font-size:11px" class="text-center">Auto</th>
+        <th style="font-size:11px" class="text-center">Inscrição Imob.</th>
+        <th style="font-size:11px" class="text-center">Quadra</th>
+        <th style="font-size:11px" class="text-center">Lote</th>
+        <th style="font-size:11px" class="text-center">Área</th>
+        <th style="font-size:11px" class="text-center">Endereço</th>
+        <th style="font-size:11px" class="text-center">Julgamento</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    {% for infracao in object_list %}
+    <tr>
+        <td style="font-size:10px" class="text-center">{{ infracao.numero_format_ano }}</td>
+	<td style="font-size:10px" >{{ infracao.inspecao.terreno.inscricao }}</td>
+        <td style="font-size:10px" class="text-center">{{ infracao.inspecao.terreno.quadra }}</td>
+        <td style="font-size:10px" class="text-center">{{ infracao.inspecao.terreno.lote }}</td>
+        <td style="font-size:10px" class="text-center">{{ infracao.inspecao.terreno.area }}</td>
+	<td style="font-size:10px" class="text-center">{{ infracao.inspecao.terreno.logradouro_terreno.tipo }} {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }} </td>
+        <td style="font-size:10px" class="text-center">{{ infracao.julgamento|date:"F" }}/{{ infracao.julgamento|date:"Y" }}</td>
+
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 100,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

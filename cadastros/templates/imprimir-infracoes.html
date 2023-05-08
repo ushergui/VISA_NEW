@@ -1,0 +1,113 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% block conteudo %}
+{% if termo_pesquisa %}
+    <div align="center"><h3>Você pesquisou pelo termo: "{{ termo_pesquisa }}"</h3></div>
+{% endif %}
+
+<h3>Lista dos autos de infração <a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
+
+</h3>
+<hr>
+<div class="table responsive">
+
+<table class="table table-striped table-sm table-hover" id="tabela-listar">
+
+    <thead>
+    <tr>
+        
+    <th class="text-center" style="font-size:12px">Auto </th>
+	<th class="text-center" style="font-size:12px">Imóvel</th>
+	<th class="text-center" style="font-size:12px">Proprietário</th>
+	<th class="text-center" style="font-size:12px">Valor da multa</th>
+	<th class="text-center" style="font-size:12px">Data do auto</th>
+    <th class="text-center" style="font-size:12px">Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for infracao in object_list %}
+    <tr>
+		
+    <td style="font-size:11px"  class="text-center">{{ infracao.numero_format_ano }} </td>
+
+
+	<td style="font-size:11px">{{ infracao.inspecao.terreno.inscricao }} - {{ infracao.inspecao.terreno.logradouro_terreno.tipo }} {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}</td>
+    <td style="font-size:11px"  class="text-center">{{ infracao.inspecao.terreno.proprietario }} </td>
+    <td style="font-size:11px"  class="text-center">
+    {% if infracao.situacao == "3" or infracao.situacao == "8" %}
+    {{ infracao.vrm }}
+    {% elif infracao.julgamento == None %}
+    *{{ infracao.vrm }}
+	{% else %}
+
+	{% endif %}
+         </td>
+    <td style="font-size:11px"  class="text-center">{{ infracao.data_auto|date:"d/m/Y" }} </td>
+
+
+	<td style="font-size:11px"  class="text-center">
+	{% if infracao.situacao == "3" or infracao.situacao == "8" %}
+    Multado
+    {% elif infracao.julgamento == None %}
+    Não finalizado
+	{% else %}
+    Arquivado
+	{% endif %}
+    </td>
+
+    {% empty %}
+        <tr>
+            <td colspan="3">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+
+</tbody>
+</table>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [[ 14, "desc" ]],
+            "pageLength":50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

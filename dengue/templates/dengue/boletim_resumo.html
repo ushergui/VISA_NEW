@@ -1,0 +1,173 @@
+{% extends 'bases.html' %}
+{% block extra_css %}
+<style>
+    .chart-container {
+        height: 400px;
+        width: 100%;
+    }
+    .custom-table tr td, .custom-table tr th {
+        height: 25px; /* Ajuste esse valor conforme a altura desejada */
+        padding: 2px 8px; /* Ajuste o espaçamento interno das células */
+    }
+    h3 {
+        margin-top: -35px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
+    }
+    h4 {
+        margin-top: -35px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
+    }
+</style>
+{% endblock %}
+{% block conteudo %}
+{% if termo_pesquisa %}
+    <div align="left"><h4>Você pesquisou pelas últimas 4 semanas a partir da semana: "{{ termo_pesquisa }}"</h4></div>
+{% endif %}
+<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a></h3></div>
+<div align="center"><h3>Boletim Dengue</h3></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped custom-table">
+        <thead>
+            <tr>
+                <th></th>
+                {% for resultado in resultado_agrupado %}
+                    <th>{{ resultado.semana_epidemiologica }}</th>
+                {% endfor %}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Casos positivos</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.casos_positivos }}</td>
+                {% endfor %}
+                <td>{{ total_casos_positivos }}</td>
+            </tr>
+            <tr>
+                <td>Casos negativos</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.casos_negativos }}</td>
+                {% endfor %}
+                <td>{{ total_casos_negativos }}</td>
+            </tr>
+            <tr>
+                <td>Aguardando</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.aguardando }}</td>
+                {% endfor %}
+                <td>{{ total_aguardando }}</td>
+            </tr>
+            <tr>
+                <td>Faltas/Recusa</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.faltas_recusa }}</td>
+                {% endfor %}
+                <td>{{ total_faltas_recusa }}</td>
+            </tr>
+            <tr>
+                <td>Internações</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.total_internacao }}</td>
+                {% endfor %}
+                <td>{{ total_internacao }}</td>
+            </tr>
+            <tr>
+                <td>Óbitos</td>
+                {% for resultado in resultado_agrupado %}
+                    <td>{{ resultado.total_obito }}</td>
+                {% endfor %}
+                <td>{{ total_obito }}</td>
+            </tr>
+        </tbody>
+   </table>
+        </div>
+        <div class="col-md-12">
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<script>
+    const labels = [{% for resultado in resultado_agrupado %}'{{ resultado.semana_epidemiologica }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+    const casos_positivos = [{% for resultado in resultado_agrupado %}{{ resultado.casos_positivos }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const casos_negativos = [{% for resultado in resultado_agrupado %}{{ resultado.casos_negativos }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const aguardando = [{% for resultado in resultado_agrupado %}{{ resultado.aguardando }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const faltas_recusa = [{% for resultado in resultado_agrupado %}{{ resultado.faltas_recusa }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const internacoes = [{% for resultado in resultado_agrupado %}{{ resultado.total_internacao }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const obitos = [{% for resultado in resultado_agrupado %}{{ resultado.total_obito }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Casos positivos',
+                data: casos_positivos,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: false,
+            }, {
+                label: 'Casos negativos',
+                data: casos_negativos,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: false,
+            }, {
+    label: 'Aguardando',
+    data: aguardando,
+    borderColor: 'rgba(153, 102, 255, 1)',
+    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+    fill: false,
+}, {
+    label: 'Faltas/Recusa',
+    data: faltas_recusa,
+    borderColor: 'rgba(255, 159, 64, 1)',
+    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+    fill: false,
+},{
+    label: 'Internações',
+    data: internacoes,
+    borderColor: 'rgba(54, 162, 235, 1)',
+    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+    fill: false,
+}, {
+    label: 'Óbitos',
+    data: obitos,
+    borderColor: 'rgba(153, 102, 255, 1)',
+    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+    fill: false,
+}]
+        },
+        options: {
+            maintainAspectRatio: false,
+            height: 700,
+            plugins: {
+                datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 5,
+                    font: {
+                        size: 14
+                    }
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 1
+                    }
+                }]
+            }
+        }
+    });
+</script>
+{% endblock %}

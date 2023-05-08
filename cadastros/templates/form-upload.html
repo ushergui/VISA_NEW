@@ -1,0 +1,183 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+<h3> {{ titulo }}</h3>
+<p class="lead">
+    Preencha todos os campos obrigatórios.
+</p>
+
+
+<hr>
+<form action="" method="POST" enctype="multipart/form-data">
+
+    {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
+
+        {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
+    fields, por isto escrever desta forma. -->
+
+    <button type="submit" onclick="return Verificar()" class="btn btn-primary">
+       {{ botao }}
+    </button>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+function preencherDataAtual() {
+        var dataRelatorio1 = document.getElementById("id_data_relatorio1");
+        var dataAtual = new Date().toLocaleDateString('pt-BR');
+        dataRelatorio1.value = dataAtual;
+    }
+
+
+
+    $(document).ready(function(){
+        $("#id_cep").mask("00.000-000");
+        $("#id_inscricao").mask("00.00.000.0000.000");
+        $("#id_data_inspecao1").mask("00/00/0000");
+        $("#id_data_relatorio1").mask("00/00/0000");
+        $('#id_horario_inspecao1').mask('00:00');
+        $('#id_entrada_protocolo').mask("00/00/0000");
+        $('#id_data_auto').mask("00/00/0000");
+		$('#id_data_entrega_autuacao').mask("00/00/0000");
+        $('#id_prazo_defesa').mask("00/00/0000");
+		$('#id_prazo_manifesto').mask("00/00/0000");
+		$('#id_data_inspecao2').mask("00/00/0000");
+		$('#id_horario_inspecao2').mask("00:00");
+		$('#id_data_manifesto').mask("00/00/0000");
+		$('#id_julgamento').mask("00/00/0000");
+		$('#id_produtidade_inspecao').mask("00/00/0000");
+        $('#id_protocolo_defesa').mask("SSS-00000/00");
+       
+
+   
+
+
+    });
+
+    $(document).ready(function(){
+        $('#id_estado').select2();
+        $('#id_tipo').select2();
+        $('#id_cidade').select2();
+        $('#id_bairro').select2();
+        $('#id_logradouro_proprietario').select2();
+        $('#id_logradouro_terreno').select2();
+        $('#id_logradouro_correspondencia').select2();
+        $('#id_proprietario').select2();
+        $('#id_tipo_de_imovel').select2();
+        $('#id_solicitante_protocolo').select2();
+        $('#id_logradouro').select2();
+        $('#id_status_protocolo').select2();
+        $('#id_protocolo').select2();
+        $('#id_fiscal').select2();
+        $('#id_terreno').select2();
+        $('#id_inspecao').select2();
+    });
+
+    function Verificar() {
+    var limpo = document.getElementById('id_limpo');
+    var value = limpo.options[limpo.selectedIndex].value;
+
+    var selectMato = document.getElementById('id_mato');
+    var valueMato = selectMato.options[selectMato.selectedIndex].value;
+
+    var selectEntulho = document.getElementById('id_entulho');
+    var valueEntulho = selectEntulho.options[selectEntulho.selectedIndex].value;
+
+    var selectLixo = document.getElementById('id_lixo');
+    var valueLixo = selectLixo.options[selectLixo.selectedIndex].value;
+
+    var selectCarcaca = document.getElementById('id_carcaca');
+    var valueCarcaca = selectCarcaca.options[selectCarcaca.selectedIndex].value;
+
+    var selectMaterial = document.getElementById('id_material');
+    var valueMaterial = selectMaterial.options[selectMaterial.selectedIndex].value;
+
+    var selectPneu = document.getElementById('id_pneu');
+    var valuePneu = selectLixo.options[selectPneu.selectedIndex].value;
+
+    var selectOutro = document.getElementById('id_outro');
+    var valueOutro = selectOutro.options[selectOutro.selectedIndex].value;
+
+    var selectMovel = document.getElementById('id_movel');
+    var valueMovel = selectMovel.options[selectMovel.selectedIndex].value;
+	
+
+
+
+	if ((value == "LIMPO" || value == "RAZOAVEL") && (valueMato =="X" || valueEntulho =="X" || valueLixo=="X" || valueCarcaca=="X" || valueMaterial=="X" || valuePneu=="X" || valueOutro=="X" || valueMovel=="X")){
+	alert("O terreno não pode ser considerado limpo ou razoável e ao mesmo tempo ruim! Revise e altere!");
+        return false;
+    }
+    else if((value == "LIMPO" || value == "RAZOAVEL") && (valueMato !="X" || valueEntulho !="X" || valueLixo!="X" || valueCarcaca!="X" || valueMaterial!="X" || valuePneu!="X" || valueOutro!="X" || valueMovel!="X")){
+    }
+    else if((value != "LIMPO" || value != "RAZOAVEL") && (valueMato =="X" || valueEntulho =="X" || valueLixo=="X" || valueCarcaca=="X" || valueMaterial=="X" || valuePneu=="X" || valueOutro=="X" || valueMovel=="X")){
+    }
+    else if((value != "LIMPO" || value != "RAZOAVEL") && (valueMato !="X" || valueEntulho !="X" || valueLixo!="X" || valueCarcaca!="X" || valueMaterial!="X" || valuePneu!="X" || valueOutro!="X" || valueMovel!="X")){
+    alert("Você deve escolher a situação que o terreno se encontra!");
+        return false;
+
+    }
+
+
+
+   }
+
+var dataRelatorio1 = document.getElementById("id_data_relatorio1");
+var produtidade_inspecao = document.getElementById("id_produtidade_inspecao");
+var dataAtual = new Date();
+var dia = dataAtual.getDate().toString().padStart(2, '0');
+var mes = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
+var ano = dataAtual.getFullYear();
+var dataFormatada = dia + '/' + mes + '/' + ano;
+
+dataRelatorio1.value = dataFormatada;
+produtidade_inspecao.value = dataFormatada;
+console.log(dataRelatorio1);
+console.log(produtidade_inspecao);
+
+
+
+
+
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+<script>
+document.getElementById("id_foto_inspecao_1").addEventListener("change", function() {
+  var fileInput = this;
+  var file = fileInput.files[0];
+  var reader = new FileReader();
+  reader.onload = function() {
+    EXIF.getData(file, function() {
+      var dateTime = EXIF.getTag(this, "DateTimeOriginal");
+      if (dateTime) {
+        var date = dateTime.substring(0, 10);
+        var dateCorrigida = new Date(date.replace(/:/g, "/"));
+        var dateCorrigidaBr = dateCorrigida.toLocaleDateString("pt-BR");
+        var time = dateTime.substring(11, 16);
+        document.getElementById("id_data_inspecao1").value = dateCorrigidaBr;
+        console.log(date);
+        console.log(dateCorrigidaBr);
+        document.getElementById("id_horario_inspecao1").value = time;
+        console.log(time);
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+
+
+</script>
+
+
+
+{% endblock %}

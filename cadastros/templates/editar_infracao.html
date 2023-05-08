@@ -1,0 +1,114 @@
+{% extends 'modelo-ifpr.html' %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+<h3> {{ titulo }}</h3>
+<p>Auto(s) de Infração que será(ão) afetado(s): {{ numeros_relacionados }}</p>
+<p class="lead">
+    Preencha todos os campos obrigatórios.
+</p>
+
+<hr>
+<form action="" method="POST">
+    {% csrf_token %}
+
+    {{ form|crispy }}
+
+    <h3 id="valorConvertido1"></h3>
+    <button type="submit" onclick="return Verificar()" class="btn btn-primary">
+    {{ botao }}
+    </button>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+
+    $(document).ready(function(){
+        $("#id_cep").mask("00.000-000");
+        $("#id_inscricao").mask("00.00.000.0000.000");
+        $("#id_data_inspecao1").mask("00/00/0000");
+        $('#id_entrada_protocolo').mask("00/00/0000");
+        $('#id_data_auto').mask("00/00/0000");
+        $('#id_data').mask("00/00/0000");
+		$('#id_prazo_manifesto').mask("00/00/0000");
+		$('#id_prazo_defesa').mask("00/00/0000");
+		$('#id_data_entrega_autuacao').mask("00/00/0000");
+        $('#id_prazo_defesa').mask("00/00/0000");
+        $('#id_prazo_manifesto').mask("00/00/0000");
+        $('#id_data_inspecao2').mask("00/00/0000");
+        $('#id_horario_inspecao2').mask("00:00");
+        $('#id_data_manifesto').mask("00/00/0000");
+        $('#id_julgamento').mask("00/00/0000");
+        $('#id_encerramento_protocolo').mask("00/00/0000");
+        $('#id_data_entrega_julgamento').mask("00/00/0000");
+        $('#id_produtividade_infracao').mask("00/00/0000");
+        $('#id_produtividade_manifesto').mask("00/00/0000");
+        $('#id_protocolo_defesa').mask("SSS-00000/00");
+		$('#id_protocolo').mask("SSS-00000/00");
+		$('#id_rastreio_julgamento').mask("SS000000000SS");
+        $('#id_rastreio_infracao').mask("SS000000000SS");
+
+		$('#id_estado').select2();
+        $('#id_tipo').select2();
+        $('#id_cidade').select2();
+        $('#id_bairro').select2();
+        $('#id_logradouro_proprietario').select2();
+        $('#id_logradouro_terreno').select2();
+        $('#id_logradouro_correspondencia').select2();
+        $('#id_proprietario').select2();
+        $('#id_tipo_de_imovel').select2();
+        $('#id_solicitante_protocolo').select2();
+        $('#id_logradouro').select2();
+        $('#id_status_protocolo').select2();
+        $('#id_infracao').select2();
+        $('#id_fiscal').select2();
+        $('#id_terreno').select2();
+        $('#id_inspecao').select2();
+    });
+
+
+document.getElementById("id_data_entrega_autuacao").addEventListener("keyup", function () {
+    const dataEntregaAutuacao = this.value.split('/').reverse().join('-');
+
+    if (dataEntregaAutuacao && dataEntregaAutuacao.length === 10) {
+        fetch(`/calcular_prazo_defesa?data_entrega_autuacao=${dataEntregaAutuacao}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.prazo_defesa) {
+                    document.getElementById("id_prazo_defesa").value = data.prazo_defesa;
+                } else {
+                    console.error(data.error);
+                }
+            })
+            .catch((error) => console.error(error));
+    } else {
+        document.getElementById("id_prazo_defesa").value = "";
+    }
+});
+
+	function calcularPrazoDefesa() {
+        const dataEntregaAutuacaoField = document.getElementById("{{ form.data_entrega_autuacao.auto_id }}");
+        const dataEntregaAutuacao = dataEntregaAutuacaoField.value;
+
+        if (dataEntregaAutuacao) {
+            const url = new URL("/calcular_prazo_defesa", window.location.origin);
+            url.searchParams.append("data_entrega_autuacao", dataEntregaAutuacao);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById("{{ form.prazo_defesa.auto_id }}").value = data.prazo_defesa;
+                    }
+                });
+        }
+    }
+</script>
+{% endblock %}

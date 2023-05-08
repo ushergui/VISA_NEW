@@ -1,0 +1,61 @@
+{% extends 'modelo-ifpr.html' %}
+
+
+{% block conteudo %}
+
+{% if user.perfil.nome_completo %}
+<h3>Bem vindo ao sistema {{ user.perfil.nome_completo }}</h3>
+{% else %}
+<h3>Você precisa completar seu cadastro. Acesse os <a href="{% url 'atualizar-dados' %}">meus dados</a> para atualizar.</h3>
+{% endif %}
+
+<br>
+<br>
+<h2>Buscar inspeção</h2>
+<form class="form-inline" action="{% url 'listar-inspecoes' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-lg" type="text" name="q" placeholder="Digite parte do protocolo, fiscal, inscrição, endereço ou proprietário" size="67">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+
+<br>
+<br>
+
+<h2>Buscar infração</h2>
+<form class="form-inline" action="{% url 'listar-infracoes' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-lg" type="text" name="q" placeholder="Digite parte do protocolo, fiscal, auto de infração, inscrição, endereço ou proprietário" size="67">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+
+{% if user.perfil.nome_completo == "Guilherme Firmino Duarte"%}
+<br>
+<br>
+<h2>Buscar produtividade terrenos limpos</h2>
+<form class="form-inline" action="{% url 'listar-produtividades' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-lg" type="text" name="q" placeholder="Digite parte do protocolo, fiscal, inscrição, endereço ou proprietário" size="67">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+<br>
+<br>
+<h2>Buscar produtividade terrenos sujos</h2>
+
+<form class="form-inline" action="{% url 'listar-produtividades2' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-lg" type="text" name="q" placeholder="Digite parte do protocolo, fiscal, auto de infração, inscrição, endereço ou proprietário" size="67">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+
+
+{% else %}
+
+{% endif %}
+
+
+
+{% endblock %}
