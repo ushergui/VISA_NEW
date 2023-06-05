@@ -1,5 +1,4 @@
 {% extends 'basy.html' %}
-
 {% load static %}
 
 {% block conteudo %}
@@ -14,15 +13,21 @@
 	<tr>
         <th>Razão Social</th>
         <th>Nome Fantasia</th>
+        <th>Ações</th>
 
 
     </tr>
 	</thead>
 	<tbody>
-    {% for empresa in object_list %}
+    {% for empresa in empresas %}
     <tr>
         <td>{{ empresa.razao }}</td>
 	    <td>{{ empresa.nome_fantasia }}</td>
+        <td>
+            <a href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a>
+            <a href="{% url 'editar_empresa' empresa.id %}">Editar</a>
+            <a href="{% url 'excluir_empresa' empresa.id %}">Excluir</a>
+        </td>
 
 
         

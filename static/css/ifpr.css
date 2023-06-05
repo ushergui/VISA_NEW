@@ -2,6 +2,22 @@
 /* 
 Cores do IFPR 
 */
+.form-container {
+    background-color: #76a2ce; /* Este é um tom de azul claro, você pode alterá-lo de acordo com suas necessidades */
+    width: 33.33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    margin: auto; /* isso centraliza o formulário */
+    padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+    border-radius: 5px; /* Isso faz com que as bordas do formulário sejam levemente arredondadas */
+}
+
+@media screen and (max-width: 768px) {
+    .form-container {
+        background-color: #76a2ce; /* Este é um tom de azul claro, você pode alterá-lo de acordo com suas necessidades */
+        width: 100%;
+        padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+        border-radius: 5px; /* Isso faz com que as bordas do formulário sejam levemente arredondadas */
+    }
+}
 .bg-ifpr {
     background-color: #007834;
 }
@@ -64,6 +80,12 @@ Personalização da Barra de menu pra ficar igual do site
 */
 .navbar {
     padding: 0 !important;
+}
+
+.navbar .container {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
 }
 
 .navbar .navbar-brand{

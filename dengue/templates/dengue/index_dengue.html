@@ -48,6 +48,7 @@
     </form>
 
     <br>
+	
     <h4>Notificações por bairro nas últimas 4 semanas</h4>
     <form class="form-inline" action="{% url 'total_bairros' %}" method="get">
       <div class="form-group mx-sm-1 mb-2">
@@ -91,11 +92,21 @@
     </div>
     <div class="form-group">
         <label for="week" class="mr-2">Semana:</label>
-        <input type="number" name="week" id="week" min="1" max="52" value="{{ semana_pesquisa }}" class="form-control-sm mr-4">
+		<input type="number" name="q2" id="week" min="1" max="52" value="{{ semana_pesquisa }}" class="form-control-sm mr-4">
+
     </div>
     <button type="submit" class="btn btn-primary btn-sm">Pesquisar</button>
 </form>
+<br>
+<h4>Positivos por bairro nas últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'total_bairros_positivos' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
 
+      <br>
 {% endblock %}
 
 {% block scripts %}

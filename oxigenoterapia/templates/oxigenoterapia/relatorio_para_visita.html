@@ -1,0 +1,85 @@
+{% extends 'oxigenoterapia/base.html' %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<div class="table-container"></div>
+<h3 class="center-title">Lista para visita oxigenoterapia</h3>
+
+<form class="form-inline" action="{% url 'relatorio_para_visita' %}" method="get">
+    <div class="form-group">
+        <label for="q3" class="mr-2">USF</label>
+        <select name="usf" id="q3" class="form-control-sm mr-4">
+            <option value="">--Escolha uma USF--</option>
+            {% for usf in usfs %}
+                <option value="{{ usf.id }}" {% if usf_pesquisa == usf.id %} selected {% endif %}>{{ usf.nome_fantasia_usf }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+
+    <div class="form-group">
+        <label for="q4" class="mr-2">Equipamento</label>
+        <select name="equipamento" id="q4" class="form-control-sm mr-4">
+            <option value="">--Escolha um equipamento--</option>
+            {% for equip in equipamentos %}
+                <option value="{{ equip }}" {% if equipamento_pesquisa == equip %} selected {% endif %}>{{ equip }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <input type="hidden" name="busca_submetida" value="true">
+    <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+</form>
+
+{% if busca_submetida %}
+    <div class="table-container table-responsive" style="margin-top: 30px;"></div>
+    <table class="table table-striped" id="tabela-pacientes" style="font-size: 15px;">
+            <thead>
+                <tr>
+                    <th>Prontuário</th>
+                    <th>Paciente</th>
+                    <th>Telefone 1</th>
+                    <th>Telefone 2</th>
+                    <th>Endereço</th>
+                    <th>USF</th>
+                    <th>CID</th>
+                    <th>Equipamento(s)</th>
+                    <th>Modo de Uso</th>
+                    <th>Parâmetros</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for modo in modos_uso %}
+                <tr>
+                    <td>{{ modo.paciente.prontuario_paciente }}</td>
+                    <td>{{ modo.paciente.nome_paciente|capitalize_name }}</td>
+                    <td>{% if modo.paciente.telefone_paciente1 %}{{ modo.paciente.telefone_paciente1 }}</td>{% else %}{% endif %}</td>
+                    <td>{% if modo.paciente.telefone_paciente2 %}{{ modo.paciente.telefone_paciente2 }}</td>{% else %}{% endif %}</td>
+                    <td>{{ modo.paciente.logradouro_paciente.tipo|capitalize_name }} {{ modo.paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ modo.paciente.numero_paciente }} {% if modo.paciente.complemento_paciente %} {{ modo.paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ modo.paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                    <td>{{ modo.paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+                    <td>{{ modo.cid.codigo_doenca }}</td>
+                    <td>
+                        {% for equip in modo.equipamento.all %}
+                            {{ equip.nome_equipamento }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            None
+                        {% endfor %}
+                    </td>
+                    <td>{{ modo.tempo_de_uso }}</td>
+                    <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'relatorio_para_visita_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+            </a>
+        </div>
+{% else %}
+    <!-- Aqui você pode colocar alguma mensagem indicando que a tabela só será exibida após a busca. -->
+{% endif %}
+
+{% endblock %}

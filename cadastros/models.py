@@ -1,3 +1,5 @@
+import datetime
+from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 #Pra deixar cada um ver somente aquilo que cadastrou, exemplo pra usar: Produtividade
@@ -74,6 +76,7 @@ class Logradouro (models.Model):
     tipo = models.CharField(max_length=22, null=False, choices=TIPOS_CHOICES)
     bairro=models.ForeignKey(Bairro, on_delete=models.PROTECT)
     cep = models.CharField(max_length=13, verbose_name="CEP")
+    
     def __str__(self):
         return "{} {} - {} - {}".format(self.tipo, self.nome_logradouro, self.bairro, self.cep)
     def save(self, *args, **kwargs):
@@ -363,6 +366,13 @@ class Inspecao(models.Model):
         else:
             return " "
 
+class ValorVRM(models.Model):
+    ano = models.PositiveIntegerField(unique=True)
+    valor = models.DecimalField(max_digits=10, decimal_places=4)
+
+    def __str__(self):
+        return f'{self.ano} - {self.valor}'
+
 
 class Infracao(models.Model):
     inspecao = models.ForeignKey(Inspecao, on_delete=models.PROTECT, verbose_name='Inspeção')
@@ -425,6 +435,7 @@ class Infracao(models.Model):
         ("13", "Não defendeu e limpou (razoável)"),
         ("14", "Defendeu e limpou (razoável)"),
         ("15", "Não defendeu e limpou (razoável) via Edital"),
+        ("16", "Defendeu e indicou possuidor")
 
     )
     situacao = models.CharField(blank=True, null=True, max_length=25, choices=SITUACAO_CHOICES, verbose_name="Situação")
@@ -436,19 +447,28 @@ class Infracao(models.Model):
     produtividade_manifesto = models.DateField(null=True,blank=True, verbose_name="Qual o mês (data) da produtividade do manifesto?")
     
     
-
-    def vrm(self):
+    @property
+    def get_vrm(self):
         data = self.data_auto
         ano = data.year
-        vrmAtual = 0
-        if ano == 2022:
-            vrmAtual = 2.1972
-        if ano == 2023:
-            vrmAtual = 2.3589
-            
-        vrm = self.inspecao.terreno.area * vrmAtual
-        return str(f'{round(vrm, 2):.2f}'.replace('.',','))
-
+        vrmAtual = Decimal(0)
+        if ano <= 2023:
+            if ano == 2022:
+                vrmAtual = Decimal(2.1972)
+            if ano == 2023:
+                if data < datetime.date(2023, 6, 3):
+                    vrmAtual = Decimal(2.3589)
+                else:
+                    vrmAtual = Decimal(2.3589) * 2
+        else:
+            try:
+                vrmAno = ValorVRM.objects.get(ano=ano)
+                vrmAtual = vrmAno.valor * Decimal(0.02)
+            except ValorVRM.DoesNotExist:
+                raise ValueError(f"Não há um VRM cadastrado para o ano {ano}.")
+        area = Decimal(self.inspecao.terreno.area)
+        vrm = area * vrmAtual
+        return round(vrm, 2)
 
 
     def get_sequencial(self):
@@ -466,8 +486,6 @@ class Infracao(models.Model):
         ano = data.year
         return f'{str(self.numero).zfill(4)}/{str(ano)}'
 
-
-
     def save(self, *args, **kwargs):
         if self.numero is None or self.numero == '':
             self.numero = self.get_sequencial()
@@ -479,6 +497,11 @@ class Infracao(models.Model):
         super(Infracao, self).save(*args, **kwargs)
     class Meta:
         verbose_name_plural = 'Infrações'
+    @property
+    def is_pre_june_2023(self):
+        print(self.data_auto)
+        print(datetime.date(2023, 6, 2))
+        return self.data_auto <= datetime.date(2023, 6, 2)
 
 
     def __str__(self):
@@ -495,3 +518,4 @@ class FeriadoRecesso(models.Model):
 
     def __str__(self):
         return f'{self.data} - {self.descricao} - {self.tipo}'
+

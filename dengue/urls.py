@@ -5,6 +5,7 @@ urlpatterns = [
     path('notificacoes/', views.listar_notificacoes, name='listar_notificacoes'),
     path('notificacoes_gerais/', views.listar_notificacoes_gerais, name='listar_notificacoes_gerais'),
     path('total_bairros/', views.total_bairros, name='total_bairros'),
+    path('total_bairros_positivos/', views.total_bairros_positivos, name='total_bairros_positivos'),
     path('notificacoes/criar/', views.criar_notificacao, name='criar_notificacao'),
     path('notificacoes/editar/<int:pk>/', views.editar_notificacao, name='editar_notificacao'),
     path('notificacoes/deletar/<int:pk>/', views.deletar_notificacao, name='deletar_notificacao'),

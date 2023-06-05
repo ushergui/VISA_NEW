@@ -1,0 +1,80 @@
+{% extends 'oxigenoterapia/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block conteudo %}
+
+<div class="table-container"></div>
+<h3 class="center-title">Aparelhos alugados </h3>
+
+<form class="form-inline" action="{% url 'aparelhos_alugados' %}" method="get">
+    <div class="form-group">
+        <label for="q1" class="mr-2">Mês (em número)</label>
+        <input type="number" name="mes" id="q1" value="{{ mes }}" class="form-control-sm mr-4" min="1" max="12" required>
+    </div>
+    <div class="form-group">
+        <label for="q2" class="mr-2">Ano</label>
+        <input type="number" name="ano" id="q2" value="{{ ano }}" class="form-control-sm mr-4" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+</form>
+
+
+<p>Se você deixar o mês e o ano em branco, o sistema listará todos os pacientes, independentemente do mês/ano.</p>
+
+
+{% if pacientes %}
+<div class="counters">
+    <p>CPAP: {{ cpap_count }}</p>
+    <p>BiPAP: {{ bipap_count }}</p>
+    <p>VENTILADOR: {{ ventilador_count }}</p>
+</div>
+    <div class="table-container table-responsive" style="margin-top: 30px;"></div>
+    <table class="table table-striped" id="tabela-pacientes" style="font-size: 15px;">
+        <tbody>
+            <tr>
+                <th>Nome do paciente</th>
+                <th>Equipamentos em Uso</th>
+                <th>Status</th>
+                <th>Data do óbito</th>        
+                <th>Data da alta</th>        
+                
+
+            </tr>
+            {% for modo_uso in pacientes %}
+                <tr>
+                    <td>{{ modo_uso.paciente.nome_paciente|capitalize_name }}</td>
+                    <td>
+                        {% for equipamento in modo_uso.equipamento.all %}
+                            {{ equipamento.nome_equipamento }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ modo_uso.paciente.status }}</td>
+                    {% if modo_uso.paciente.data_obito|date:"d/m/Y" %}
+                    <td>{{ modo_uso.paciente.data_obito|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% if modo_uso.paciente.data_alta|date:"d/m/Y" %}
+                    <td>{{ modo_uso.paciente.data_alta|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    
+                </tr>
+                
+            {% endfor %}
+            
+        </tbody>
+    </table>
+    <div class="text-center mt-4">
+        <a href="{% url 'aparelhos_alugados_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-file-pdf"></i> Gerar PDF
+        </a>
+    </div>
+
+{% else %}
+    <!-- Aqui você pode colocar alguma mensagem indicando que a tabela só será exibida após a busca. -->
+{% endif %}
+
+{% endblock %}

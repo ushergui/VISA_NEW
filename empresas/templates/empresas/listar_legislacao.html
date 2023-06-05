@@ -1,0 +1,76 @@
+{% extends 'basy.html' %}
+{% load static %}
+
+{% block conteudo %}
+<h3>Lista de Legislação
+
+<a href="{% url 'criar_legislacao' %}" class="btn btn-primary btn-sm">Adicionar legislação</a>
+</h3>
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+	<thead>
+	<tr>
+        <th>Legislação</th>
+
+
+    </tr>
+	</thead>
+	<tbody>
+    {% for legislacao in object_list %}
+    <tr>
+        <td>{{ legislacao.lei }}</td>
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="1">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

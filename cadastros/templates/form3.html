@@ -1,4 +1,5 @@
 {% block conteudo %}
+<div class="form-container">
 <h3> {{ titulo }}</h3>
 <p class="lead">
     Preencha todos os campos obrigatórios.
@@ -9,7 +10,7 @@
     <input type="hidden" name="inspecao.terreno.proprietario.nome_proprietario" value="{{ nome_proprietario }}">
     <button type="submit">Editar Todos</button>
 </form>
-
+</div>
 {% endblock %}
 {% block scripts %}
 <script>

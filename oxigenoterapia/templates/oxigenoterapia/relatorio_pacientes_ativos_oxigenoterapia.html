@@ -1,0 +1,75 @@
+{% extends 'oxigenoterapia/base.html' %}
+
+{% block conteudo %}
+<div class="table-container"></div>
+<h3 class="center-title">Última visita - Pacientes de Oxigenoterapia</h3>
+
+<form class="form-inline" action="{% url 'relatorio_pacientes_ativos_oxigenoterapia' %}" method="get">
+    <div class="form-group">
+        <label for="q3" class="mr-2">Fisioterapeuta</label>
+        <select name="fisioterapeuta" id="q3" class="form-control-sm mr-4">
+            <option value="">--Escolha um fisioterapeuta--</option>
+            {% for fisio in fisioterapeutas %}
+                <option value="{{ fisio.primeiro_nome_fisioterapeuta }}" {% if fisioterapeuta_pesquisa == fisio.primeiro_nome_fisioterapeuta %} selected {% endif %}>{{ fisio.primeiro_nome_fisioterapeuta }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+</form>
+
+{% if fisioterapeuta_pesquisa %}
+    {% if pacientes %}
+
+    <div class="table-container table-responsive" style="margin-top: 30px;"></div>
+    <table class="table table-striped" id="tabela-pacientes" style="font-size: 15px;">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>USF</th>
+                    <th>Data da última visita</th>
+                    <th>Total de dias desde a última visita</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paciente in pacientes %}
+                    <tr>
+                        <td>{{ paciente.nome_paciente }}</td>
+                        <td>{{ paciente.usf_paciente.nome_fantasia_usf }}</td>
+                        {% if paciente.data_ultima_visita != "-----------------" %}
+                        <td>{{ paciente.data_ultima_visita|date:"d/m/Y" }}</td>
+                        {% else %}
+                        <td>{{ paciente.data_ultima_visita }}</td>
+                        {% endif %}
+                        <td>{{ paciente.total_dias_ultima_visita }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'relatorio_pacientes_ativos_oxigenoterapia_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+            </a>
+        </div>
+    {% else %}
+    <div class="table-container table-responsive" style="margin-top: 30px;"></div>
+    <table class="table table-striped" id="tabela-pacientes" style="font-size: 15px;">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>USF</th>
+                <th>Data da última visita</th>
+                <th>Total de dias desde a última visita</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="5">Nenhum paciente encontrado.</td>
+            </tr>
+        </tbody>
+    </table>   
+</div> 
+    {% endif %}
+{% endif %}
+
+{% endblock %}

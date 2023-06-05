@@ -27,6 +27,8 @@ urlpatterns = [
     path('', include('core.urls')),
     path('', include('usuarios.urls')),
     path('', include('dengue.urls')),
+    path('', include('oxigenoterapia.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 
 ]
 if settings.DEBUG:

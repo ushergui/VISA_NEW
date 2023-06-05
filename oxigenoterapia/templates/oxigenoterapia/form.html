@@ -1,0 +1,84 @@
+{% extends 'oxigenoterapia/base.html' %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+
+{% block conteudo %}
+<div class="form-container">
+<h3 class="text-center"> {{ titulo }}</h3>
+<hr>
+<form action="" method="POST">
+
+    {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
+
+    {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
+    fields, por isto escrever desta forma. -->
+
+
+    <button type="submit" class="btn btn-primary center-button">
+        {{ botao }}
+    </button>
+    
+
+</form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+
+    $(document).ready(function(){
+        $('#id_cpf_paciente').mask("000.000.000-00");
+        $('#id_logradouro_paciente').select2();
+        $('#id_usf_paciente').select2();
+        $('#id_equipamento').select2();
+        $('#id_nascimento_paciente').mask("00/00/0000");
+        $('#id_data_inicio_uso').mask("00/00/0000");
+        $('#id_data_atendimento').mask("00/00/0000");
+        $('#id_data_obito').mask("00/00/0000");
+        $('#id_data_alta').mask("00/00/0000");
+        
+        var $codigoDoenca = $('#id_codigo_doenca');
+        $codigoDoenca.mask('S00').on('keyup', function() {
+            var textoMaiusculo = $(this).val().toUpperCase();
+            $(this).val(textoMaiusculo);
+
+            if ($(this).val().replace(/\W/g, '').length >= 3) {
+                $(this).unmask().mask('S00.0');
+            } else {
+                $(this).unmask().mask('S00');
+            }
+        });
+
+        $('#id_prontuario_paciente').mask('000000', {
+            'translation': {
+                0: { pattern: /[0-9*]/ }
+            }
+        }).on('input', function() {
+            var numero = $(this).val().replace(/\D/g, '');
+            if (numero.length > 6) {
+                $(this).val(numero.substring(0, numero.length - 1));
+            }
+        });
+
+        var behavior = function (val) {
+            return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+        },
+        options = {
+            onKeyPress: function (val, e, field, options) {
+                field.mask(behavior.apply({}, arguments), options);
+            }
+        };
+        $('#id_telefone_paciente1').mask(behavior, options);
+        $('#id_telefone_paciente2').mask(behavior, options);
+
+        $('#id_nome_paciente').on('keyup', function() {
+            var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+            $(this).val(textoSemAcentos);
+        });
+    });
+</script>
+{% endblock %}

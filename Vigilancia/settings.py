@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'cadastros.apps.CadastrosConfig',
     'empresas.apps.EmpresasConfig',
     'dengue.apps.DengueConfig',
+    'oxigenoterapia.apps.OxigenoterapiaConfig',
     'core.apps.CoreConfig',
     'usuarios.apps.UsuariosConfig',
     'crispy_forms',
+    'ckeditor',
     'django_cleanup.apps.CleanupConfig'
 
     #nome-do-app.apps.nome-do-app-Config
@@ -76,7 +78,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'custom_filters': 'cadastros.templatestags.custom_filters',
-                'crispy_forms_filters': 'cadastros.templatestags.crispy_forms_filters',
+                'my_crispy_forms_filters': 'cadastros.templatestags.my_crispy_forms_filters',
             },
         },
     },
@@ -87,7 +89,7 @@ WSGI_APPLICATION = 'Vigilancia.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -105,7 +107,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-"""
+
 #}
 # DATABASES = {
 #  'default': {
@@ -137,7 +139,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -148,9 +149,6 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 
 USE_TZ = True
-
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -181,3 +179,5 @@ DATE_INPUT_FORMATS = [
     '%d de %b de %Y'#, '%d de %b, %Y',   # '25 de Out de 2006', '25 Out, 2006'
     '%d de %B de %Y'#, '%d de %B, %Y',   # '25 de Outubro de 2006', '25 de Outubro, 2006'
 ]
+
+CKEDITOR_UPLOAD_PATH = "uploads/"

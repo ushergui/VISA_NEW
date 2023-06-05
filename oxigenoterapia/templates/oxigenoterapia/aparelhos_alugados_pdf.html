@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load custom_filters %}
+<html>
+<head>
+    <title>Relatório de Pacientes Ativos em Ventilação</title>
+    <style>
+        table { font-size: 12px; text-align: center; width: 100%; }
+
+        td, th { padding: 5px; }
+    </style>
+</head>
+<body>
+
+    
+
+<div class="table-container"></div>
+<h3 class="center-title">Aparelhos alugados no mês de {{ mes }} do ano de {{ ano }}-> CPAP: {{ cpap_count }} - BiPAP: {{ bipap_count }} - Ventilador: {{ ventilador_count }}
+</h3>
+
+
+<table class="table table-striped" style="font-size: 12px;">
+        <tbody>
+            <tr>
+                <th>Nome do paciente</th>
+                <th>Equipamentos em Uso</th>
+                <th>Status</th>
+                <th>Data do óbito</th>        
+                <th>Data da alta</th>        
+                
+
+            </tr>
+            {% for modo_uso in pacientes %}
+                <tr>
+                    <td>{{ modo_uso.paciente.nome_paciente|capitalize_name }}</td>
+                    <td>
+                        {% for equipamento in modo_uso.equipamento.all %}
+                            {{ equipamento.nome_equipamento }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ modo_uso.paciente.status }}</td>
+                    {% if modo_uso.paciente.data_obito|date:"d/m/Y" %}
+                    <td>{{ modo_uso.paciente.data_obito|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    {% if modo_uso.paciente.data_alta|date:"d/m/Y" %}
+                    <td>{{ modo_uso.paciente.data_alta|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
+                    
+                </tr>
+                
+            {% endfor %}
+            
+        </tbody>
+    </table>
+</body>
+</html>

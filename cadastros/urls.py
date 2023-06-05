@@ -1,11 +1,11 @@
 from django.urls import path #Estou pegando do módulo django
 
 from .views import EstadoCreate, CidadeCreate, BairroCreate, LogradouroCreate, \
-    ProprietarioCreate, TerrenoCreate, ProtocoloCreate, FiscalCreate, InspecaoCreate, InfracaoCreate, ProdutividadeUpdate, InspecaoDetalhes, InfracaoDetalhes, InfracaoPrintList  # ReinspecaoCreate
+    ProprietarioCreate, TerrenoCreate, ProtocoloCreate, FiscalCreate, InspecaoCreate, InfracaoCreate, ProdutividadeUpdate, InspecaoDetalhes, InfracaoDetalhes, InfracaoPrintList, VRMCreate
 
 from .views import EstadoUpdate, CidadeUpdate, BairroUpdate, LogradouroUpdate, \
     ProprietarioUpdate, TerrenoUpdate, ProtocoloUpdate, FiscalUpdate, InspecaoUpdate, InfracaoUpdate, \
-    DefesasCreate, ReinspecoesCreate, ARJulgamento, gerenciar_defesa, ARCreate
+    DefesasCreate, ReinspecoesCreate, ARJulgamento, gerenciar_defesa, ARCreate, VRMUpdate
 
 from .views import EstadoDelete, CidadeDelete, BairroDelete, LogradouroDelete, \
     ProprietarioDelete, TerrenoDelete, ProtocoloDelete, FiscalDelete, InspecaoDelete, InfracaoDelete
@@ -58,7 +58,7 @@ urlpatterns = [
     path('deletar/logradouro/<int:pk>/', LogradouroDelete.as_view(), name="deletar-logradouro"),
     path('deletar/proprietario/<int:pk>/', ProprietarioDelete.as_view(), name="deletar-proprietario"),
     path('deletar/terreno/<int:pk>/', TerrenoDelete.as_view(), name="deletar-terreno"),
-    path('deletar/pr                                                                                                                                                                            otocolo/<int:pk>/', ProtocoloDelete.as_view(), name="deletar-protocolo"),
+    path('deletar/protocolo/<int:pk>/', ProtocoloDelete.as_view(), name="deletar-protocolo"),
     path('deletar/fiscal/<int:pk>/', FiscalDelete.as_view(), name="deletar-fiscal"),
     path('deletar/inspecao/<int:pk>/', InspecaoDelete.as_view(), name="deletar-inspecao"),
     path('deletar/infracao/<int:pk>/', InfracaoDelete.as_view(), name="deletar-infracao"),
@@ -109,5 +109,11 @@ urlpatterns = [
     path('feriados/excluir/<int:pk>/', views.FeriadoRecessoDelete.as_view(), name='excluir_feriado'),
     path('editar_infracao/<int:pk>/', views.editar_infracao, name='editar_infracao'),
     path('gerenciar_defesa/<int:pk>/', views.gerenciar_defesa, name='gerenciar_defesa'),
+
+    path('vrm/', views.vrm_list, name='vrm_list'),
+    path('vrm/create/', VRMCreate.as_view(), name='vrm_create'),
+    path('vrm/update/<int:pk>/', VRMUpdate.as_view(), name='vrm_update'),
+    path('vrm/delete/<int:pk>/', views.vrm_delete, name='vrm_delete'),
+
 ]
 

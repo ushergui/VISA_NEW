@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatório de Pacientes Ativos em Oxigenoterapia</title>
+    <style>
+        table { font-size: 12px; text-align: center; width: 100%; }
+        th { background-color: #f5f5f5; }
+        td, th { padding: 5px; }
+    </style>
+</head>
+<body>
+    <h3>Relatório de Pacientes Ativos em Oxigenoterapia {% if fisioterapeuta_pesquisa %} - Fisioterapeuta: {{ fisioterapeuta_pesquisa }}{% endif %}</h3>
+    <table class="table table-striped" style="font-size: 10px;">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>USF</th>
+                <th>Data da última visita</th>
+                <th>Total de dias desde o último atendimento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in pacientes %}
+                <tr>
+                    <td>{{ paciente.nome_paciente }}</td>
+                    <td>{{ paciente.usf_paciente.nome_fantasia_usf }}</td>
+                    {% if paciente.data_ultima_visita != "-----------------" %}
+                    <td>{{ paciente.data_ultima_visita|date:"d/m/Y" }}</td>
+                    {% else %}
+                    <td>{{ paciente.data_ultima_visita }}</td>
+                    {% endif %}
+                    <td>{{ paciente.total_dias_ultima_visita }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </body>
+</html>

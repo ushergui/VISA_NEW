@@ -1,0 +1,75 @@
+{% extends 'basy.html' %}
+{% load static %}
+
+{% block conteudo %}
+  <h2>Protocolos da Empresa</h2>
+  <div class="table-responsive">
+    <table class="table" id="tabela-listar">
+      <thead>
+        <tr>
+          <th>Número do Protocolo</th>
+          <th>Empresa</th>
+          <th>Observações</th>
+          <th>Status do Protocolo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for protocolo in protocolos %}
+          <tr>
+            <td>{{ protocolo.numero_protocolo }}</td>
+            <td>{{ protocolo.empresa }}</td>
+            <td>{{ protocolo.observacoes_protocolo }}</td>
+            <td>{{ protocolo.status_protocolo }}</td>
+            <td>
+              <a class="btn btn-info" href="{% url 'editar_protocolo' protocolo.id %}">Editar</a>
+              <a class="btn btn-danger" href="{% url 'excluir_protocolo' protocolo.id %}">Excluir</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

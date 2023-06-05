@@ -11,7 +11,14 @@
 <style type="text/css">
  .ft06{font-size:20px;font-family:BAAAAA+Arial;color:#000000;
 }
-
+.print-only {
+     display: block;
+ }
+ @media print {
+     .print-only {
+         display: none;
+     }
+ }
 </style>
 <!--<style type="text/css">
 
@@ -125,6 +132,39 @@
 </div>
 
          <p style="position:absolute;top:868px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
+  {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
+
+  {% elif infracao.situacao == "16" %}
+
+<p style="position:absolute;top:168px;left:10px;white-space:nowrap" class="ft01"><b>Responsável por apresentar a defesa:</b></p>
+<p style="position:absolute;top:168px;left:268px;white-space:nowrap" class="ft02"> {{ infracao.quem }} </p>
+
+
+<p style="position:absolute;top:198px;left:10px;white-space:nowrap" class="ft01">O responsável acima apresentou defesa ao Auto de Inf. nº {{ infracao.numero_format_ano }}, &#160;conforme requerimento {{ infracao.protocolo_defesa }}</p>
+<p style="position:absolute;top:224px;left:10px;white-space:nowrap" class="ft01">de {{ infracao.entrada_protocolo|date:"d/m/Y" }}, contendo os documentos relacionados &#160;no art. 9º da Lei Municipal nº 4778/2021. &#160;A defesa foi</p>
+<p style="position:absolute;top:250px;left:10px;white-space:nowrap" class="ft01">apresentada &#160;no prazo estabelecido &#160;no art. 8º da Lei Municipal &#160;nº 4778/2021, considerando que a notificação</p>
+<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">do Auto de Infração foi entregue em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}.</p>
+<p style="position:absolute;top:302px;left:10px;white-space:nowrap" class="ft01">Em&#160; sua&#160; defesa,&#160; o&#160; responsável&#160; apresenta documentos que comprovam a venda do terreno e solicita anulação</p>
+<p style="position:absolute;top:328px;left:10px;white-space:nowrap" class="ft01">do Auto de Infração.</p>
+<p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft01">Considerando&#160; que&#160; foi&#160; comprovada&#160; a&#160; venda&#160; do imóvel e indicado o possuidor do terreno, sou pelo arquiva-</p>
+<p style="position:absolute;top:380px;left:10px;white-space:nowrap" class="ft01">mento&#160; do&#160; presente&#160; Auto&#160; de Infração e realização de nova inspeção no terreno para avaliar a situação atual e</p>
+<p style="position:absolute;top:406px;left:10px;white-space:nowrap" class="ft01">necessidade de notificação/autuação do possuidor.</p>
+
+    <p style="position:absolute;top:432px;left:10px;white-space:nowrap" class="ft01">Esta é a manifestação.</p>
+
+    <div style="position: absolute; top: 522px; left: 0px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -27%);">
+    {{ infracao.inspecao.fiscal.nome_fiscal|capitalize_name }}
+  </p>
+</div>
+
+<div style="position: absolute; top: 554px; left: 0px; width: 704px;">
+  <p style="text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -27%);">
+    Mat.{{ infracao.inspecao.fiscal.matricula_fiscal }} - {{ infracao.inspecao.fiscal.nivel }}
+  </p>
+</div>
+
+         <p style="position:absolute;top:458px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
   {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
 
 	 {% elif infracao.situacao == "2" %}
@@ -477,11 +517,10 @@
 
          <p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft02">São&#160;Sebastião&#160;do&#160;Paraíso,
   {{ infracao.data_manifesto|date:"d" }}&#160;de&#160;{{ infracao.data_manifesto|date:"F" }}&#160;de&#160;{{ infracao.data_manifesto|date:"Y" }}</p>
+  {% else %}
 
+  <h1 style="position:absolute;top:302px;left:82px">Algo errado não está certo! Falar com o Guilherme</h1>
 	 {% endif %}
-
-
-
 
      {% if infracao.inspecao.fiscal.nome_fiscal != "GUILHERME FIRMINO DUARTE" and infracao.situacao != "4" or infracao.situacao != "7"   %}
 
@@ -498,7 +537,9 @@
      {% endif %}
 
 
-
+     <div class="print-only" style="position: absolute; top: 40%; left: 48%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 90px; color: rgba(0, 0, 0, 0.5);">
+      Imprimir uma só via
+    </div>
 
 <p style="position:absolute;top:1010px;left:35px;white-space:nowrap" class="ft02">Divisão&#160;de&#160;Vigilância&#160;Sanitária&#160;–&#160;Rua&#160;Tiradentes,&#160;1011&#160;–&#160;Centro&#160;–&#160;São&#160;Sebastião&#160;do&#160;Paraíso&#160;–&#160;MG</p>
 <p style="position:absolute;top:1030px;left:110px;white-space:nowrap" class="ft02">Telefone&#160;(35)3539-5003&#160;–&#160;e-mail&#160;vigilancia.saude@ssparaiso.mg.gov.br</p>
@@ -506,6 +547,7 @@
 
 </section>
 </div>
+
 </body>
 </html>
 

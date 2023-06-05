@@ -1,7 +1,8 @@
 from django import forms
-from .models import Logradouro, Bairro, Proprietario, Logradouro, Protocolo, Terreno, Inspecao, Infracao, FeriadoRecesso
+from .models import Logradouro, Bairro, Proprietario, Logradouro, Protocolo, Terreno, Inspecao, Infracao, FeriadoRecesso, ValorVRM
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
+from django.core.exceptions import ValidationError
 
 
 class LogradouroForm(forms.ModelForm):
@@ -108,6 +109,102 @@ class InfracaoUpdateForm(forms.ModelForm):
                   'rastreio_julgamento', 'status_rastreio_julgamento', 'data_entrega_julgamento', 'produtividade_infracao',
                   'produtividade_manifesto', 'email']
 
+class ReinspecaoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+
+        if instance and instance.pk:
+            if instance.status_rastreio != 'ENTREGUE':
+                self.fields['situacao'].choices = (
+                    ("", "---------"),
+                    ("6", "Não recebeu e limpou"),
+                    ("4", "Manifesto e julgamento fora do sistema"),
+                    ("11", "Erro na identificação"),
+                    ("12", "Mudança do proprietário no decorrer do processo")
+                )
+            elif instance.status_rastreio == 'ENTREGUE' and not instance.protocolo_defesa:
+                self.fields['situacao'].choices = (
+                    ("", "---------"),
+                    ("2", "Não defendeu e limpou"),
+                    ("13", "Não defendeu e limpou (razoável)"),
+                    ("3", "Não defendeu e não limpou"),
+                    ("4", "Manifesto e julgamento fora do sistema"),
+                    ("8", "Não defendeu e não limpou via Edital"),
+                    ("9", "Não defendeu e limpou via Edital"),
+                    ("15", "Não defendeu e limpou (razoável) via Edital"),
+                    ("10", "Perda de prazo"),
+                    ("11", "Erro na identificação"),
+                    ("12", "Mudança do proprietário no decorrer do processo")
+                )
+            elif instance.status_rastreio == 'ENTREGUE' and instance.protocolo_defesa:
+                self.fields['situacao'].choices = (
+                    ("", "---------"),
+                    ("1", "Defendeu e limpou"),
+                    ("14", "Defendeu e limpou (razoável)"),
+                    ("4", "Manifesto e julgamento fora do sistema"),
+                    ("5", "Defendeu após o prazo e limpou"),
+                    ("10", "Perda de prazo"),
+                    ("11", "Erro na identificação"),
+                    ("12", "Mudança do proprietário no decorrer do processo"),
+                    ("16", "Defendeu e indicou possuidor")
+                )
+            else:
+                self.fields['situacao'].choices = (
+                    ("", "---------"),
+                    ("4", "Manifesto e julgamento fora do sistema"),
+                    ("10", "Perda de prazo"),
+                    ("11", "Erro na identificação"),
+                    ("12", "Mudança do proprietário no decorrer do processo"),
+                )
+
+    class Meta:
+        model = Infracao
+        fields = ['numero_format_ano', 'foto_inspecao_2', 'data_inspecao2', 'horario_inspecao2', 'data_manifesto',
+                  'produtividade_manifesto', 'situacao', 'julgamento']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        situacao = cleaned_data.get('situacao')
+        data_manifesto = cleaned_data.get('data_manifesto')
+        julgamento = cleaned_data.get('julgamento')
+        data_inspecao2 = cleaned_data.get('data_inspecao2')
+        produtividade_manifesto = cleaned_data.get('produtividade_manifesto')
+
+        # Checar se a situacao foi preenchida e se as datas foram deixadas em branco
+        if situacao and situacao != "" and (not data_manifesto or not julgamento):
+            raise forms.ValidationError(
+                "As datas de manifesto e julgamento são obrigatórias quando uma situação é selecionada."
+            )
+
+        # Checar se a data do manifesto é posterior ao julgamento
+        if data_manifesto and julgamento and data_manifesto > julgamento:
+            raise forms.ValidationError(
+                "A data do manifesto não pode ser posterior à data do julgamento."
+            )
+
+        # Checar se a data_inspecao2 é maior que a data_manifesto
+        if data_inspecao2 and data_manifesto and data_inspecao2 > data_manifesto:
+            raise forms.ValidationError(
+                "A data da inspeção não pode ser posterior à data do manifesto."
+            )
+        
+        # Checar se a produtividade_manifesto é menor que a data_manifesto
+        if produtividade_manifesto and data_manifesto and produtividade_manifesto < data_manifesto:
+            raise forms.ValidationError(
+                "A data da produtividade não pode ser inferior a data do manifesto."
+            )
+        
+        return cleaned_data
+
+    def clean_situacao(self):
+        situacao = self.cleaned_data.get('situacao')
+
+        if not situacao:
+            raise forms.ValidationError("Escolha uma situação válida.")
+        return situacao
+
+
 class FeriadoRecessoForm(forms.ModelForm):
     class Meta:
         model = FeriadoRecesso
@@ -161,3 +258,7 @@ class ARForm(forms.ModelForm):
             raise ValueError("self.fields is None. It should be a dictionary containing the form fields.")
 
 
+class ValorVRMForm(forms.ModelForm):
+    class Meta:
+        model = ValorVRM
+        fields = ['ano', 'valor']

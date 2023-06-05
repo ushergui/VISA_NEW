@@ -1,0 +1,15 @@
+{% extends 'oxigenoterapia/base.html' %}
+
+{% block conteudo %}
+<h2>Deletar Paciente</h2>
+
+<p>Você tem certeza que deseja deletar "{{ object }}"?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Confirmar">
+</form>
+
+<a href="{% url 'paciente_list' %}">Cancelar</a>
+
+{% endblock %}

@@ -1,0 +1,149 @@
+
+.form-container {
+    width: 33.33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    margin: auto; /* isso centraliza o formulário */
+}
+.form-container-2 {
+    width: 75%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+
+}
+
+.bordered-div {
+    width: 120%;
+    display: inline-block;
+    border: 2px solid #808080; /* Cor da borda em cinza */
+    padding: 6px; /* Espaçamento interno para a borda não colar no texto */
+    border-radius: 6px; /* Quinas arredondadas */
+}
+
+.label-right {
+    text-align: right;
+}
+
+
+@media screen and (max-width: 768px) {
+    .form-container {
+      width: 100%;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .form-container-2 {
+      width: 100%;
+    }
+  }
+
+.field-container {
+    display: flex;
+    align-items: center;
+}
+
+.field-label {
+    margin-right: 10px; /* Espaçamento entre label e conteúdo */
+}
+
+.field-content {
+    flex-grow: 1; /* Permite que o conteúdo ocupe o resto do espaço disponível */
+}
+
+.field-label, .field-content {
+    border: 1px solid #000; /* Substitua #000 pela cor de borda que desejar */
+    padding: 5px; /* Espaçamento interno para a borda não colar no texto */
+}
+
+
+.bg-ifpr {
+    background-color: #343a40;
+}
+
+.text-ifpr {
+    color: #414242;
+}
+
+.border-ifpr {
+    border-color: #414242;
+}
+.bg-ifpr-escuro {
+    background-color: #414242;
+}
+
+.text-ifpr-escuro {
+    color: #414242;
+}
+
+.border-ifpr-escuro {
+    border-color: #414242;
+}
+
+
+/*
+Tamanhos diferentes para fontes
+*/
+.font-75 {
+    font-size: 75%;
+}
+
+.font-115 {
+    font-size: 115%;
+}
+
+.font-125 {
+    font-size: 125%;
+}
+
+.font-150 {
+    font-size: 150%;
+}
+
+.font-175 {
+    font-size: 175%;
+}
+
+
+/*
+Formatação do DataTable
+*/
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td:first-child::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th:first-child::before {
+    top: 15px !important;
+}
+
+
+/*
+Personalização da Barra de menu pra ficar igual do site
+*/
+.navbar {
+    padding: 0 !important;
+}
+
+.navbar .navbar-brand{
+    padding-left: 10px;
+}
+
+.navbar a.nav-link{
+    color: white !important;
+}
+
+.navbar .nav-item{
+    padding: 3px 5px;
+}
+
+.navbar .nav-item:hover{
+    background-color: #465042;
+}
+
+
+/*
+Alerta na validação dos formulários (login com senha errada, por exemplo)
+*/
+.alert dl, .alert ol, .alert ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+/*
+Largura máxima das tabelas para não ficar mal formatada
+*/
+table td{
+    max-width: 500px;
+}

@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block conteudo %}
-<h3>Lista de contabilidades
+<h3>Lista de riscos
 <a href="{% url 'cadastrar_risco' %}" class="btn btn-primary btn-sm">Adicionar risco</a>
 </h3>
 
@@ -12,7 +12,6 @@
 <table class="table table-striped" id="tabela-listar">
 	<thead>
 	<tr>
-        <th>ID</th>
         <th>Risco</th>
         <th>Valor Risco</th>
         <th>Ações</th>
@@ -22,7 +21,7 @@
 	<tbody>
     {% for risco in riscos %}
     <tr>
-    <td>{{ risco.id }}</td>
+
                     <td>{{ risco.risco }}</td>
                     <td>{{ risco.valor_risco }}</td>
                     <td>
@@ -33,7 +32,7 @@
     </tr>
     {% empty %}
         <tr>
-            <td colspan="2">Nenhum campo registrado.</td>
+            <td colspan="4">Nenhum campo registrado.</td>
         </tr>
     {% endfor %}
     </tbody>

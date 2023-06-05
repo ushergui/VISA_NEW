@@ -5,6 +5,7 @@
 {% load crispy_forms_tags %}
 
 {% block conteudo %}
+<div class="form-container">
 <h3> {{ titulo }}</h3>
 <p>Auto(s) de Infração que será(ão) afetado(s): {{ numeros_relacionados }}</p>
 <p class="lead">
@@ -23,6 +24,7 @@
     </button>
 
 </form>
+</div>
 {% endblock %}
 
 {% block scripts %}

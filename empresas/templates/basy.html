@@ -1,6 +1,7 @@
-{% load static %}
-
 <!doctype html>
+{% load static %}
+{% load custom_filters %}
+
 <html lang="pt-br" class="h-100">
 
 <head>
@@ -22,10 +23,10 @@
     <!--<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
     <link href="{% static 'css/select2.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/all.css' %}" rel="stylesheet">
 
     <!-- CSS adicional -->
-    <link href="{% static 'css/empresas.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dark.css' %}" type="text/css" rel="stylesheet">
 
     <!-- Importação do Datatables -->
     <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.22/datatables.min.css" /> -->
@@ -71,8 +72,7 @@
                     <ul class="navbar-nav mr-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'index' %}">
-                                <!-- Ao invés de colocar o link, usei o atalho e coloquei o "nome" da url -->
+                            <a class="nav-link" href="{% url 'empresas' %}">
                                 <i class="fa fa-home" aria-hidden="true"></i>
                                 Início
                             </a>
@@ -88,9 +88,11 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 
                                 <a class="dropdown-item" href="{% url 'cadastrar_risco' %}">Risco</a>
+                                <a class="dropdown-item" href="{% url 'criar_legislacao' %}">Legislação</a>
                                 <a class="dropdown-item" href="{% url 'criar_contabilidade' %}">Contabilidade</a>
                                 <a class="dropdown-item" href="{% url 'criar_empresa' %}">Empresa</a>
                                 <a class="dropdown-item" href="{% url 'criar_cnae' %}">Cnae</a>
+                                <a class="dropdown-item" href="{% url 'novo_protocolo' %}">Protocolo</a>
 
                             </div>
                         </li>
@@ -103,9 +105,11 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 
                                 <a class="dropdown-item" href="{% url 'listar_risco' %}">Risco</a>
+                                <a class="dropdown-item" href="{% url 'listar_legislacao' %}">Legislação</a>
                                 <a class="dropdown-item" href="{% url 'listar_contabilidades' %}">Contabilidade</a>
                                 <a class="dropdown-item" href="{% url 'listar_empresas' %}">Empresas</a>
                                 <a class="dropdown-item" href="{% url 'listar_cnaes' %}">Cnae</a>
+                                <a class="dropdown-item" href="{% url 'listar_protocolos' %}">Protocolos</a>
 
                             </div>
                         </li>
@@ -144,7 +148,7 @@
                             <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink"
                                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-user-circle" aria-hidden="true"></i>
-                                <span id="username">{{ request.user }}</span>
+                                <span id="username">{{ request.user.first_name|capitalize_name }}</span>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="dropdown-item" href="{% url 'atualizar-dados' %}">
@@ -247,4 +251,3 @@ Bloco acima do rodapé com links -->
 </body>
 
 </html>
-

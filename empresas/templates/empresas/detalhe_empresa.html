@@ -1,0 +1,132 @@
+{% extends 'basy.html' %}
+{% load static %}
+{% load custom_filters %}
+
+
+    <!-- Bloco de conteúdo -->
+    
+        {% block conteudo %}
+        <div class="form-container-2">
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <div class="label-right">
+                        <label>Razão Social:</label>
+                    </div>
+                </div>
+                
+                <div class="col-sm-4">
+                    <div class="bordered-div">
+                        <span class="bordered-span-razao">{{ empresa.razao }}</span>
+                    </div>
+                </div>
+                <!-- Repita para os outros campos -->
+                <div class="col-sm-2">
+                    <div class="label-right">
+                        <label>Nome Fantasia:</label>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="bordered-div">
+                        <span class="bordered-span-razao">{{ empresa.nome_fantasia }}</span>
+                    </div>
+                </div>
+            </div>
+        
+        
+
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <div class="label-right">
+                        <label>MEI</label>
+                    <input type="checkbox" disabled {% if empresa.mei %}checked{% endif %}>
+                </div>
+                
+                <div class="col-sm">
+                    <label>CNPJ:</label>
+                    <span class="bordered-span">{{ empresa.cnpj }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>Telefone:</label>
+                    <span class="bordered-span">{{ empresa.telefone1 }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>Recado:</label>
+                    <span class="bordered-span">{{ empresa.telefone2 }}</span>
+                </div>
+            </div>
+        </div>
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>Email:</label>
+                    <span class="bordered-span">{{ empresa.email }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>Data do Alvará:</label>
+                    <span class="bordered-span">{{ empresa.alvara }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>Endereço:</label>
+                    <span class="bordered-span">{{ empresa.logradouro_empresa }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>CNAE(s):</label>
+                    {% for cnae in empresa.cnae.all %}
+                    <span class="bordered-span">{{ cnae.codigo_cnae }} - {{ cnae.descricao_cnae }} - {{ cnae.risco_cnae }}{% if not forloop.last %},{% endif %}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>Responsável Legal:</label>
+                    <span class="bordered-span">{{ empresa.responsavel_legal }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>RG:</label>
+                    <span class="bordered-span">{{ empresa.rg }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>CPF:</label>
+                    <span class="bordered-span">{{ empresa.cpf }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>Contabilidade:</label>
+                    <span class="bordered-span">{{ empresa.contabilidade }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>Risco da empresa:</label>
+                    <span class="bordered-span">{{ empresa.risco_empresa }}</span>
+                </div>
+                <div class="col-sm">
+                    <label>Status:</label>
+                    <span class="bordered-span">{{ empresa.status_funcionamento }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm">
+                    <label>Observações</label>
+                    <span class="bordered-span">{{ empresa.observacoes }}</span>
+                </div>
+            </div>
+
+            <div class="row mb-3 text-center">
+                <div class="col-sm">
+                    <a href="{% url 'editar_empresa' empresa.id %}" class="btn btn-primary">Editar</a>
+                </div>
+            </div>
+            
+        </div>
+        {% endblock %}
+    </div>
+                   
+

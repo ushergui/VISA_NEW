@@ -1,0 +1,41 @@
+{% extends 'oxigenoterapia/base.html' %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<h3>Relatório de Troca de Filtro</h3>
+
+<div align="right">
+    <h3>
+        <a href="{% url 'relatorio_troca_de_filtro' %}" class="btn btn-primary btn-sm">Atualizar Relatório</a>
+    </h3>
+</div>
+
+<div class="table responsive">
+    <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
+        <thead>
+            <tr>
+                <th style="text-align: center">Nome do Paciente</th>
+                <th style="text-align: center">Telefone 1</th>
+                <th style="text-align: center">Telefone 2</th>
+                <th style="text-align: center">Data mais recente (troca ou instalação) </th>
+                <th style="text-align: center">Equipamentos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in relatorio %}
+                <tr>
+                    <td style="text-align: center">{{ item.nome_paciente|capitalize_name }}</td>
+                    <td>{% if item.telefone_1 %}{{ item.telefone_1 }}</td>{% else %}{% endif %}</td>
+                    <td>{% if item.telefone_2 %}{{ item.telefone_2 }}</td>{% else %}{% endif %}</td>
+                    <td style="text-align: center">{{ item.data_recente|date:"d/m/Y" }}</td>
+                    <td style="text-align: center">{{ item.nome_equipamentos }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center">Nenhum relatório registrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

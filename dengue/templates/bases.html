@@ -1,5 +1,6 @@
 <!doctype html>
 {% load static %}
+{% load custom_filters %}
 
 
 
@@ -150,7 +151,7 @@
                             <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink"
                                 role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-user-circle" aria-hidden="true"></i>
-                                <span id="username">{{ request.user }}</span>
+                                <span id="username">{{ request.user.first_name|capitalize_name }}</span>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="dropdown-item" href="{% url 'atualizar-dados' %}">

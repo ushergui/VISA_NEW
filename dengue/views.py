@@ -38,11 +38,11 @@ def listar_notificacoes(request):
             notificacoes = Notificacao.objects.filter(
                 semana_epidemiologica__in=ultimas_4_semanas,
                 resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']
-            )
+            ).select_related('semana_epidemiologica')
         except ValueError:
-            notificacoes = Notificacao.objects.all()
+            notificacoes = Notificacao.objects.all().select_related('semana_epidemiologica')
     else:
-        notificacoes = Notificacao.objects.all()
+        notificacoes = Notificacao.objects.all().select_related('semana_epidemiologica')
 
     context = {
         'notificacoes': notificacoes,
@@ -85,6 +85,30 @@ def total_bairros(request):
             notificacoes = Notificacao.objects.none()
     else:
         notificacoes = Notificacao.objects.all().values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+
+    context = {
+        'notificacoes': notificacoes,
+        'termo_pesquisa': search_query
+    }
+
+    return render(request, 'dengue/total_por_bairros.html', context)
+    
+def total_bairros_positivos(request):
+    search_query = request.GET.get('q')
+    if search_query:
+        try:
+            semana_atual = int(search_query)
+            ultimas_4_semanas = [semana_atual - i for i in range(4)]
+            notificacoes = Notificacao.objects.filter(
+                semana_epidemiologica__in=ultimas_4_semanas,
+                resultado__in=["Positivo NS1", "Positivo sorologia", "Isolamento viral positivo"]
+            ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+        except ValueError:
+            notificacoes = Notificacao.objects.none()
+    else:
+        notificacoes = Notificacao.objects.filter(
+            resultado__in=["Positivo NS1", "Positivo sorologia", "Isolamento viral positivo"]
+        ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
 
     context = {
         'notificacoes': notificacoes,
@@ -180,7 +204,7 @@ def boletim_resumo(request):
 
 def semana_epidemiologica(request):
     search_query = request.GET.get('q2')
-    search_year = request.GET.get('year2')
+    search_year = request.GET.get('ano_pesquisa')
     notificacoes = Notificacao.objects.values('semana_epidemiologica', 'semana_epidemiologica__data_inicio_semana',
                                               'semana_epidemiologica__data_fim_semana').annotate(quantidade=Count('semana_epidemiologica')).order_by('semana_epidemiologica')
 

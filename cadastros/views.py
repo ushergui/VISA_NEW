@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from reportlab.pdfgen import canvas
 from braces.views import LoginRequiredMixin
 from datetime import datetime
-from .models import Estado, Cidade, Bairro, Logradouro, Proprietario, Terreno, Protocolo, Infracao, Inspecao, Fiscal, FeriadoRecesso
+from .models import Estado, Cidade, Bairro, Logradouro, Proprietario, Terreno, Protocolo, Infracao, Inspecao, Fiscal, FeriadoRecesso, ValorVRM
 # Método para redirecionar o usuário após ele efetuar um cadastro
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import \
@@ -26,11 +26,13 @@ from django.urls import reverse
 from django.contrib import admin
 from .forms import LogradouroForm, LogradouroUpdateForm, ProprietarioForm, ProprietarioUpdateForm, \
     ProtocoloForm, ProtocoloUpdateForm, TerrenoForm, TerrenoUpdateForm, InspecaoForm, InspecaoUpdateForm, \
-    InfracaoCreateForm, InfracaoUpdateForm, FeriadoRecessoForm, InfracaoForm, InfracaoFormDefesa, ARForm
+    InfracaoCreateForm, InfracaoUpdateForm, FeriadoRecessoForm, InfracaoForm, InfracaoFormDefesa, ARForm, ValorVRMForm, ReinspecaoForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from datetime import timedelta
 from django.http import QueryDict
+
+
 
 def get_queryset(self):
     txt_nome = self.request.GET.get('nome')
@@ -216,6 +218,8 @@ class InspecaoCreate(LoginRequiredMixin, CreateView):
         return reverse('listar-inspecoes')
 
 
+from datetime import datetime, date
+
 class InfracaoCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')
     model = Infracao
@@ -223,9 +227,20 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     template_name = 'form.html'
     success_url = reverse_lazy('listar-infracoes-ativos')
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        if self.request.method == 'POST':
+            # O formulário está sendo enviado, então pegue a data do POST request
+            data_auto_str = self.request.POST.get('data_auto')
+            data_auto = datetime.strptime(data_auto_str, "%Y-%m-%d").date()
+        else:
+            # O formulário está sendo exibido, então use a data atual
+            data_auto = datetime.today().date()
+
+        is_pre_june_2023 = data_auto <= date(2023, 6, 2)
+
+        context['is_pre_june_2023'] = is_pre_june_2023
         context['titulo'] = "Cadastro de infração"
         context['botao'] = "Cadastrar"
         return context
@@ -410,51 +425,9 @@ class DefesasCreate(LoginRequiredMixin, UpdateView):
 class ReinspecoesCreate(LoginRequiredMixin, UpdateView):
     login_url = reverse_lazy('login')
     model = Infracao
-    fields = ['numero_format_ano', 'foto_inspecao_2', 'data_inspecao2', 'horario_inspecao2', 'data_manifesto',
-              'produtividade_manifesto', 'situacao', 'julgamento']
+    form_class = ReinspecaoForm
     template_name = 'form-upload2.html'
     success_url = reverse_lazy('listar-infracoes')
-
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        if form.instance.status_rastreio != 'ENTREGUE':
-            form.fields['situacao'].choices = (
-                ("", "---------"),
-                ("6", "Não recebeu e limpou"),
-                ("4", "Manifesto e julgamento fora do sistema"),
-                ("7", "Edital (não usar este)"),
-                ("9", "Não defendeu e limpou via Edital"),
-                ("15", "Não defendeu e limpou (razoável) via Edital"),
-                ("10", "Perda de prazo"),
-                ("11", "Erro na identificação"),
-                ("12", "Mudança do proprietário no decorrer do processo")
-            )
-        elif form.instance.status_rastreio == 'ENTREGUE' and not form.instance.protocolo_defesa:
-            form.fields['situacao'].choices = (
-                ("", "---------"),
-                ("2", "Não defendeu e limpou"),
-                ("13", "Não defendeu e limpou (razoável)"),
-                ("3", "Não defendeu e não limpou"),
-                ("4", "Manifesto e julgamento fora do sistema"),
-                ("8", "Não defendeu e não limpou via Edital"),
-                ("9", "Não defendeu e limpou via Edital"),
-                ("15", "Não defendeu e limpou (razoável) via Edital"),
-                ("10", "Perda de prazo"),
-                ("11", "Erro na identificação"),
-                ("12", "Mudança do proprietário no decorrer do processo")
-            )
-        else:
-            form.fields['situacao'].choices = (
-                ("", "---------"),
-                ("1", "Defendeu e limpou"),
-                ("14", "Defendeu e limpou (razoável)"),
-                ("4", "Manifesto e julgamento fora do sistema"),
-                ("5", "Defendeu após o prazo e limpou"),
-                ("10", "Perda de prazo"),
-                ("11", "Erro na identificação"),
-                ("12", "Mudança do proprietário no decorrer do processo")
-            )
-        return form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -616,9 +589,6 @@ class InspecaoList(LoginRequiredMixin, ListView):
         context['termo_pesquisa'] = self.request.GET.get('q')
         return context
 
-
-
-
 class InfracaoList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')
     model = Infracao
@@ -626,13 +596,24 @@ class InfracaoList(LoginRequiredMixin, ListView):
     permission_required = 'app.view_infracao'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related(
+            'inspecao__protocolo',
+            'inspecao__terreno',
+            'inspecao__fiscal',
+            'inspecao__terreno__logradouro_terreno',
+            'inspecao__terreno__proprietario'
+        )
         q = self.request.GET.get('q')
         if q:
-            queryset = queryset.filter(inspecao__protocolo__protocolo__icontains=q) | queryset.filter(inspecao__terreno__inscricao__icontains=q) \
-                       | queryset.filter(inspecao__fiscal__primeiro_nome__icontains=q) | queryset.filter(inspecao__terreno__logradouro_terreno__nome_logradouro__icontains=q)\
-                       | queryset.filter(inspecao__terreno__proprietario__nome_proprietario__icontains=q) | queryset.filter(inspecao__terreno__logradouro_terreno__bairro__nome_bairro__icontains=q)\
-                       | queryset.filter(numero_format_ano__icontains=q)
+            queryset = queryset.filter(
+                Q(inspecao__protocolo__protocolo__icontains=q) |
+                Q(inspecao__terreno__inscricao__icontains=q) |
+                Q(inspecao__fiscal__primeiro_nome__icontains=q) |
+                Q(inspecao__terreno__logradouro_terreno__nome_logradouro__icontains=q) |
+                Q(inspecao__terreno__proprietario__nome_proprietario__icontains=q) |
+                Q(inspecao__terreno__logradouro_terreno__bairro__nome_bairro__icontains=q) |
+                Q(numero_format_ano__icontains=q)
+            )
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -640,6 +621,7 @@ class InfracaoList(LoginRequiredMixin, ListView):
         context['termo_pesquisa'] = self.request.GET.get('q')
         return context
 
+    
 class InfracaoPrintList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')
     model = Infracao
@@ -653,7 +635,9 @@ class InfracaoListFilterAtivos(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(julgamento__isnull=True)
+        queryset = queryset.select_related('inspecao__protocolo', 'inspecao__fiscal', 'inspecao__terreno').prefetch_related('inspecao__terreno__logradouro_terreno', 'inspecao__terreno__logradouro_correspondencia', 'inspecao__terreno__proprietario')
         return queryset
+
 
 
 class ProdutividadeList(LoginRequiredMixin, ListView):
@@ -778,7 +762,9 @@ def gerar_ar7(request, pk, template_name="gerar_ar7.html"):
 
 def gerar_auto(request, pk, template_name="auto_infracao.html"):
     infracao = get_object_or_404(Infracao, pk=pk)
-    return render(request, template_name, {'infracao': infracao})
+    is_pre_june_2023 = infracao.is_pre_june_2023
+    return render(request, template_name, {'infracao': infracao, 'is_pre_june_2023': is_pre_june_2023})
+
 
 def calcular_dias_uteis(data_inicial, quantidade_dias, feriados_recessos):
     data_atual = data_inicial
@@ -961,3 +947,43 @@ class ARCreate(LoginRequiredMixin, UpdateView):
             infracao.prazo_defesa = prazo_defesa
         infracao.save()
         return HttpResponseRedirect(self.get_success_url())
+    
+
+def vrm_list(request):
+    vrms = ValorVRM.objects.all()
+    return render(request, 'vrm_list.html', {'vrms': vrms})
+
+class VRMCreate(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('login')
+    model = ValorVRM
+    form_class = ValorVRMForm
+    template_name = 'form.html'
+    success_url = reverse_lazy('vrm_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Adicionar VRM"
+        context["botao"] = "Adicionar"
+        return context
+
+class VRMUpdate(LoginRequiredMixin, UpdateView):
+    login_url = reverse_lazy('login')
+    model = ValorVRM
+    form_class = ValorVRMForm
+    template_name = 'form.html'
+    success_url = reverse_lazy('vrm_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Editar VRM"
+        context["botao"] = "Salvar"
+        return context
+
+def vrm_delete(request, pk):
+    vrm = get_object_or_404(ValorVRM, pk=pk)
+
+    if request.method=='POST':
+        vrm.delete()
+        return redirect('vrm_list')
+
+    return render(request, 'form-excluir.html', {'item': vrm})

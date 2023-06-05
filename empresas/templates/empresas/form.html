@@ -6,11 +6,8 @@
 
 
 {% block conteudo %}
+<div class="form-container">
 <h3> {{ titulo }}</h3>
-<p class="lead">
-    Preencha todos os campos obrigatórios.
-</p>
-
 <hr>
 <form action="" method="POST">
 
@@ -19,16 +16,56 @@
     {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
     fields, por isto escrever desta forma. -->
 
+
     <button type="submit" class="btn btn-primary">
     {{ botao }}
     </button>
 
 </form>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{% static 'js/jquery.mask.min.js' %}"></script>
 <script>
+    
+
+$(document).ready(function() {
+    $('#id_cnae').change(function() {
+        var selectedCnaes = $(this).val();
+        if (selectedCnaes) {
+            // Criamos uma string de parâmetros manualmente
+            var dataString = '';
+            for (var i = 0; i < selectedCnaes.length; i++) {
+                dataString += 'cnaes=' + selectedCnaes[i] + '&';
+            }
+            
+            dataString = dataString.slice(0, -1);
+
+            $.ajax({
+                url: '/api/get_risco/?' + dataString,
+                success: function(data) {
+                    $('#id_risco_empresa').val(data.risco).change();  
+                }
+            });
+
+            
+        }
+    });
+
+    $('#id_risco_empresa').change(function() {
+        var selectedRisco = $(this).val();
+        // Verifique se o risco selecionado é 1 ou 2
+        if (selectedRisco == "1" || selectedRisco == "2") {
+            // Se for, ajuste o status de funcionamento para 'DISPENSADA'
+            $('#id_status_funcionamento').val('DISPENSADA');
+        }
+
+        else {
+            $('#id_status_funcionamento').val('');
+        }
+    });
+});
 
     $(document).ready(function(){
         $("#id_cep").mask("00.000-000");
@@ -64,24 +101,27 @@
             field.mask(behavior.apply({}, arguments), options);
         }
     };
+    $('#id_telefone1_contabilidade').mask(behavior, options);
+    $('#id_telefone2_contabilidade').mask(behavior, options);
     $('#id_telefone').mask(behavior, options);
+    $('#id_telefone1').mask(behavior, options);
     $('#id_telefone2').mask(behavior, options);
 
 
     $(document).ready(function() {
-        $('#id_razao').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+    $('#id_razao').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
         $(this).val(textoSemAcentos);
-        });
     });
+});
 
-
-    $(document).ready(function() {
-        $('#id_nome_fantasia').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+$(document).ready(function() {
+    $('#id_nome_fantasia').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
         $(this).val(textoSemAcentos);
-        });
     });
+});
+
 
     $(document).ready(function() {
         $('#id_responsavel_legal').on('keyup', function() {
@@ -90,8 +130,21 @@
         });
     });
 
+    $(document).ready(function() {
+        $('#id_descricao').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+        $(this).val(textoSemAcentos);
+        });
+    });
+
 
     $(document).ready(function() {
+  $('#id_email_contabilidade').on('keyup', function() {
+    var textoSemAcentos = $(this).val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9@._-]/gi, '');
+    $(this).val(textoSemAcentos);
+  });
+});
+$(document).ready(function() {
   $('#id_email').on('keyup', function() {
     var textoSemAcentos = $(this).val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9@._-]/gi, '');
     $(this).val(textoSemAcentos);

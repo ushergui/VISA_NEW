@@ -47,6 +47,7 @@ class Notificacao(models.Model):
         ("USF CAIC II", "USF CAIC II"),
         ("USF CAIC III", "USF CAIC III"),
         ("USF Cidade Industrial", "USF Cidade Industrial"),
+        ("EAP Guardinha", "EAP Guardinha"),
         ("EAP Rural", "EAP Rural"),
         ("USF Estação", "USF Estação"),
         ("Farmácia Ana Terra", "Farmácia Ana Terra"),
