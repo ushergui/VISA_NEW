@@ -129,12 +129,20 @@
                                 Informações
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="{% url 'atendimentos_realizados' %}"><i class="fa-solid fa-table-list"></i> Atendimentos realizados</a>
                                 <a class="dropdown-item" href="{% url 'relatorio_pacientes_ativos_oxigenoterapia' %}"><i class="fa-solid fa-user-injured"></i> Pacientes ativos oxigenoterapia</a>
                                 <a class="dropdown-item" href="{% url 'relatorio_pacientes_ativos_ventilacao' %}"><i class="fa-solid fa-user-injured"></i> Pacientes ativos ventilação</a>
-                                <a class="dropdown-item" href="{% url 'relatorio_para_visita' %}"><i class="fa-solid fa-user-injured"></i> Lista para visita</a>
+                                <a class="dropdown-item" href="{% url 'relatorio_para_visita' %}"><i class="fa-solid fa-stethoscope"></i> Lista para visita</a>
                                 <a class="dropdown-item" href="{% url 'relatorio_troca_de_filtro' %}"><i class="fa-solid fa-user-injured"></i> Troca de filtro</a>
+                                <a class="dropdown-item" href="{% url 'relatorio_troca_de_mascara' %}"><i class="fa-solid fa-mask-ventilator"></i> Troca de Máscara</a>
                                 <a class="dropdown-item" href="{% url 'aparelhos_alugados' %}"><i class="fa-solid fa-user-injured"></i> Aparelhos alugados</a>
                             </div>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="{% url 'pesquisa_paciente' %}" id="navbarDropdownMenuLink">
+                                <i class="fa-solid fa-user-injured"></i> Pesquisa paciente
+                            </a>
                         </li>
 
                         {% endif %}

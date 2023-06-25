@@ -9,19 +9,26 @@
 <div class="form-container">
 <h3> {{ titulo }}</h3>
 <hr>
-<form action="" method="POST">
+<form method="POST">
+    {% csrf_token %}
+    <p>Protocolo: {{ produtividade.protocolo }}</p>
+    <p>Fiscal responsável: {{ produtividade.fiscal_responsavel }}</p>
+    {{ form|crispy }}
+    {% for acao in acoes %}
+    <label for="acao-{{ acao.id }}">{{ acao }}</label>
+    <input type="checkbox" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
 
-    {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
-
-    {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
-    fields, por isto escrever desta forma. -->
-
+    <label for="multiplicador-{{ acao.id }}">Multiplicador</label>
+    <input type="number" id="multiplicador-{{ acao.id }}" name="multiplicadores" step="0.1">
+    {% endfor %}
+    <br>
 
     <button type="submit" class="btn btn-primary">
-    {{ botao }}
+        {{ botao }}
     </button>
 
 </form>
+
 </div>
 {% endblock %}
 
@@ -89,7 +96,7 @@ $(document).ready(function() {
 		$('#id_cnae').select2();
         $('#id_tipo').select2();
         $('#id_empresa').select2();
-        
+        $('#id_protocolo').select2();
         $('#id_forma_de_recebimento').select2();
         $('#id_motivo').select2();
         $('#id_bairro').select2();

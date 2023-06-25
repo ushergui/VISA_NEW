@@ -1,14 +1,15 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from .models import Paciente, Fisioterapeuta, Equipamento, Descartavel, Cid, Prescricao, Usf, Atendimento, ModoDeUso, Finalidade
 from .forms import PacienteForm, FisioterapeutaForm, EquipamentoForm, DescartavelForm, CidForm, PrescricaoForm, AtendimentoForm, UsfForm, AtendimentoForm, ModoDeUsoForm, FinalidadeForm
 from cadastros.models import Logradouro
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Count, F, Q, Max
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.http import FileResponse, HttpResponse
 import datetime
+from datetime import date
 from django.utils import timezone
 from django.template.loader import get_template
 from weasyprint import HTML, CSS
@@ -16,6 +17,8 @@ from django.db import transaction
 from datetime import datetime, timedelta
 import calendar
 import locale
+from django.contrib import messages
+from collections import defaultdict
 
 
 class PacienteListView(ListView):
@@ -26,7 +29,7 @@ class PacienteCreateView(CreateView):
     model = Paciente
     form_class = PacienteForm
     template_name = 'oxigenoterapia/form.html'
-    success_url = reverse_lazy('paciente_list')
+    success_url = reverse_lazy('prescricao_new')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -240,8 +243,6 @@ class CidDeleteView(DeleteView):
     model = Cid
     template_name = 'oxigenoterapia/cid_confirm_delete.html'
     success_url = reverse_lazy('cid_list')
-
-
 
 
 class PrescricaoListView(ListView):
@@ -465,118 +466,100 @@ class UsfDeleteView(DeleteView):
     template_name = 'oxigenoterapia/usf_confirm_delete.html'
     success_url = reverse_lazy('usf_list')
 
-
 def consulta_atendimentos(request):
-    ano_atual = datetime.date.today().year
-    mes_atual = datetime.date.today().month
-    ano = int(request.GET.get('year'))
     mes = int(request.GET.get('month'))
+    ano = int(request.GET.get('year'))
     nome_fisioterapeuta = request.GET.get('fisioterapeuta')
-    esconde_ativos_periodo = False
-    if ano > ano_atual or (ano == ano_atual and mes >= mes_atual):
-        esconde_ativos_periodo = True
-    total_ativos = Paciente.objects.filter(status="ATIVO").count()
+    data_inicial = date(ano, mes, 1)
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    data_final = date(ano, mes, ultimo_dia)
+
+    atendimentos = Atendimento.objects.filter(data_atendimento__range=[data_inicial, data_final])
+    total_obitos_periodo = Paciente.objects.filter(status="ÓBITO", data_obito__range=[data_inicial, data_final]).count()
+    total_altas_periodo = Paciente.objects.filter(status="ALTA", data_alta__range=[data_inicial, data_final]).count()
     
-    if ano and mes:
-        total_obitos = Paciente.objects.filter(status="ÓBITO", data_obito__year=ano, data_obito__month=mes).count()
-        total_altas = Paciente.objects.filter(status="ALTA", data_alta__year=ano, data_alta__month=mes).count()
-        total_ativos_periodo = ModoDeUso.objects.filter(Q(data_inicio_uso__year=ano), Q(data_inicio_uso__month=mes)).count() - total_obitos - total_altas
-    else:
-        total_obitos = Paciente.objects.filter(status="ÓBITO").count()
-        total_altas = Paciente.objects.filter(status="ALTA").count()
-        total_ativos_periodo = 0
-
-    atendimentos = Atendimento.objects.all()
-
-    if ano:
-        atendimentos = atendimentos.filter(data_atendimento__year=ano)
-    if mes:
-        atendimentos = atendimentos.filter(data_atendimento__month=mes)
     if nome_fisioterapeuta:
         atendimentos = atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
 
-    # Nesse ponto, precisamos primeiramente fazer um pré-filtro dos atendimentos que estamos interessados
     ids_atendimentos_interesse = atendimentos.values_list('id', flat=True)
 
-    # Agora precisamos pegar todos os ModosDeUso que foram associados com esses atendimentos
     modos_de_uso = ModoDeUso.objects.filter(atendimentos__id__in=ids_atendimentos_interesse)
 
-    # Agora conseguimos realizar a agregação por finalidade do equipamento
     atendimentos_por_finalidade = modos_de_uso.values(
         finalidade=F('equipamento__finalidade_equipamento__finalidade')
     ).annotate(total=Count('atendimentos'))
 
-    total_geral = sum(atendimento['total'] for atendimento in atendimentos_por_finalidade)
+    total_atendimentos = sum(atendimento['total'] for atendimento in atendimentos_por_finalidade)
+
+    inicio_contagem = date(2013, 1, 1)
+    total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).count()
+    #total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).exclude(paciente__status__in=["ÓBITO", "ALTA"]).count()
+    print(total_ativos_periodo)
+    total_ativos_periodo -= Paciente.objects.filter(data_obito__range=[inicio_contagem, data_final]).count()
+    print(total_ativos_periodo)
+    total_ativos_periodo -= Paciente.objects.filter(data_alta__range=[inicio_contagem, data_final]).count()
+    print(total_ativos_periodo)
+    
+    total_ativos = Paciente.objects.filter(status="ATIVO").count()
+    fisioterapeutas = Fisioterapeuta.objects.all()
 
     context = {
         'ano_pesquisa': ano,
         'mes_pesquisa': mes,
         'fisioterapeuta_pesquisa': nome_fisioterapeuta,
+        'total_atendimentos': total_atendimentos,
         'atendimentos_por_finalidade': atendimentos_por_finalidade,
-        'total_geral': total_geral,
-        'total_ativos': total_ativos,
-        'total_obitos': total_obitos,
-        'total_altas': total_altas,
+        'total_obitos_periodo': total_obitos_periodo,
+        'total_altas_periodo': total_altas_periodo,
         'total_ativos_periodo': total_ativos_periodo,
-        'esconde_ativos_periodo': esconde_ativos_periodo,
+        'total_ativos': total_ativos,
+        'fisioterapeutas': fisioterapeutas,
     }
 
     return render(request, 'oxigenoterapia/consulta_atendimentos.html', context)
 
-
 def consulta_atendimentos_pdf(request):
-    ano_atual = datetime.date.today().year
-    mes_atual = datetime.date.today().month
-    ano = int(request.GET.get('year'))
     mes = int(request.GET.get('month'))
+    ano = int(request.GET.get('year'))
     nome_fisioterapeuta = request.GET.get('fisioterapeuta')
-    esconde_ativos_periodo = False
-    if ano > ano_atual or (ano == ano_atual and mes >= mes_atual):
-        esconde_ativos_periodo = True
-    total_ativos = Paciente.objects.filter(status="ATIVO").count()
+    data_inicial = date(ano, mes, 1)
+    ultimo_dia = calendar.monthrange(ano, mes)[1]
+    data_final = date(ano, mes, ultimo_dia)
+
+    atendimentos = Atendimento.objects.filter(data_atendimento__range=[data_inicial, data_final])
+    total_obitos_periodo = Paciente.objects.filter(status="ÓBITO", data_obito__range=[data_inicial, data_final]).count()
+    total_altas_periodo = Paciente.objects.filter(status="ALTA", data_alta__range=[data_inicial, data_final]).count()
     
-    if ano and mes:
-        total_obitos = Paciente.objects.filter(status="ÓBITO", data_obito__year=ano, data_obito__month=mes).count()
-        total_altas = Paciente.objects.filter(status="ALTA", data_alta__year=ano, data_alta__month=mes).count()
-        total_ativos_periodo = ModoDeUso.objects.filter(Q(data_inicio_uso__year=ano), Q(data_inicio_uso__month=mes)).count() - total_obitos - total_altas
-    else:
-        total_obitos = Paciente.objects.filter(status="ÓBITO").count()
-        total_altas = Paciente.objects.filter(status="ALTA").count()
-        total_ativos_periodo = 0
-
-    atendimentos = Atendimento.objects.all()
-
-    if ano:
-        atendimentos = atendimentos.filter(data_atendimento__year=ano)
-    if mes:
-        atendimentos = atendimentos.filter(data_atendimento__month=mes)
     if nome_fisioterapeuta:
         atendimentos = atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
 
-    # Nesse ponto, precisamos primeiramente fazer um pré-filtro dos atendimentos que estamos interessados
     ids_atendimentos_interesse = atendimentos.values_list('id', flat=True)
 
-    # Agora precisamos pegar todos os ModosDeUso que foram associados com esses atendimentos
     modos_de_uso = ModoDeUso.objects.filter(atendimentos__id__in=ids_atendimentos_interesse)
 
-    # Agora conseguimos realizar a agregação por finalidade do equipamento
     atendimentos_por_finalidade = modos_de_uso.values(
         finalidade=F('equipamento__finalidade_equipamento__finalidade')
     ).annotate(total=Count('atendimentos'))
 
-    total_geral = sum(atendimento['total'] for atendimento in atendimentos_por_finalidade)
+    total_atendimentos = sum(atendimento['total'] for atendimento in atendimentos_por_finalidade)
+
+    inicio_contagem = date(2013, 1, 1)
+    total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).exclude(paciente__status__in=["ÓBITO", "ALTA"]).count()
+    total_ativos_periodo -= Paciente.objects.filter(data_obito__range=[inicio_contagem, data_final]).count()
+    total_ativos_periodo -= Paciente.objects.filter(data_alta__range=[inicio_contagem, data_final]).count()
+    
+    total_ativos = Paciente.objects.filter(status="ATIVO").count()
 
     context = {
         'ano_pesquisa': ano,
         'mes_pesquisa': mes,
         'fisioterapeuta_pesquisa': nome_fisioterapeuta,
+        'total_atendimentos': total_atendimentos,
         'atendimentos_por_finalidade': atendimentos_por_finalidade,
-        'total_geral': total_geral,
-        'total_ativos': total_ativos,
-        'total_obitos': total_obitos,
-        'total_altas': total_altas,
+        'total_obitos_periodo': total_obitos_periodo,
+        'total_altas_periodo': total_altas_periodo,
         'total_ativos_periodo': total_ativos_periodo,
-        'esconde_ativos_periodo': esconde_ativos_periodo,
+        'total_ativos': total_ativos,
     }
     html_string = render_to_string('oxigenoterapia/consulta_atendimentos_pdf.html', context)
 
@@ -598,7 +581,7 @@ def relatorio_pacientes_ativos_oxigenoterapia(request):
 
     # Alterar a forma como filtramos os pacientes
     modo_de_uso = ModoDeUso.objects.filter(
-        equipamento__finalidade_equipamento__finalidade='OXIGENOTERAPIA').values_list('paciente_id', flat=True)
+        equipamento__finalidade_equipamento__finalidade='OXIGENOTERAPIA').values_list('paciente_id', flat=True).distinct()
     pacientes = Paciente.objects.filter(status='ATIVO', id__in=modo_de_uso)
 
     if fisioterapeuta_nome:
@@ -629,7 +612,7 @@ def relatorio_pacientes_ativos_oxigenoterapia_pdf(request):
     fisioterapeuta_nome = request.GET.get('fisioterapeuta')
 
     modo_de_uso = ModoDeUso.objects.filter(
-        equipamento__finalidade_equipamento__finalidade='OXIGENOTERAPIA').values_list('paciente_id', flat=True)
+        equipamento__finalidade_equipamento__finalidade='OXIGENOTERAPIA').values_list('paciente_id', flat=True).distinct()
     pacientes = Paciente.objects.filter(status='ATIVO', id__in=modo_de_uso)
 
     if fisioterapeuta_nome:
@@ -756,33 +739,40 @@ def relatorio_pacientes_ativos_ventilacao_pdf(request):
     response['Content-Disposition'] = 'inline; filename=relatorio_pacientes_ativos_ventilacao.pdf'
     return response
 
+#FUNCIONANDO
 def relatorio_para_visita(request):
-    usf_id = request.GET.get('usf', None)
+    fisioterapeuta_id = request.GET.get('fisioterapeuta', None)
+    
     equipamento = request.GET.get('equipamento', None)
     busca_submetida = False  # Inicializando como False
 
     # Recuperar opções de seleção
-    usfs = Usf.objects.all()
+    fisioterapeutas = Fisioterapeuta.objects.all()
     equipamentos = Finalidade.objects.values_list('agrupamento', flat=True).distinct()
 
     # Iniciar com todos os objetos ModoDeUso onde o paciente está ativo
     modos_uso = ModoDeUso.objects.filter(paciente__status='ATIVO')
 
     # Aplicar filtros se eles foram fornecidos
-    if usf_id:
-        modos_uso = modos_uso.filter(paciente__usf_paciente__id=usf_id)
+    if fisioterapeuta_id:
+        modos_uso = modos_uso.filter(paciente__usf_paciente__nome_fisioterapeuta__id=fisioterapeuta_id)
 
     if equipamento:
         modos_uso = modos_uso.filter(equipamento__finalidade_equipamento__agrupamento=equipamento)
 
     if request.GET:  # Verificar se a requisição é do tipo GET
         busca_submetida = True
-
+    
+    modos_uso_por_paciente = defaultdict(list)
+    for modo_uso in modos_uso:
+        modos_uso_por_paciente[modo_uso.paciente].append(modo_uso)
+    
     context = {
+        'modos_uso_por_paciente': dict(modos_uso_por_paciente),
         'modos_uso': modos_uso,
-        'usfs': usfs,
+        'fisioterapeutas': fisioterapeutas,
         'equipamentos': equipamentos,
-        'usf_pesquisa': usf_id,
+        'fisioterapeuta_pesquisa': fisioterapeuta_id,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
     }
@@ -792,44 +782,41 @@ def relatorio_para_visita(request):
 
 
 def relatorio_para_visita_pdf(request):
-    usf_id = request.GET.get('usf', None)
+    fisioterapeuta_id = request.GET.get('fisioterapeuta', None)
+    
     equipamento = request.GET.get('equipamento', None)
     busca_submetida = False  # Inicializando como False
 
     # Recuperar opções de seleção
-    usfs = Usf.objects.all()
+    fisioterapeutas = Fisioterapeuta.objects.all()
     equipamentos = Finalidade.objects.values_list('agrupamento', flat=True).distinct()
 
     # Iniciar com todos os objetos ModoDeUso onde o paciente está ativo
     modos_uso = ModoDeUso.objects.filter(paciente__status='ATIVO')
 
     # Aplicar filtros se eles foram fornecidos
-    if usf_id:
-        modos_uso = modos_uso.filter(paciente__usf_paciente__id=usf_id)
+    if fisioterapeuta_id:
+        modos_uso = modos_uso.filter(paciente__usf_paciente__nome_fisioterapeuta__id=fisioterapeuta_id)
 
     if equipamento:
         modos_uso = modos_uso.filter(equipamento__finalidade_equipamento__agrupamento=equipamento)
 
     if request.GET:  # Verificar se a requisição é do tipo GET
         busca_submetida = True
-
-    usf = None
-    if usf_id:
-        try:
-            usf = Usf.objects.get(id=usf_id)
-        except Usf.DoesNotExist:
-            pass  # ou lidar com a situação em que usf_id não corresponde a nenhum Usf
-
+    
+    modos_uso_por_paciente = defaultdict(list)
+    for modo_uso in modos_uso:
+        modos_uso_por_paciente[modo_uso.paciente].append(modo_uso)
+    
     context = {
+        'modos_uso_por_paciente': dict(modos_uso_por_paciente),
         'modos_uso': modos_uso,
-        'usfs': usfs,
+        'fisioterapeutas': fisioterapeutas,
         'equipamentos': equipamentos,
-        'usf': usf,  # passando o objeto Usf para o contexto
-        'usf_pesquisa': usf_id,
+        'fisioterapeuta_pesquisa': fisioterapeuta_id,
         'equipamento_pesquisa': equipamento,
-        'busca_submetida': busca_submetida,
+        'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
     }
-
  # Aqui o código renderiza o HTML e cria o PDF
     html_template = get_template('oxigenoterapia/relatorio_para_visita_pdf.html').render(context)
     html = HTML(string=html_template)
@@ -838,6 +825,15 @@ def relatorio_para_visita_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename=relatorio_para_visita_pdf.html'
     return response
+
+
+class AtendimentosRealizados(TemplateView):
+    template_name = "oxigenoterapia/atendimentos_realizados.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fisioterapeutas'] = Fisioterapeuta.objects.all()
+        return context
 
 
 def relatorio_troca_de_filtro(request):
@@ -854,20 +850,53 @@ def relatorio_troca_de_filtro(request):
     for paciente in pacientes:
         prescricao_recente = ModoDeUso.objects.filter(paciente=paciente).order_by('-data_inicio_uso').first()
         atendimento_recente = Atendimento.objects.filter(prescricao__paciente=paciente).order_by('-data_atendimento').first()
-    
+        
         data_recente = max(prescricao_recente.data_inicio_uso, atendimento_recente.data_atendimento) if atendimento_recente else prescricao_recente.data_inicio_uso
-    
-        nome_equipamentos = ", ".join([equipamento.nome_equipamento for equipamento in prescricao_recente.equipamento.all()])
-    
-        relatorio.append({
-            'nome_paciente': paciente.nome_paciente,
-            'telefone_1': paciente.telefone_paciente1,
-            'telefone_2': paciente.telefone_paciente2,
-            'data_recente': data_recente,
-            'nome_equipamentos': nome_equipamentos,
-        })
+        
+        equipamentos = prescricao_recente.equipamento.all()
+        nome_equipamentos = ", ".join([equipamento.nome_equipamento for equipamento in equipamentos])
+        
+        if any(equipamento.finalidade_equipamento.agrupamento == "VENTILAÇÃO" for equipamento in equipamentos):
+            relatorio.append({
+                'nome_paciente': paciente.nome_paciente,
+                'telefone_1': paciente.telefone_paciente1,
+                'telefone_2': paciente.telefone_paciente2,
+                'data_recente': data_recente,
+                'nome_equipamentos': nome_equipamentos,
+            })
 
     return render(request, 'oxigenoterapia/relatorio_troca_de_filtro.html', {'relatorio': relatorio})
+
+def relatorio_troca_de_mascara(request):
+    cutoff_date = datetime.now() - timedelta(days=6*30)
+
+    prescricoes = ModoDeUso.objects.filter(
+        Q(data_inicio_uso__lt=cutoff_date) &
+        ~Q(atendimentos__data_atendimento__gt=cutoff_date, atendimentos__troca_de_mascara=True)
+    ).values('paciente')
+
+    pacientes = Paciente.objects.filter(id__in=prescricoes)
+
+    relatorio = []
+    for paciente in pacientes:
+        prescricao_recente = ModoDeUso.objects.filter(paciente=paciente).order_by('-data_inicio_uso').first()
+        atendimento_recente = Atendimento.objects.filter(prescricao__paciente=paciente).order_by('-data_atendimento').first()
+        
+        data_recente = max(prescricao_recente.data_inicio_uso, atendimento_recente.data_atendimento) if atendimento_recente else prescricao_recente.data_inicio_uso
+        
+        equipamentos = prescricao_recente.equipamento.all()
+        nome_equipamentos = ", ".join([equipamento.nome_equipamento for equipamento in equipamentos])
+        
+        if any(equipamento.finalidade_equipamento.agrupamento == "VENTILAÇÃO" for equipamento in equipamentos):
+            relatorio.append({
+                'nome_paciente': paciente.nome_paciente,
+                'telefone_1': paciente.telefone_paciente1,
+                'telefone_2': paciente.telefone_paciente2,
+                'data_recente': data_recente,
+                'nome_equipamentos': nome_equipamentos,
+            })
+
+    return render(request, 'oxigenoterapia/relatorio_troca_de_mascara.html', {'relatorio': relatorio})
 
 
 def aparelhos_alugados(request):
@@ -943,4 +972,61 @@ def aparelhos_alugados_pdf(request):
 
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename=aparelhos_alugados_pdf.html'
+    return response
+
+def pesquisa_paciente(request):
+    termo_pesquisa = request.GET.get('q', '')
+    modos_uso = []
+    if termo_pesquisa:
+        modos_uso = ModoDeUso.objects.filter(
+            Q(paciente__nome_paciente__icontains=termo_pesquisa) | 
+            Q(paciente__prontuario_paciente__icontains=termo_pesquisa)
+        )
+    return render(request, 'oxigenoterapia/pesquisa_paciente.html', {'modos_uso': modos_uso})
+
+
+def detalhes_paciente(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+    prescricao = Prescricao.objects.filter(paciente=paciente).order_by('-data_inicio_uso').first()
+    mododeuso = ModoDeUso.objects.filter(paciente=paciente).order_by('-data_inicio_uso').first()
+    atendimentos = Atendimento.objects.filter(prescricao=mododeuso).order_by('-data_atendimento')
+    return render(request, 'oxigenoterapia/detalhes_paciente.html', {'paciente': paciente, 'prescricao': prescricao, 'mododeuso': mododeuso, 'atendimentos': atendimentos})
+
+def termo_de_uso(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+
+    # Obtém o ModoDeUso mais recente para este paciente que está no agrupamento "VENTILAÇÃO"
+    mododeuso = ModoDeUso.objects.filter(paciente=paciente, equipamento__finalidade_equipamento__agrupamento="VENTILAÇÃO").order_by('-data_inicio_uso').first()
+
+    context = {
+        'paciente': paciente,
+        'mododeuso': mododeuso  # passa a informação do ModoDeUso para o contexto
+    }
+    
+    html_template = get_template('oxigenoterapia/termo_de_uso_de_bem_publico.html').render(context)
+    html = HTML(string=html_template, base_url=request.build_absolute_uri())
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')]) 
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=termo_de_uso.html'
+    return response
+
+def oficio_cpap_bipap(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+
+    # Obtém o ModoDeUso mais recente para este paciente que está no agrupamento "VENTILAÇÃO"
+    mododeuso = ModoDeUso.objects.filter(paciente=paciente, equipamento__finalidade_equipamento__agrupamento="VENTILAÇÃO").order_by('-data_inicio_uso').first()
+    prescricao = Prescricao.objects.filter(paciente=paciente).order_by('-data_inicio_uso').first()
+    context = {
+        'paciente': paciente,
+        'mododeuso': mododeuso,
+        'prescricao': prescricao  # passa a informação do ModoDeUso para o contexto
+    }
+    
+    html_template = get_template('oxigenoterapia/oficio_cpap_bipap.html').render(context)
+    html = HTML(string=html_template, base_url=request.build_absolute_uri())
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')]) 
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=oficio_cpap_bipap.html'
     return response

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Paciente, Fisioterapeuta, Equipamento, Descartavel, Cid, ModoDeUso, Usf, Atendimento, Prescricao, Finalidade
 from cadastros.models import Cidade, Bairro, Logradouro
+from django.core.exceptions import ValidationError
 
 class LogradouroModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
@@ -31,6 +32,35 @@ class PacienteForm(forms.ModelForm):
             self.fields['logradouro_paciente'].queryset = logradouros_ss_paraiso
         else:
             self.fields['logradouro_paciente'].queryset = Logradouro.objects.none()
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        data_obito = cleaned_data.get('data_obito')
+        data_alta = cleaned_data.get('data_alta')
+
+        if status == 'ÓBITO' and not data_obito:
+            self.add_error('data_obito', ValidationError(
+                'Favor preencher o campo de data de óbito.',
+                code='required',
+            ))
+
+        if status == 'ALTA' and not data_alta:
+            self.add_error('data_alta', ValidationError(
+                'Favor preencher o campo de data de alta.',
+                code='required',
+            ))
+
+        if data_obito and status != 'ÓBITO':
+            self.add_error('status', ValidationError(
+                'Favor selecionar o campo ÓBITO no status.',
+                code='invalid',
+            ))
+
+        if data_alta and status != 'ALTA':
+            self.add_error('status', ValidationError(
+                'Favor selecionar o campo ALTA no status.',
+                code='invalid',
+            ))
 
 
 class FisioterapeutaForm(forms.ModelForm):
@@ -68,12 +98,12 @@ class CidForm(forms.ModelForm):
 class PrescricaoForm(forms.ModelForm):
     class Meta:
         model = Prescricao
-        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros']
+        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros', 'status', 'numero_oficio', 'data_oficio','destinatario_oficio']
 
 class ModoDeUsoForm(forms.ModelForm):
     class Meta:
         model = ModoDeUso
-        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros']
+        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros', 'status']
 
 class AtendimentoForm(forms.ModelForm):
     equipamento = forms.ModelMultipleChoiceField(queryset=Equipamento.objects.all(), required=False)

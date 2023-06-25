@@ -2,30 +2,5 @@
 {% load static %}
 {% block conteudo %}
 
-<h4>Atendimentos realizados</h4>
-<form class="form-inline" action="{% url 'consulta_atendimentos' %}" method="get">
-    <div class="form-group">
-        <label for="q1" class="mr-2">Mês (em número)</label>
-        <input type="number" name="month" id="q1" value="{{ termo_pesquisa }}" class="form-control-sm mr-4">
-    </div>
-    <div class="form-group">
-        <label for="q2" class="mr-2">Ano</label>
-        <input type="number" name="year" id="q2" value="{{ ano_pesquisa }}" class="form-control-sm mr-4">
-    </div>
-    <div class="form-group">
-        <label for="q3" class="mr-2">Fisioterapeuta</label>
-        <select name="fisioterapeuta" id="q3" class="form-control-sm mr-4">
-            <option value="">--Escolha um fisioterapeuta--</option>
-            {% for fisio in fisioterapeutas %}
-                <option value="{{ fisio.primeiro_nome_fisioterapeuta }}" {% if fisioterapeuta_pesquisa == fisio.primeiro_nome_fisioterapeuta %} selected {% endif %}>{{ fisio.primeiro_nome_fisioterapeuta }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Pesquisar</button>
-</form>
-
-<br>
-
 
 {% endblock %}

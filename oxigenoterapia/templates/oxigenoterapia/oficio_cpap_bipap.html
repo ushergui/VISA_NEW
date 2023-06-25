@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_tags %}
+{% load custom_filters %}
+<html>
+<head>
+    <title>Ofício de solicitação de equipamento</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 3cm 1cm 3cm 1cm;  /* margem ao redor do conteúdo do body */
+            @top-center {
+                content: element(header);
+            }
+        }
+        #header {
+            position: running(header);
+            width: 100%;
+        }
+        body {
+            margin: 0;  /* remova a margem do body */
+        }
+        img {
+            width: 300px;
+            margin: auto;
+            display: block;
+        }
+        .title {
+            text-align: center;
+            text-decoration: underline;
+            font-family: Arial;
+            font-size: 14px;
+        }
+        .paragrafo {
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            white-space: normal;
+            text-align: justify;
+            line-height: 2.1;
+            font-size: 14px;
+            margin: 30px;
+        }
+        .right-align {
+            text-align: right;
+            font-size: 14px;
+        }
+        .center-align {
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="{% static 'img/Cabecalho.png' %}" alt="Cabeçalho da Secretaria de Saúde">
+    </div>
+    <p class="right-align">
+        São Sebastião do Paraíso, {% if prescricao.data_oficio %}{{ prescricao.data_oficio|month_lower }}{% else %}PREENCHER A DATA DO OFÍCIO NO CADASTRO DE PRESCRIÇÃO{% endif %}
+    </p>
+	<p class="paragrafo">
+		Ofício nº {% if prescricao.numero_oficio %}{{ prescricao.numero_oficio }}{% else %}PREENCHER O NÚMERO DO OFÍCIO NO CADASTRO DE PRESCRIÇÃO{% endif %}
+	</p>
+	<p class="paragrafo">
+		Equipe de oxigenoterapia e ventilação domiciliar
+
+	</p>
+	<p class="paragrafo">
+		A/C: {% if prescricao.destinatario_oficio %}{{ prescricao.destinatario_oficio|capitalize_name }}{% else %}PREENCHER O NÚMERO DO OFÍCIO NO CADASTRO DE PRESCRIÇÃO{% endif %}
+	</p>
+	<p class="paragrafo">
+		Assunto: Solicitação de {% for equipamento in mododeuso.equipamento.all %} {{ equipamento.nome_equipamento }} - Modelo {{ equipamento.modelo_equipamento }}{% endfor %} para o(a) paciente {{ paciente.nome_paciente|capitalize_name }}
+	</p>
+	<p class="paragrafo">
+		Venho por meio deste, solicitar junto a empresa {% for equipamento in mododeuso.equipamento.all %} {{ equipamento.empresa_equipamento }}{% endfor %} a instalação de {% for equipamento in mododeuso.equipamento.all %} {{ equipamento.nome_equipamento }} - Modelo {{ equipamento.modelo_equipamento }}{% endfor %} e acessórios para o(a) paciente {{ paciente.nome_paciente|capitalize_name }}, prontuário {{ paciente.prontuario_paciente }}, residente à {{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }}{% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}, telefone: {{ paciente.telefone_paciente1 }} Tendo em vista que a paciente é portador(a) da doença {{ mododeuso.cid.codigo_doenca }} - {{ mododeuso.cid.nome_doenca }}, avaliamos que a mesma se enquadra nos critérios para concessão do aparelho de {% for equipamento in mododeuso.equipamento.all %} {{ equipamento.nome_equipamento }}{% endfor %}.
+	</p><br><br>
+
+
+    <p class="center-align">
+        _______________________________
+    </p>
+    <p class="center-align">
+        {{ mododeuso.paciente.usf_paciente.nome_fisioterapeuta.nome_fisioterapeuta|capitalize_name }}
+    </p>
+
+    <p class="center-align">
+        {{ mododeuso.paciente.usf_paciente.nome_fisioterapeuta.crefito }}
+    </p>
+
+  </body>
+</html>
+

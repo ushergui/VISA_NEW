@@ -1,0 +1,185 @@
+{% extends 'oxigenoterapia/base.html' %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<div class="container-centralizado" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+    <div style="width: 50%;">
+        <div class="paciente-container">
+			<h2>Dados do paciente <a href="{% url 'paciente_edit' paciente.id %}"><i class="fas fa-pencil-alt"></i></a></h2><br>
+			
+			<div class="row">
+				<div class="col-lg-2 ">
+					<h4>Prontuário</h4>
+					<p >{{ paciente.prontuario_paciente }}</p>
+				</div>
+				<div class="col-lg-6 ">
+					<h4>Nome</h4>
+					<p>{{ paciente.nome_paciente|capitalize_name }}</p>
+				</div>
+				<div class="col-lg-4 ">
+					<h4>Data de nascimento</h4>
+					<p>{{ paciente.nascimento_paciente|date:"d/m/Y" }}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-8 ">
+					<h4>Endereço</h4>
+					<p>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</p>
+				</div>
+				<div class="col-lg-4 ">
+					<h4>Telefone(s)</h4>
+					<p style="font-size: 0.82em">{% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }} {% else %} {% endif %} {% if paciente.telefone_paciente2 %} - {{ paciente.telefone_paciente2 }} {% else %} {% endif %}</p>
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-4 ">
+					<h4>USF</h4>
+					<p>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</p>
+				</div>
+				<div class="col-lg-4 ">
+					<h4>RG</h4>
+					<p>{% if paciente.rg_paciente %} {{ paciente.rg_paciente }} {% else %} {% endif %}</p>
+				</div>
+				<div class="col-lg-4 ">
+					<h4>CPF</h4>
+					<p>{% if paciente.cpf_paciente %} {{ paciente.cpf_paciente }} {% else %} {% endif %}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-4 ">
+					<h4>Fisioterapeuta responsável</h4>
+					<p>{{ paciente.usf_paciente.nome_fisioterapeuta.nome_fisioterapeuta|capitalize_name }}</p>
+				</div>
+				<div class="col-lg-4 ">
+					<h4>Status do cadastro</h4>
+					<p>{{ paciente.status|capitalize_name }}</p>
+				</div>
+				{% if paciente.data_obito %}
+				<div class="col-lg-4 ">
+					<h4>Data do óbito</h4>
+					<p>{{ paciente.data_obito|date:"d/m/Y" }}</p>
+				</div>
+				{% elif paciente.data_alta %}
+				<div class="col-lg-4 ">
+					<h4>Data da alta</h4>
+					{{ paciente.data_alta|date:"d/m/Y"  }}
+				</div>
+				{% else %}
+				{% endif %}
+			</div>
+        
+			{% if paciente.observacoes_paciente %}
+			<div class="row">
+				<div class="col-lg-12 ">
+					<h4>Observações</h4>
+					<p>{{ paciente.observacoes_paciente }} </p>
+				</div>
+			</div>
+			{% else %}{% endif %}
+        </div>
+        
+        <div class="prescricao-e-uso-container">
+            <div class="prescricao-container">
+				<h2>Prescrição atual <a href="{% url 'prescricao_edit' prescricao.id %}"><i class="fas fa-pencil-alt"></i></a></h2><br>
+				<!-- Verifique se a prescrição existe antes de tentar exibi-la -->
+				{% if prescricao %}
+					<p>Equipamento(s): </p>
+					<ul>
+						{% for equipamento in prescricao.equipamento.all %}
+							<li>{{ equipamento.nome_equipamento }}
+							{% if equipamento.finalidade_equipamento.agrupamento == "VENTILAÇÃO" %}
+							<a href="{% url 'termo_de_uso' paciente.id %}"><i class="fas fa-file-contract"></i></a></li>
+							<a href="{% url 'oficio_cpap_bipap' paciente.id %}"><i class="fas fa-file-contract"></i></a></li>
+							{% else %}
+
+							{% endif %}
+						{% endfor %} 
+					</ul>
+					<p>Data de início do uso: {{ prescricao.data_inicio_uso|date:"d/m/Y" }}</p>
+					<p>Tempo de uso: {{ prescricao.tempo_de_uso }}</p>
+					<p>CID: {{ prescricao.cid.codigo_doenca }}</p>
+					{% if prescricao.litros %}
+					<p>Litros: {{ prescricao.litros }}</p>
+					{% else %}
+					{% endif %}
+					{% if prescricao.parametros %}
+					<p>Parâmetros: {{ prescricao.parametros }}</p>
+					{% else %}
+					{% endif %}
+				{% else %}
+					<p>Nenhuma prescrição encontrada para este paciente.</p>
+				{% endif %}
+            </div>
+            
+            <div class="prescricao-container">
+				<h2>Uso atual <a href="{% url 'mododeuso_edit' mododeuso.id %}"><i class="fas fa-pencil-alt"></i></a></h2><br>
+				<!-- Verifique se a prescrição existe antes de tentar exibi-la -->
+				{% if mododeuso %}
+					<p>Equipamentos: </p>
+					<ul>
+						{% for equipamento in mododeuso.equipamento.all %}
+							<li>{{ equipamento.nome_equipamento }}</li>
+						{% endfor %}
+					</ul>
+					<p>Data de início do uso: {{ mododeuso.data_inicio_uso|date:"d/m/Y" }}</p>
+					<p>Tempo de uso: {{ mododeuso.tempo_de_uso }}</p>
+					<p>CID: {{ mododeuso.cid.codigo_doenca }}</p>
+					{% if mododeuso.litros %}
+					<p>Litros: {{ mododeuso.litros }}</p>
+					{% else %}
+					{% endif %}
+					{% if mododeuso.parametros %}
+					<p>Parâmetros: {{ mododeuso.parametros }}</p>
+					{% else %}
+					{% endif %}
+				{% else %}
+					<p>Nenhum modo de uso encontrada para este paciente.</p>
+				{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="atendimento-container">
+		<h2>Atendimentos <a href="{% url 'atendimento_new' mododeuso.id %}"><i class="fas fa-plus"></i></a></h2><br>
+		{% if atendimentos %}
+		<table class="table table-striped" style="font-size: 11px;">
+			<thead>
+				<tr>
+					<th style="text-align: center">Data</th>
+					<th style="text-align: center">Troca de Filtro</th>
+					<th style="text-align: center">Troca de Máscara</th>
+					<th style="text-align: center">Relatório</th>
+					<th style="text-align: center">Fisioterapeuta</th>
+					<th style="text-align: center">Editar</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for atendimento in atendimentos %}
+				<tr>
+					<td style="text-align: center">{{ atendimento.data_atendimento|date:"d/m/Y" }}</td>
+					{% if atendimento.troca_de_filtro == True %}
+					<td style="text-align: center">Sim</td>
+					{% else %}
+					<td style="text-align: center">Não</td>
+					{% endif %}
+					{% if atendimento.troca_de_mascara == True %}
+					<td style="text-align: center">Sim</td>
+					{% else %}
+					<td style="text-align: center">Não</td>
+					{% endif %}
+					<td>{{ atendimento.relatorio_atendimento }}</td>
+					<td style="text-align: center">{{ atendimento.fisioterapeuta_atendimento.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                    <td style="text-align: center"><a href="{% url 'atendimento_edit' atendimento.id %}"><i class="fas fa-pencil-alt"></i></a></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		
+
+		{% else %}
+			<p>Nenhum atendimento encontrado para este paciente.</p>
+		{% endif %}
+    </div>
+</div>
+
+{% endblock %}

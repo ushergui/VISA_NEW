@@ -3,9 +3,28 @@
 <head>
     <title>Relatório de Pacientes Ativos em Oxigenoterapia</title>
     <style>
-        table { font-size: 12px; text-align: center; width: 100%; }
-        th { background-color: #f5f5f5; }
-        td, th { padding: 5px; }
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body {
+            margin: 1cm;  /* margem ao redor do conteúdo do body */
+        }
+        table { 
+            font-size: 12px; 
+            text-align: center; 
+            width: 100%; 
+            border-collapse: collapse;
+        }
+        th { 
+            background-color: #f5f5f5; 
+        }
+        td, th { 
+            padding: 5px; 
+            border: 1px solid #000; 
+            border-radius: 5px;  /* Arredonda as bordas */
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}  /* Linhas zebradas */
     </style>
 </head>
 <body>

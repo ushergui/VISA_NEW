@@ -1,6 +1,8 @@
 from django.db import models
 from cadastros.models import Logradouro
 from ckeditor.fields import RichTextField
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 class Fisioterapeuta(models.Model):
         nome_fisioterapeuta = models.CharField(max_length=100, null=False, verbose_name="Nome completo")
@@ -15,6 +17,7 @@ class Fisioterapeuta(models.Model):
         nivel_fisioterapeuta = models.CharField(max_length=19, null=False, choices=NIVEL_CHOICES)
 
         primeiro_nome_fisioterapeuta = models.CharField(max_length=16, null=False)
+        crefito = models.CharField(max_length=40, null=False)
         class Meta:
             ordering = ["nome_fisioterapeuta"]
 
@@ -62,6 +65,16 @@ class Paciente(models.Model):
     def __str__(self):
         return self.nome_paciente
 
+@receiver(pre_save, sender=Paciente)
+def update_related_status(sender, instance, **kwargs):
+    if instance.pk:  # significa que o objeto já existia, então é uma atualização
+        old_instance = sender.objects.get(pk=instance.pk)
+        if old_instance.status == "ATIVO" and instance.status in ["ÓBITO", "ALTA"]:  # significa que o status foi alterado de "ATIVO" para "ÓBITO" ou "ALTA"
+            # atualiza o status dos objetos Prescricao relacionados
+            Prescricao.objects.filter(paciente=instance, status="ATIVO").update(status=instance.status)
+            # atualiza o status dos objetos ModoDeUso relacionados
+            ModoDeUso.objects.filter(paciente=instance, status="ATIVO").update(status=instance.status)
+
 class Finalidade(models.Model):    
      finalidade = models.CharField(max_length=30, verbose_name="Finalidade")
      AGRUPAMENTO_CHOICES = (
@@ -94,7 +107,8 @@ class Cid(models.Model):
      nome_doenca = models.CharField(max_length=80, null=False, verbose_name="Nome da doença")
 
      def __str__(self):
-            return self.codigo_doenca
+            return f"{self.codigo_doenca} - {self.nome_doenca}"
+    
  
 class ModoDeUso(models.Model):
     paciente = models.ForeignKey(Paciente, null=False, related_name='Paciente', on_delete=models.PROTECT)
@@ -111,6 +125,13 @@ class ModoDeUso(models.Model):
     cid = models.ForeignKey(Cid, null=False, related_name='CID', on_delete=models.PROTECT)
     litros = models.CharField(null=True, blank=True, max_length=50)
     parametros = models.CharField(null=True, blank=True, max_length=300, verbose_name="Parâmetros")
+    STATUS_CHOICES = (
+    ("ATIVO","ATIVO"),
+    ("ÓBITO","ÓBITO"),
+    ("ALTA","ALTA"),
+    )
+    status = models.CharField(null=False, blank=False, max_length=15, verbose_name="Status", choices=STATUS_CHOICES, default="ATIVO")
+
     
     def __str__(self):
         data_inicio_uso_formatada = self.data_inicio_uso.strftime('%d/%m/%Y')
@@ -132,6 +153,15 @@ class Prescricao(models.Model):
     cid = models.ForeignKey(Cid, null=False, related_name='CID10', on_delete=models.PROTECT)
     litros = models.CharField(null=True, blank=True, max_length=50)
     parametros = models.CharField(null=True, blank=True, max_length=300, verbose_name="Parâmetros")
+    STATUS_CHOICES = (
+    ("ATIVO","ATIVO"),
+    ("ÓBITO","ÓBITO"),
+    ("ALTA","ALTA"),
+    )
+    status = models.CharField(null=False, blank=False, max_length=15, verbose_name="Status", choices=STATUS_CHOICES, default="ATIVO")
+    numero_oficio = models.CharField(null=True, blank=True, max_length=15, verbose_name="Número do Ofício")
+    data_oficio = models.DateField(null=True, blank=True, verbose_name="Data do Ofício")
+    destinatario_oficio = models.CharField(null=True, blank=True, max_length=45, verbose_name="Destinatário")
     
     def __str__(self):
         data_inicio_uso_formatada = self.data_inicio_uso.strftime('%d/%m/%Y')

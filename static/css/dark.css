@@ -4,13 +4,45 @@
     margin: auto; /* isso centraliza o formulário */
 }
 .form-container-2 {
-    width: 75%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
-
+    width: 58%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    margin: auto;
 }
 
+.empresa-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.protocolos-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    width: calc(100% - 50% - 20px); 
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 4px;
+    
+}
+
+
+h3{
+    font-size: 25px; font-style: bold; 
+}
+h4{
+    font-size: 15px; font-style: bold; font-weight: bold;/* Altere o valor conforme necessário */
+}
+p{
+    font-size: 13px;  /* Altere o valor conforme necessário */
+}
 .bordered-div {
-    width: 120%;
-    display: inline-block;
+    width: 100%;
     border: 2px solid #808080; /* Cor da borda em cinza */
     padding: 6px; /* Espaçamento interno para a borda não colar no texto */
     border-radius: 6px; /* Quinas arredondadas */

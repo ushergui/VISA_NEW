@@ -38,11 +38,11 @@ def listar_notificacoes(request):
             notificacoes = Notificacao.objects.filter(
                 semana_epidemiologica__in=ultimas_4_semanas,
                 resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']
-            ).select_related('semana_epidemiologica')
+            )
         except ValueError:
-            notificacoes = Notificacao.objects.all().select_related('semana_epidemiologica')
+            notificacoes = Notificacao.objects.all()
     else:
-        notificacoes = Notificacao.objects.all().select_related('semana_epidemiologica')
+        notificacoes = Notificacao.objects.all()
 
     context = {
         'notificacoes': notificacoes,
@@ -178,7 +178,7 @@ def boletim_resumo(request):
         casos_negativos=Count('pk', filter=Q(
             resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])),
         aguardando=Count('pk', filter=Q(
-            resultado__in=['Aguardando coleta', 'Aguardando agendamento', 'Aguardando resultado'])),
+            resultado__in=['Aguardando coleta', 'Aguardando agendamento', 'Aguardando resultado', 'Não agendado'])),
         faltas_recusa=Count('pk', filter=Q(resultado__in=['Faltou', 'Recusou'])),
         total_internacao=Count('pk', filter=Q(internacao__isnull=False)),
         total_obito=Count('pk', filter=Q(obito__isnull=False)),

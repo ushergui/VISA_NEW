@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
@@ -100,27 +100,6 @@ def criar_empresa(request):
 
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
 
-    """if form.is_valid():
-        empresa = form.save(commit=False)
-        # Obter o objeto Risco correspondente ao valor do campo risco_empresa
-        risco_empresa = form.cleaned_data['risco_empresa']
-        # Calcular o risco da empresa com base nos CNAEs selecionados
-        risco = 1
-        for cnae in empresa.cnae.all():
-            if cnae.risco_cnae.valor_risco > risco:
-                risco = cnae.risco_cnae.valor_risco
-        # Definir o risco da empresa como o maior risco encontrado
-        if risco > risco_empresa.valor_risco:
-            empresa.risco_empresa = risco
-        else:
-            empresa.risco_empresa = risco_empresa
-        empresa.save()
-        form.save_m2m()
-        return redirect('listar_empresas')
-
-    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})"""
-
-
 def editar_empresa(request, id):
     empresa = Empresas.objects.get(id=id)
     form = EmpresasForm(request.POST or None, instance=empresa)
@@ -133,18 +112,6 @@ def editar_empresa(request, id):
 
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
 
-    """if form.is_valid():
-        empresa = form.save(commit=False)
-        risco_empresa = form.cleaned_data['risco_empresa']
-
-        # Aqui você pode adicionar a lógica para redefinir o risco da empresa com base nos CNAEs selecionados
-        empresa.save()
-        form.save_m2m()
-        return redirect('listar_empresas')
-
-    
-    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})"""
-
 def excluir_empresa(request, id):
     empresa = Empresas.objects.get(id=id)
 
@@ -156,7 +123,8 @@ def excluir_empresa(request, id):
 
 def detalhe_empresa(request, empresa_id):
     empresa = Empresas.objects.get(id=empresa_id)
-    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa})
+    protocolos = ProtocoloEmpresa.objects.filter(empresa=empresa)
+    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa, 'protocolos': protocolos})
 
 def listar_risco(request):
     riscos = Risco.objects.all()
@@ -247,7 +215,9 @@ def novo_protocolo(request):
             return redirect('listar_protocolos')
     else:
         form = ProtocoloEmpresaForm()
-    return render(request, 'empresas/form.html', {'form': form})
+    titulo = "Cadastrar protocolo"
+    botao = "Cadastrar"
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
 
 def editar_protocolo(request, id):
     protocolo = get_object_or_404(ProtocoloEmpresa, id=id)
@@ -266,4 +236,159 @@ def excluir_protocolo(request, id):
         protocolo.delete()
         return redirect('listar_protocolos')
     return render(request, 'empresas/form-excluir.html', {'protocolo': protocolo})
+
+def listar_inspecao(request):
+    inspecoes = Inspecao.objects.all()
+    return render(request, 'empresas/listar_inspecao.html', {'inspecoes': inspecoes})
+
+def cadastrar_inspecao(request):
+    titulo = "Cadastro de Inspeção"
+    botao = "Cadastrar"
+    if request.method == "POST":
+        form = InspecaoForm(request.POST, request.FILES) 
+        if form.is_valid():
+            form.save()
+            return redirect('listar_inspecao')
+    else:
+        form = InspecaoForm()
+    return render(request, 'empresas/form-upload.html', {'form': form, 'titulo':titulo, 'botao':botao})
+
+
+def alterar_inspecao(request, id):
+    titulo = "Alterar Inspeção"
+    botao = "Gravar"
+    inspecao = Inspecao.objects.get(id=id)
+    if request.method == "POST":
+        form = InspecaoForm(request.POST, request.FILES, instance=inspecao)  # Adicionado request.FILES
+        if form.is_valid():
+            form.save()
+            return redirect('listar_inspecao')
+    else:
+        form = InspecaoForm(instance=inspecao)
+    return render(request, 'empresas/form.html', {'form': form, 'titulo':titulo, 'botao':botao})
+
+
+def excluir_inspecao(request, id):
+    inspecao = Inspecao.objects.get(id=id)
+    if request.method == "POST":
+        inspecao.delete()
+        return redirect('listar_inspecao')
+    return render(request, 'empresas/form-excluir.html', {'obj': inspecao})
+
+def listar_acao_produtividade(request):
+    acoes = AcaoProdutividade.objects.all()
+    return render(request, 'empresas/listar_acao_produtividade.html', {'acoes': acoes})
+
+def criar_acao_produtividade(request):
+    if request.method == "POST":
+        form = AcaoProdutividadeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_acao_produtividade')
+    else:
+        form = AcaoProdutividadeForm()
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': 'Criar Ação de Produtividade', 'botao': 'Salvar'})
+
+def editar_acao_produtividade(request, id):
+    acao = get_object_or_404(AcaoProdutividade, id=id)
+    if request.method == "POST":
+        form = AcaoProdutividadeForm(request.POST, instance=acao)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_acao_produtividade')
+    else:
+        form = AcaoProdutividadeForm(instance=acao)
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': 'Editar Ação de Produtividade', 'botao': 'Atualizar'})
+
+def excluir_acao_produtividade(request, id):
+    acao = get_object_or_404(AcaoProdutividade, id=id)
+    if request.method == "POST":
+        acao.delete()
+        return redirect('listar_acao_produtividade')
+    return render(request, 'empresas/form-excluir.html', {'obj': acao})
+
+
+
+
+
+
+def listar_produtividade(request):
+    produtividades = Produtividade.objects.all()
+    return render(request, 'empresas/listar_produtividade.html', {'produtividades': produtividades})
+
+def criar_produtividade(request, protocolo_id):
+    acoes = AcaoProdutividade.objects.all()
+    protocolo = ProtocoloEmpresa.objects.get(id=protocolo_id)
+
+    if request.method == "POST":
+        form = ProdutividadeForm(request.POST, initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
+
+
+        fiscais_auxiliares_ids = request.POST.getlist('fiscal_auxiliar')
+        acoes_ids = request.POST.getlist('acoes')
+        multiplicadores = request.POST.getlist('multiplicadores')
+
+        if form.is_valid():
+            produtividade = form.save(commit=False)
+            produtividade.protocolo = protocolo
+            produtividade.fiscal_responsavel = protocolo.fiscal_responsavel
+            produtividade.save()
+            produtividade.fiscal_auxiliar.set(fiscais_auxiliares_ids)
+
+            for acao_id, multiplicador in zip(acoes_ids, multiplicadores):
+                AcaoProdutividadeRel.objects.create(
+                    acao_id=acao_id,
+                    produtividade=produtividade,
+                    multiplicador=multiplicador
+                )
+
+            produtividade.total = sum([
+                rel.acao.pontos * rel.multiplicador
+                for rel in produtividade.acaoprodutividaderel_set.all()
+            ])
+            produtividade.save()
+
+            return redirect('listar_produtividade')
+    else:
+        form = ProdutividadeForm(initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
+
+    return render(request, 'empresas/form-produtividade.html', {
+        'form': form, 
+        'acoes': acoes, 
+        'titulo': 'Criar Produtividade', 
+        'botao': 'Salvar'
+        
+    })
+
+"""Resolveu sim; Agora que o campo total  seja dinâmico usando ajax por exemplo para mostrar a prévia de quantos pontos serão enviados para o banco de dados, visto que ao selecionar o checkbox referente a cada acao, este já terá um valor de pontos associados, assim como quando digito um total no input do multiplicador relacionado a acao da produtividade:
+
+"""
+
+def editar_produtividade(request, id):
+    produtividade = get_object_or_404(Produtividade, id=id)
+
+    if request.method == 'POST':
+        form = ProdutividadeFormEdit(request.POST, instance=produtividade, protocolo=produtividade.protocolo, fiscal_responsavel=produtividade.fiscal_responsavel)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_produtividade')
+    else:
+        form = ProdutividadeFormEdit(instance=produtividade, protocolo=produtividade.protocolo, fiscal_responsavel=produtividade.fiscal_responsavel)
+
+    context = {
+        'form': form,
+        'produtividade': produtividade,
+        # outros contextos necessários
+    }
+
+    return render(request, 'empresas/form-produtividade-editar.html', context)
+
+
+def excluir_produtividade(request, id):
+    produtividade = get_object_or_404(Produtividade, id=id)
+    if request.method == "POST":
+        produtividade.delete()
+        return redirect('listar_produtividade')
+    return render(request, 'empresas/form-excluir.html', {'obj': produtividade})
+
 

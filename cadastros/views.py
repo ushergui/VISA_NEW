@@ -9,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import render_to_string
 from reportlab.pdfgen import canvas
 from braces.views import LoginRequiredMixin
-from datetime import datetime
+from datetime import datetime, date
 from .models import Estado, Cidade, Bairro, Logradouro, Proprietario, Terreno, Protocolo, Infracao, Inspecao, Fiscal, FeriadoRecesso, ValorVRM
 # Método para redirecionar o usuário após ele efetuar um cadastro
 from django.urls import reverse_lazy
@@ -218,7 +218,7 @@ class InspecaoCreate(LoginRequiredMixin, CreateView):
         return reverse('listar-inspecoes')
 
 
-from datetime import datetime, date
+
 
 class InfracaoCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')

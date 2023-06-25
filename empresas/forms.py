@@ -1,6 +1,6 @@
 from django import forms
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa
-from cadastros.models import Logradouro
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade
+from cadastros.models import Logradouro, Fiscal
 from django.core.exceptions import ValidationError
 import re
 
@@ -14,9 +14,6 @@ class CnaeForm(forms.ModelForm):
     class Meta:
         model = Cnae
         fields = '__all__'
-
-
-
 
 def valida_cpf(cpf):
     # remove caracteres não numéricos
@@ -139,4 +136,61 @@ class ProtocoloEmpresaForm(forms.ModelForm):
     class Meta:
         model = ProtocoloEmpresa
         fields = '__all__' 
+
+class InspecaoForm(forms.ModelForm):
+    class Meta:
+        model = Inspecao
+        fields = ['protocolo','data_inspecao', 'vigirisco','data_relatorio', 'legislacao', 'desenvolvimento', 'inadequacoes', 'observacoes', 'conclusao' ]
+
+class AcaoProdutividadeForm(forms.ModelForm):
+    class Meta:
+        model = AcaoProdutividade
+        fields = ['codigo_produtividade', 'acao', 'pontos']
+
+
+class ProdutividadeForm(forms.ModelForm):
+    class Meta:
+        model = Produtividade
+        fields = ('protocolo', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscal_auxiliar')
+        widgets = {
+    'protocolo': forms.Select(attrs={'disabled': 'disabled'}),
+    'fiscal_responsavel': forms.Select(attrs={'disabled': 'disabled'}),
+}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'fiscal_responsavel' in self.initial:
+            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        inspecao = cleaned_data.get("inspecao")
+        
+        if Produtividade.objects.filter(inspecao=inspecao).exists():
+            raise forms.ValidationError("Produtividade com esta Inspeção já existe.")
+        
+        return cleaned_data
+
+class ProdutividadeFormEdit(forms.ModelForm):
+    class Meta:
+        model = Produtividade
+        fields = ('total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_auxiliar')
+
+    protocolo = forms.CharField(max_length=200, disabled=True, required=False)
+    fiscal_responsavel = forms.CharField(max_length=200, disabled=True, required=False)
+
+    def __init__(self, *args, **kwargs):
+        protocolo = kwargs.pop('protocolo', None)
+        fiscal_responsavel = kwargs.pop('fiscal_responsavel', None)
+        super().__init__(*args, **kwargs)
+
+        if protocolo:
+            self.fields['protocolo'].initial = protocolo
+        if fiscal_responsavel:
+            self.fields['fiscal_responsavel'].initial = fiscal_responsavel
+
+        if 'fiscal_responsavel' in self.initial:
+            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
+
+
 

@@ -1,37 +1,31 @@
 {% extends 'basy.html' %}
+
 {% load static %}
 
 {% block conteudo %}
-  <h2>Protocolos da Empresa</h2>
-  <div class="table-responsive">
-    <table class="table" id="tabela-listar">
-      <thead>
-        <tr>
-          <th>Número do Protocolo</th>
-          <th>Empresa</th>
-          <th>Observações</th>
-          <th>Status do Protocolo</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for protocolo in protocolos %}
-          <tr>
-            <td>{{ protocolo.numero_protocolo }}</td>
-            <td>{{ protocolo.empresa }}</td>
-            <td>{{ protocolo.observacoes_protocolo }}</td>
-            <td>{{ protocolo.status_protocolo }}</td>
-            <td>
-              <a class="btn btn-info" href="{% url 'editar_protocolo' protocolo.id %}">Editar</a>
-              <a class="btn btn-danger" href="{% url 'excluir_protocolo' protocolo.id %}">Excluir</a>
-              <a class="btn btn-primary" href="{% url 'criar_produtividade' protocolo.id %}">Criar Produtividade</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<h3>Lista de Inspeções</h3>
+<table class="table table-striped" id="tabela-listar">
+    <tr>
+        <th>Data Inspeção</th>
+        <th>Data Relatório</th>
+        <th>Legislação</th>
+        <!-- E assim por diante para todos os campos que você quer mostrar -->
+    </tr>
+    {% for inspecao in inspecoes %}
+    <tr>
+        <td>{{ inspecao.data_inspecao }}</td>
+        <td>{{ inspecao.data_relatorio }}</td>
+        <td>{{ inspecao.legislacao }}</td>
+        <!-- E assim por diante para todos os campos que você quer mostrar -->
+        <td>
+            <a href="{% url 'alterar_inspecao' inspecao.id %}">Editar</a>
+            <a href="{% url 'excluir_inspecao' inspecao.id %}">Excluir</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
+
 {% block scripts %}
 <script>
 
@@ -74,3 +68,4 @@
 </script>
 
 {% endblock %}
+

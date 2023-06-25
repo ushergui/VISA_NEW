@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+{% load static %}
+{% load my_tags %}
+{% load custom_filters %}
+<html>
+<head>
+    <title>Termo de autorização de uso de bem público</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 3cm 1cm 3cm 1cm;  /* margem ao redor do conteúdo do body */
+            @top-center {
+                content: element(header);
+            }
+        }
+        #header {
+            position: running(header);
+            width: 100%;
+        }
+        body {
+            margin: 0;  /* remova a margem do body */
+        }
+        img {
+            width: 300px;
+            margin: auto;
+            display: block;
+        }
+        .title {
+            text-align: center;
+            text-decoration: underline;
+            font-family: Arial;
+            font-size: 14px;
+        }
+        .paragrafo {
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            white-space: normal;
+            text-align: justify;
+            line-height: 2.1;
+            font-size: 14px;
+            margin: 30px;
+        }
+        .right-align {
+            text-align: right;
+        }
+        .center-align {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="{% static 'img/Cabecalho.png' %}" alt="Cabeçalho da Secretaria de Saúde">
+    </div>
+    <p class="title">TERMO DE AUTORIZAÇÃO DE USO DE BEM PÚBLICO</p>
+	<p class="paragrafo">
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pelo presente Termo de Autorização de Uso de Bem Público, de um lado o <strong>MUNICÍPIO DE SÃO SEBASTIÃO DO PARAÍSO</strong> (cedente), inscrito no CNPJ/MF sob nº 18.241.349/0001-80, com endereço na Praça dos Imigrantes, nº 100 - Lagoinha, comarca de São Sebastião do Paraíso/MG, neste ato representado pela(o) Secretária(o) Municipal de Saúde, endereço Av. Wenceslau Braz, nº 1362 - Vila Formosa, CEP 37955-134, do outro lado o(a) Sr(a). <strong>{{ paciente.nome_paciente|capitalize_name }}</strong>, brasileiro(a), portador(a) do CPF nº <strong>{{ paciente.cpf_paciente }}</strong> e RG <strong>{{ paciente.rg_paciente }}</strong>, residente e domiciliado(a) à {{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }}{% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}, acordam entre si, o presente termo mediante as cláusulas e condições seguintes:
+	</p>
+	<p class="paragrafo">
+		<strong>Cláusula primeira - DO OBJETO: </strong> Constitui objeto do presente termo a autorização de uso do equipamento <strong>{% for equipamento in mododeuso.equipamento.all %} {{ equipamento.nome_equipamento }} - Modelo {{ equipamento.modelo_equipamento }}{% endfor %}</strong>, locado da empresa <strong>{% for equipamento in mododeuso.equipamento.all %} {{ equipamento.empresa_equipamento }}.{% endfor %}</strong>
+
+	</p>
+	<p class="paragrafo">
+		<strong>Cláusula segunda – DO USO:</strong> O(s) aparelho(s) cedido(s), destina(m)-se a uso exclusivo do CESSIONÁRIO, não podendo, em hipótese alguma, comercializar com qualquer ente público ou mesmo com terceiros. 
+	</p>
+	<p class="paragrafo">
+		<strong>Cláusula terceira - DA GRATUIDADE: </strong>A ocupação e uso do bem público, mencionado na cláusula primeira, será gratuita, porém, o CESSIONÁRIO se compromete a:
+	</p>
+	<p class="paragrafo">
+		<strong>3.1 - </strong>Zelar pela integridade do bem, conservando-o em perfeito estado;<br>
+        <strong>3.2 - </strong>Devolver o bem, objeto do presente ajuste, em perfeitas condições, ressalvado o seu desgaste normal, a ser avaliado por profissional competente designado pela cedente, em caso de superveniente desnecessidade ou no caso de sua rescisão antecipada;<br>
+         <strong>3.3 - </strong>Considerando que o presente equipamento é alugado da empresa mencionada acima, fica cessionário ciente de que, caso haja superveniente desnecessidade ou mude de cidade, deverá imediatamente devolvê-lo ao Município, sob pena de responder judicialmente, inclusive ter que arcar com o valor pago, pelo município, desnecessariamente em aluguéis;<br>
+         <strong>3.4 - </strong>Permitir à PREFEITURA a fiscalização do bem, por meio de servidores designados por ela para tal finalidade;<br>
+         <strong>3.5 - </strong>Arcar com todas as despesas de instalação e manutenção do aparelho, tais como: energia elétrica, água, etc.;<br>
+         <strong>3.6 - </strong>Em caso de perda, a qualquer título, ou dano no(s) bem(ns) cedido(s), ressarcir a cedente pelos prejuízos causados, podendo, a critério da cedente, tal reposição ser realizada por bem(ns) de igual valor, espécie, qualidade e quantidade.<br>
+	</p>
+    <p class="paragrafo">
+		<strong>Cláusula quarta - DA CONVENÇÃO ENTRE AS PARTES: </strong>
+	</p>
+    <p class="paragrafo">
+		<strong>I – DAS OBRIGAÇÕES: </strong>
+	</p>
+    <p class="paragrafo">
+		<strong>4.1 - </strong>O cessionário, além da obrigação de conservação do bem e respeito ao fim que se destina, e das que importem na segurança do bem, sem alterar suas, obriga-se a todas as outras, devendo trazer o bem em boas condições de higiene e limpeza para restituí-lo em perfeito estado, findo o prazo de ocupação, ou determinada a sua restituição, pelo Poder Público Municipal, sem direito a retenção;
+	</p>
+    <p class="paragrafo">
+		<strong>II – DO PRAZO E DAS DISPOSIÇÕES GERAIS:</strong>
+	</p>
+    <p class="paragrafo">
+		<strong>4.2 - </strong>A presente autorização de uso é feita até que perdure a necessidade clínica do paciente na utilização, a qual será avaliada constantemente pelo profissional da Secretaria Municipal de Saúde deste Município ou caso haja qualquer descumprimento deste termo pelo cessionário;
+	</p>
+    <p class="paragrafo">
+		<strong>III – OBRIGAÇÕES GERAIS DO CESSIONÁRIO:</strong>
+	</p>
+    <p class="paragrafo">
+		<strong>4.3 - </strong>Manter o(s) bem(ns), objeto(s) do presente Termo de Autorização, em perfeito estado, para assim restituí-lo(s) ao Patrimônio Público ao final da presente autorização;
+	</p>
+    <p class="paragrafo">
+		<strong>4.4 - </strong>O cessionário compromete-se a não repassar esta autorização de uso, não transferir, não sublocar, não ceder ou emprestar o objeto do presente termo sob qualquer pretexto, ou por igual ou semelhante forma alterar o fim a que se destina este objeto, sem o consentimento prévio e expresso da cedente. O decurso do tempo, por si só, ou a demora da PREFEITURA em reprimir a infração, não constitui assentimento à mesma;
+	</p>
+    <p class="paragrafo">
+		<strong>4.5 - O cessionário poderá utilizar o(s) aparelho(s) objeto(s) do presente termo em hospitais, nos casos onde a necessidade de uso seja imperiosa e o hospital não tenha condições de fornecê-lo(a). Nestes casos, todos os deveres referentes à utilização, conservação e devolução do objeto, inerentes ao cessionário, também serão de responsabilidade do hospital, o qual o paciente em uso do aparelho esteja internado.</strong>
+	</p>
+    <p class="paragrafo">
+        <strong>IV – DA SUSPENSÃO: </strong>
+    </p>
+    <p class="paragrafo">
+        <strong>4.5 - </strong>A infração das obrigações previstas no item anterior e das previstas no presente instrumento, sem prejuízo de qualquer outra prevista em lei, por parte do <strong>CESSIONÁRIO</strong>, é considerada como de natureza grave, podendo acarretar a suspensão ou cancelamento da presente Autorização de Uso, com a consequente obrigatoriedade de imediata satisfação de consectários contratuais e legais;
+    </p>
+	<p class="paragrafo">
+        <strong>VI – RESCISÃO: </strong>
+    </p>
+	<p class="paragrafo">
+        <strong>4.6 - </strong>A presente autorização de uso será rescindida, automaticamente, a qualquer tempo, se constatado o não cumprimento das obrigações previstas nos itens anteriores, ou sempre que a conveniência e o interesse público assim o exigir, estando sempre sujeita à legislação municipal e às demais normas legais, no que couber;
+    </p>
+	<p class="paragrafo">
+        <strong>Cláusula Quinta: CLÁUSULA PENAL: </strong>
+    </p>
+	<p class="paragrafo">
+        <strong>5 - </strong> O cessionário obriga-se a respeitar o presente Termo em todas as suas cláusulas e condições, incorrendo na rescisão deste, o não cumprimento de qualquer uma de suas cláusulas, ficando obrigado, ainda, a Substituir <strong>o(s) equipamento(s) pelo(s) mesmo(s) modelo e marca </strong>do patrimônio público por qualquer dano causado ao aparelho objeto da presente autorização de uso;
+    </p>
+    <p class="paragrafo">
+        <strong>Por estarem justos e acordados, assinam o presente em 03 (três) vias, de igual teor e forma, para um só efeito.</strong> 
+    </p>
+    <p class="right-align">
+        São Sebastião do Paraíso, {{ mododeuso.data_inicio_uso }}
+    </p><br><br>
+    <p class="center-align">
+        ___________________________________
+    </p>
+    <p class="center-align">
+        Secretária(o) Municipal de Saúde
+    </p><br><br>
+
+    <p class="center-align">
+        ___________________________________
+    </p>
+    <p class="center-align">
+        Cessionário ou Representante
+    </p>
+
+  </body>
+</html>
+

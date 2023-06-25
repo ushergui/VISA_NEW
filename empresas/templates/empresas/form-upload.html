@@ -9,7 +9,7 @@
 <div class="form-container">
 <h3> {{ titulo }}</h3>
 <hr>
-<form action="" method="POST">
+<form action="" method="POST" enctype="multipart/form-data">
 
     {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
 
@@ -89,7 +89,7 @@ $(document).ready(function() {
 		$('#id_cnae').select2();
         $('#id_tipo').select2();
         $('#id_empresa').select2();
-        
+        $('#id_protocolo').select2();
         $('#id_forma_de_recebimento').select2();
         $('#id_motivo').select2();
         $('#id_bairro').select2();

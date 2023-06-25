@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import PacienteListView, PacienteCreateView, PacienteUpdateView, PacienteDeleteView, FisioterapeutaListView, FisioterapeutaCreateView, FisioterapeutaUpdateView, FisioterapeutaDeleteView, EquipamentoCreateView, EquipamentoUpdateView
 from .views import EquipamentoDeleteView, EquipamentoListView, DescartavelCreateView, DescartavelUpdateView, DescartavelDeleteView, DescartavelListView, CidCreateView, CidDeleteView, CidListView, CidUpdateView, PrescricaoCreateView
-from .views import PrescricaoUpdateView, PrescricaoListView, PrescricaoDeleteView, AtendimentoUpdateView, AtendimentoListView, UsfCreateView, UsfListView, UsfDeleteView, UsfUpdateView, AtendimentoCreateView, AtendimentoDeleteView
+from .views import PrescricaoUpdateView, PrescricaoListView, PrescricaoDeleteView, AtendimentoUpdateView, AtendimentoListView, UsfCreateView, UsfListView, UsfDeleteView, UsfUpdateView, AtendimentoCreateView, AtendimentoDeleteView, AtendimentosRealizados
 from .views import ModoDeUsoCreateView, ModoDeUsoListView, ModoDeUsoUpdateView, ModoDeUsoDeleteView, FinalidadeCreateView, FinalidadeListView, FinalidadeUpdateView, FinalidadeDeleteView
 from . import views
 from .views import relatorio_pacientes_ativos_oxigenoterapia, relatorio_pacientes_ativos_ventilacao, relatorio_para_visita, relatorio_para_visita_pdf, aparelhos_alugados, aparelhos_alugados_pdf
@@ -51,6 +51,7 @@ urlpatterns = [
     path('atendimento/new/<int:prescricao_id>/', AtendimentoCreateView.as_view(), name='atendimento_new'),
     path('atendimento/delete/<int:pk>/', AtendimentoDeleteView.as_view(), name='atendimento_delete'),
     path('atendimentos', AtendimentoListView.as_view(), name='atendimento_list'),
+    path('atendimentos/realizados', AtendimentosRealizados.as_view(), name='atendimentos_realizados'),
 
     path('usfs', UsfListView.as_view(), name='usf_list'),
     path('usf/new/', UsfCreateView.as_view(), name='usf_new'),
@@ -69,5 +70,10 @@ urlpatterns = [
     path('aparelhos_alugados/', aparelhos_alugados, name='aparelhos_alugados'),
     path('aparelhos_alugados_pdf/', aparelhos_alugados_pdf, name='aparelhos_alugados_pdf'),
     path('relatorio_troca_de_filtro/', views.relatorio_troca_de_filtro, name='relatorio_troca_de_filtro'),
+    path('relatorio_troca_de_mascara/', views.relatorio_troca_de_mascara, name='relatorio_troca_de_mascara'),
+    path('pesquisa_paciente/', views.pesquisa_paciente, name='pesquisa_paciente'),
+    path('detalhes_paciente/<int:paciente_id>/', views.detalhes_paciente, name='detalhes_paciente'),
+    path('termo_de_uso/<int:paciente_id>/', views.termo_de_uso, name='termo_de_uso'),
+    path('oficio_cpap_bipap/<int:paciente_id>/', views.oficio_cpap_bipap, name='oficio_cpap_bipap'),
 
 ]

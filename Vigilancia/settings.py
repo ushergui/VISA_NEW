@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'usuarios.apps.UsuariosConfig',
     'crispy_forms',
     'ckeditor',
-    'django_cleanup.apps.CleanupConfig'
+    'django_cleanup.apps.CleanupConfig',
+    'django_extensions',
 
     #nome-do-app.apps.nome-do-app-Config
 ]
@@ -78,7 +79,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'custom_filters': 'cadastros.templatestags.custom_filters',
-                'my_crispy_forms_filters': 'cadastros.templatestags.my_crispy_forms_filters',
+                'my_tags': 'cadastros.templatestags.my_tags',
             },
         },
     },
@@ -156,11 +157,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
-] #Pra reconhecer onde está o arquivo estático na nossa máquina
+    BASE_DIR / 'static',
+]
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+# Aqui é onde o Django irá coletar todos os seus arquivos estáticos em produção
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

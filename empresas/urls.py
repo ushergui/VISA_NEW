@@ -42,4 +42,19 @@ urlpatterns = [
     path('protocolo/excluir/<int:id>', excluir_protocolo, name='excluir_protocolo'),
 
 
+    path('inspecao/', views.listar_inspecao, name='listar_inspecao'),
+    path('inspecao/novo', views.cadastrar_inspecao, name='cadastrar_inspecao'),
+    path('inspecao/editar/<int:id>', views.alterar_inspecao, name='alterar_inspecao'),
+    path('inspecao/excluir/<int:id>', views.excluir_inspecao, name='excluir_inspecao'),
+
+    path('acao-produtividade/', views.listar_acao_produtividade, name='listar_acao_produtividade'),
+    path('acao-produtividade/novo', views.criar_acao_produtividade, name='criar_acao_produtividade'),
+    path('acao-produtividade/editar/<int:id>/', views.editar_acao_produtividade, name='editar_acao_produtividade'),
+    path('acao-produtividade/excluir/<int:id>/', views.excluir_acao_produtividade, name='excluir_acao_produtividade'),
+
+    path('produtividade/', views.listar_produtividade, name='listar_produtividade'),
+    path('produtividade/novo/<int:protocolo_id>/', views.criar_produtividade, name='criar_produtividade'),
+    path('produtividade/editar/<int:id>/', views.editar_produtividade, name='editar_produtividade'),
+    path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
+
 ]

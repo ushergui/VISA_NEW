@@ -75,54 +75,117 @@ class Empresas(models.Model):
         return self.razao
 
 class ProtocoloEmpresa(models.Model):
-    numero_protocolo = models.CharField(max_length=12, null=False)
+    numero_protocolo = models.CharField(max_length=12, null=False, verbose_name="Número do protocolo")
     empresa = models.ForeignKey(Empresas, on_delete=models.PROTECT)
-    observacoes_protocolo = models.CharField(max_length=250, null=False)
-    STATUS_CHOICES = (
-        ("Aguardando escolha/entrega de fiscal", "Aguardando escolha/entrega de fiscal"),    
-        ("Aguardando realização de inspeção/ emissão de relatório", "Aguardando realização de inspeção/ emissão de relatório"),
-        ("Aguardando avaliação pela coordenação", "Aguardando avaliação pela coordenação"),
-        ("Protocolo finalizado", "Protocolo finalizado"),
-
-    )
-    status_protocolo = models.CharField(max_length=80, null=False, choices=STATUS_CHOICES)
+    
     MOTIVO_CHOICES = (
-        ("Alvará Sanitário Inicial", "Alvará Sanitário Inicial"),    
-        ("Renovação do alvará", "Renovação do alvará"),    
-        ("Verificação de risco - a pedido", "Verificação de risco - a pedido"),    
-        ("Verificação de risco  - busca ativa", "Verificação de risco  - busca ativa"),    
-        ("Denúncia", "Denúncia"),    
-        ("Requisição de outros órgãos", "Requisição de outros órgãos"),    
-        ("Inutilização de produtos", "Inutilização de produtos"),    
-        ("Reinspeção a pedido", "Reinspeção a pedido"),    
-        ("Reinspeção expontânea", "Reinspeção expontânea"),    
-        ("Busca ativa - sem alvará", "Busca ativa - sem alvará"),    
-        ("Assinatura de livro de ótica", "Assinatura de livro de ótica"),    
-        ("Assinatura de livro de psicotrópicos", "Assinatura de livro de psicotrópicos"),    
-        ("Entrega de balanços/notificações de receita", "Entrega de balanços/notificações de receita"),    
-        ("Autorização de eventos", "Autorização de eventos"),    
-        ("Autorização de ambulantes", "Autorização de ambulantes"),    
-
+        ("1", "Alvará Sanitário Inicial"),    
+        ("2", "Renovação do alvará"),    
+        ("3", "Verificação de risco - a pedido"),    
+        ("3", "Verificação de risco  - busca ativa"),    
+        ("4", "Denúncia"),    
+        ("5", "Requisição de outros órgãos"),    
+        ("6", "Inutilização de produtos"),    
+        ("7", "Reinspeção a pedido"),    
+        ("8", "Reinspeção expontânea"),    
+        ("9", "Busca ativa - sem alvará"),    
+        ("10", "Assinatura de livro de ótica"),    
+        ("11", "Assinatura de livro de psicotrópicos"),    
+        ("12", "Entrega de balanços/notificações de receita"),    
+        ("13", "Autorização de eventos"),    
+        ("14", "Autorização de ambulantes"),    
+        ("15", "Outros assuntos"),    
     )
     motivo = models.CharField(max_length=120, null=False, choices=MOTIVO_CHOICES)
     FORMA_CHOICES = (
-        ("Presencialmente", "Presencialmente"),    
-        ("Telefone", "Telefone"),    
-        ("Ouvidoria", "Ouvidoria"),    
-        ("E-mail", "E-mail"),    
-        ("Whatsapp", "Whatsapp"),    
+        ("1", "Presencialmente"),  
+        ("7", "Não se aplica"),  
+        ("2", "Telefone"),    
+        ("3", "Ouvidoria"),    
+        ("4", "E-mail"),    
+        ("5", "Whatsapp"),    
+        ("6", "Rede SIM"),    
+            
     )
-    forma_de_recebimento = models.CharField(max_length=80, null=False, choices=FORMA_CHOICES)
-    entrada_protocolo = models.DateField(null=False)
-    entrada_fiscal = models.DateField(null=False)
-    encerramento_protocolo = models.DateField(null=True, blank=True)
+    forma_de_recebimento = models.CharField(max_length=80, null=False, choices=FORMA_CHOICES, default=1)
+
+    entrada_protocolo = models.DateField(null=False, verbose_name="Data de abertura do protocolo")
+    entrada_fiscal = models.DateField(null=True, blank=True, verbose_name="Data de entrega para o fiscal")
+    encerramento_protocolo = models.DateField(null=True, blank=True, verbose_name="Data de encerramento")
+    STATUS_CHOICES = (
+        ("1", "Aguardando escolha/entrega de fiscal (Administrativo)"),    
+        ("2", "Aguardando realização de inspeção/ emissão de relatório (Fiscal)"),
+        ("3", "Aguardando avaliação/ revisão (Coordenação)"),
+        ("4", "Protocolo finalizado"),
+
+    )
+    fiscal_responsavel = models.ForeignKey(Fiscal, on_delete=models.PROTECT)
+    status_protocolo = models.CharField(max_length=80, null=False, choices=STATUS_CHOICES, default=1,verbose_name="Status")
+    observacoes_protocolo = models.CharField(max_length=250, null=True, blank=True, verbose_name="Observações")
     
     class Meta:
         ordering = ["empresa"]
 
     def __str__(self):
-        return self.numero_protocolo
+        return f"{self.numero_protocolo} - {self.empresa}"
 
     def save(self, *args, **kwargs):
         self.numero_protocolo = self.numero_protocolo.upper()
         super(ProtocoloEmpresa, self).save(*args, **kwargs)
+
+class Inspecao(models.Model):
+    data_inspecao = models.DateField(null=False, verbose_name="Data da Inspeção")
+    data_relatorio = models.DateField(null=False, verbose_name="Data do Relatório")
+    legislacao = models.TextField(null=True, blank=True, verbose_name="Legislação")
+    desenvolvimento = models.TextField(null=True, blank=True, verbose_name="Desenvolvimento")
+    inadequacoes = models.TextField(null=True, blank=True, verbose_name="Inadequações")
+    observacoes = models.TextField(null=True, blank=True, verbose_name="Observações")
+    conclusao = models.TextField(null=True, blank=True, verbose_name="Conclusão")
+    protocolo = models.OneToOneField(ProtocoloEmpresa, on_delete=models.CASCADE)
+    vigirisco = models.FileField(upload_to='pdf/', verbose_name="Arquivo do Vigi-Risco")
+
+    class Meta:
+        ordering = ["data_inspecao"]
+
+    def __str__(self):
+        return f"Inspeção {self.protocolo.numero_protocolo}"
+
+class AcaoProdutividade(models.Model):
+    codigo_produtividade = models.CharField(max_length=15, unique=True, verbose_name="Código")
+    acao = models.CharField(max_length=200, verbose_name="Ação")
+    pontos = models.DecimalField(max_digits=5, decimal_places=1, verbose_name="Pontos")
+
+    def __str__(self):
+        return f"{self.codigo_produtividade} - {self.acao}"
+
+class AcaoProdutividadeRel(models.Model):
+    acao = models.ForeignKey(AcaoProdutividade, on_delete=models.CASCADE)
+    produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE) 
+    multiplicador = models.DecimalField(max_digits=3, decimal_places=1, verbose_name="Multiplicador")
+
+    def __str__(self):
+        return f"{self.acao} (multiplicador: {self.multiplicador})"
+    
+class Produtividade(models.Model):
+    protocolo = models.ForeignKey(ProtocoloEmpresa, on_delete=models.CASCADE)
+    acoes = models.ManyToManyField(AcaoProdutividade, through=AcaoProdutividadeRel, verbose_name="Ações de Produtividade")
+    total = models.DecimalField(max_digits=5, decimal_places=1, verbose_name="Total de Pontos", null=True, blank=True)
+    data_saida_fiscal = models.DateField(null=False, blank=False, verbose_name="Data de Saída do Fiscal")
+    tempo_gasto = models.DecimalField(max_digits=2, decimal_places=1, verbose_name="Tempo gasto")
+    mes_produtividade = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
+    inspecao = models.OneToOneField(Inspecao, on_delete=models.CASCADE, null=True, blank=True)
+    fiscal_responsavel = models.ForeignKey(Fiscal, on_delete=models.PROTECT, blank=True, null=True)
+    fiscal_auxiliar = models.ManyToManyField(Fiscal, related_name='fiscais_auxiliares', blank=True)
+    validacao = models.BooleanField(default=False)
+    
+
+    def save(self, *args, **kwargs):
+        if self.protocolo and not self.fiscal_responsavel:
+            self.fiscal_responsavel = self.protocolo.fiscal_responsavel
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Produtividade do protocolo {self.protocolo.numero_protocolo}"
+
+
+

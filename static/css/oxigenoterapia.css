@@ -1,3 +1,9 @@
+.container-centralizado {
+    width: 85%;
+    margin: auto;
+}
+
+
 .form-container {
     background-color: #76a2ce; /* Este é um tom de azul claro, você pode alterá-lo de acordo com suas necessidades */
     width: 33.33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
@@ -13,6 +19,91 @@
         padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
         border-radius: 5px; /* Isso faz com que as bordas do formulário sejam levemente arredondadas */
     }
+}
+
+.form-container-2 {
+    background-color: #ffffff; /* Alterando o fundo para branco */
+    border: 4px solid #76a2ce; /* Adicionando uma borda azul */
+    width: 42%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    margin: auto; /* isso centraliza o formulário */
+    padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+    border-radius: 10px; /* Aumentando a curvatura das bordas */
+}
+
+@media screen and (max-width: 768px) {
+    .form-container-2 {
+        background-color: #ffffff; /* Alterando o fundo para branco */
+        border: 4px solid #76a2ce; /* Adicionando uma borda azul */
+        width: 100%; /* Alterando a largura para 100% em telas menores */
+        padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+        border-radius: 10px; /* Aumentando a curvatura das bordas */
+    }
+}
+
+.paciente-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.prescricao-container,
+.atendimento-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    
+}
+
+.prescricao-e-uso-container {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.prescricao-container{
+    width: 50%;
+    margin-right: 20px; 
+}
+.atendimento-container {
+    width: calc(50% - 10px);
+    
+}
+
+
+@media screen and (max-width: 768px) {
+    .prescricao-e-uso-container {
+        flex-direction: column;
+    }
+
+    .paciente-container,
+    .prescricao-container,
+    .atendimento-container {
+        width: 100%;
+    }
+}
+
+.atendimento-container {
+    width: 50%;
+}
+
+@media screen and (max-width: 768px) {
+    .paciente-container,
+    .prescricao-container,
+    .atendimento-container {
+        width: 100%;
+    }
+}
+
+table tr {
+    border: 1px solid rgba(0,0,0,.05);
+    
 }
 
 .table-container {
@@ -123,7 +214,24 @@ Alerta na validação dos formulários (login com senha errada, por exemplo)
     margin-bottom: 0;
 }
 
+h2 {
+    font-size: 1.5em; /* 40px/16=2.5em */
+  }
+  
+h4 {
+    font-size: 1em; /* 30px/16=1.875em */
+   }
+  
+p {
+    font-size: 0.875em; /* 14px/16=0.875em */
+  }
+li {
+    font-size: 0.875em; /* 14px/16=0.875em */
+  }
 
+.borda-div {
+    border: 1px solid #76a2ce;
+}
 /*
 Largura máxima das tabelas para não ficar mal formatada
 */

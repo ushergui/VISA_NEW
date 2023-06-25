@@ -1,132 +1,234 @@
 {% extends 'basy.html' %}
 {% load static %}
 {% load custom_filters %}
+<style type="text/css">
 
+    </style>
 
     <!-- Bloco de conteúdo -->
+{% block conteudo %}
+<div class="container-centralizado" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+    <div style="width: 50%;">
+        <div class="empresa-container">
+            <h3>Dados da empresa <a href="{% url 'editar_empresa' empresa.id %}"><i class="fas fa-pencil-alt"></i></a></h3><br>
+            <div class="row">
+				<div class="col-lg-6 ">
+					<h4>Razão Social/Nome</h4>
+					<p >{{ empresa.razao }}</p>
+				</div>
+				<div class="col-lg-6 ">
+					<h4>Nome Fantasia</h4>
+                    <p>
+                        {% if empresa.nome_fantasia %}
+                            {{ empresa.nome_fantasia }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+			</div>
+            <div class="row">
+				<div class="col-lg-1 ">
+					<h4>MEI</h4>
+                    
+                    <p>
+                        {% if empresa.mei %}
+                        <i class="fa-solid fa-circle-check" style="color: blue; font-size: 22px;"></i>
+                        {% else %}
+                        <i class="fa-solid fa-circle-xmark" style="color: red; font-size: 30px;"></i>
+                        {% endif %}
+                    </p>
+                    <!-- <input type="checkbox" disabled {% if empresa.mei %}checked{% endif %}>  -->
+					
+				</div>
+				<div class="col-lg-2 ">
+					<h4>CNPJ</h4>
+                    <p>
+                        {% if empresa.cnpj %}
+                            {{ empresa.cnpj }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+                <div class="col-lg-2 ">
+					<h4>Telefone</h4>
+                    <p>
+                        {% if empresa.telefone1 %}
+                            {{ empresa.telefone1 }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+                <div class="col-lg-2 ">
+					<h4>Telefone 2</h4>
+                    <p>
+                        {% if empresa.telefone2 %}
+                            {{ empresa.telefone2 }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+                <div class="col-lg-3 ">
+					<h4>Email</h4>
+                    <p>
+                        {% if empresa.email %}
+                            {{ empresa.email }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+                <div class="col-lg-1 ">
+					<h4>Alvará</h4>
+                    <p>
+                        {% if empresa.alvara %}
+                            {{ empresa.alvara|date:"d/m/Y" }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+			</div>
+            <div class="row">
+				<div class="col-lg-7 ">
+					<h4>Endereço</h4>
+					<p >{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}, {{ empresa.numero_empresa }}{% if empresa.complemento_empresa %} - {{ empresa.complemento_empresa }}{% else %}{% endif %} - {{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</p>
+				</div>
+				<div class="col-lg-3 ">
+					<h4>Risco empresa</h4>
+					<p>{{ empresa.risco_empresa }}</p>
+				</div>
+                <div class="col-lg-2">
+                    <h4>Status</h4>
+                    <p> {% if empresa.status_funcionamento == "ATIVA" %}
+                            <i class="fa fa-flag" aria-hidden="true" style="color: green; font-size: 24px;"></i>
+                        {% elif empresa.status_funcionamento == "BAIXADA" %}
+                            <i class="fa fa-flag" aria-hidden="true" style="color: red; font-size: 24px;"></i>
+                        {% elif empresa.status_funcionamento == "BAIXADA" %}
+                            <i class="fa fa-flag" aria-hidden="true" style="color: orchid; font-size: 24px;"></i>
+                        {% else %}
+                            Indefinido
+                        {% endif %}    
+                    </p>    
+                </div>
+                
+			</div>
+            <div class="row">
+				<div class="col-lg-12 ">
+					<h4>CNAE(s)</h4>
+					<p >{% for cnae in empresa.cnae.all %}
+                        {{ cnae.codigo_cnae }} - {{ cnae.descricao_cnae }}{% if not forloop.last %}; {% endif %}
+                        {% endfor %}</p>
+				</div>
+			</div>
+            <div class="row">
+				<div class="col-lg-7 ">
+					<h4>Responsável Legal</h4>
+					<p >{{ empresa.responsavel_legal|capitalize_name }}</p>
+				</div>
+                <div class="col-lg-2 ">
+					<h4>CPF</h4>
+                    <p>
+                        {% if empresa.cpf_responsavel_legal %}
+                            {{ empresa.cpf_responsavel_legal }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+            </div>
+                <div class="col-lg-3 ">
+					<h4>RG</h4>
+                    <p>
+                        {% if empresa.rg_responsavel_legal %}
+                            {{ empresa.rg_responsavel_legal }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+			</div>
+            <div class="row">
+				<div class="col-lg-7 ">
+					<h4>Responsável Técnico</h4>
+					<p >{{ empresa.responsavel_tecnico|capitalize_name }}</p>
+				</div>
+                <div class="col-lg-2 ">
+					<h4>CPF</h4>
+                    <p>
+                        {% if empresa.cpf_responsavel_tecnico %}
+                            {{ empresa.cpf_responsavel_tecnico }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+            </div>
+                <div class="col-lg-3 ">
+					<h4>Conselho</h4>
+                    <p>
+                        {% if empresa.conselho_responsavel_tecnico %}
+                            {{ empresa.conselho_responsavel_tecnico }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>
+				</div>
+			</div>
+            <div class="row">
+				<div class="col-lg-9 ">
+					<h4>Observações</h4>
+					<p >{{ empresa.observacoes }}</p>
+				</div>
+
+                <div class="col-lg-3 ">
+					<h4>Contabilidade</h4>
+					<p>{{ empresa.contabilidade.nome_contabilidade|capitalize_name }}</p>
+				</div>
+			</div>
     
-        {% block conteudo %}
-        <div class="form-container-2">
-            <div class="row mb-3">
-                <div class="col-sm-2">
-                    <div class="label-right">
-                        <label>Razão Social:</label>
-                    </div>
-                </div>
-                
-                <div class="col-sm-4">
-                    <div class="bordered-div">
-                        <span class="bordered-span-razao">{{ empresa.razao }}</span>
-                    </div>
-                </div>
-                <!-- Repita para os outros campos -->
-                <div class="col-sm-2">
-                    <div class="label-right">
-                        <label>Nome Fantasia:</label>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="bordered-div">
-                        <span class="bordered-span-razao">{{ empresa.nome_fantasia }}</span>
-                    </div>
-                </div>
-            </div>
-        
-        
-
-            <div class="row mb-3">
-                <div class="col-sm-2">
-                    <div class="label-right">
-                        <label>MEI</label>
-                    <input type="checkbox" disabled {% if empresa.mei %}checked{% endif %}>
-                </div>
-                
-                <div class="col-sm">
-                    <label>CNPJ:</label>
-                    <span class="bordered-span">{{ empresa.cnpj }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>Telefone:</label>
-                    <span class="bordered-span">{{ empresa.telefone1 }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>Recado:</label>
-                    <span class="bordered-span">{{ empresa.telefone2 }}</span>
-                </div>
-            </div>
+    
         </div>
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>Email:</label>
-                    <span class="bordered-span">{{ empresa.email }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>Data do Alvará:</label>
-                    <span class="bordered-span">{{ empresa.alvara }}</span>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>Endereço:</label>
-                    <span class="bordered-span">{{ empresa.logradouro_empresa }}</span>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>CNAE(s):</label>
-                    {% for cnae in empresa.cnae.all %}
-                    <span class="bordered-span">{{ cnae.codigo_cnae }} - {{ cnae.descricao_cnae }} - {{ cnae.risco_cnae }}{% if not forloop.last %},{% endif %}</span>
+        </div>
+        <div class="protocolos-container">
+            <h3>Protocolos <a href=""><i class="fas fa-plus"></i></a></h3><br>
+            <table class="table table-striped" style="font-size: 11px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: center">Número</th>
+                        <th style="text-align: center">Abertura</th>
+                        <th style="text-align: center">Motivo</th>
+                        <th style="text-align: center">Data fiscal</th>
+                        <th style="text-align: center">Status</th>
+                        <th style="text-align: center">Data de encerramento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for protocolo in protocolos %}
+                        <tr>
+                            <td style="text-align: center">{{ protocolo.numero_protocolo }}</td>
+                            <td style="text-align: center">{{ protocolo.entrada_protocolo|date:"d/m/Y" }}</td>
+                            <td style="text-align: center">{{ protocolo.motivo }}</td>
+                            <td style="text-align: center">{{ protocolo.entrada_fiscal|date:"d/m/Y" }}</td>
+                            <td style="text-align: center">{{ protocolo.status_protocolo }}</td>
+                            <td style="text-align: center">{{ protocolo.encerramento_protocolo|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center">Nenhum protocolo encontrado para esta empresa.</td>
+                        </tr>
                     {% endfor %}
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>Responsável Legal:</label>
-                    <span class="bordered-span">{{ empresa.responsavel_legal }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>RG:</label>
-                    <span class="bordered-span">{{ empresa.rg }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>CPF:</label>
-                    <span class="bordered-span">{{ empresa.cpf }}</span>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>Contabilidade:</label>
-                    <span class="bordered-span">{{ empresa.contabilidade }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>Risco da empresa:</label>
-                    <span class="bordered-span">{{ empresa.risco_empresa }}</span>
-                </div>
-                <div class="col-sm">
-                    <label>Status:</label>
-                    <span class="bordered-span">{{ empresa.status_funcionamento }}</span>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-sm">
-                    <label>Observações</label>
-                    <span class="bordered-span">{{ empresa.observacoes }}</span>
-                </div>
-            </div>
-
-            <div class="row mb-3 text-center">
-                <div class="col-sm">
-                    <a href="{% url 'editar_empresa' empresa.id %}" class="btn btn-primary">Editar</a>
-                </div>
-            </div>
+                        
+                   
+                </tbody>
+            </table>
             
+
         </div>
+</div>
+
         {% endblock %}
-    </div>
+    
                    
 

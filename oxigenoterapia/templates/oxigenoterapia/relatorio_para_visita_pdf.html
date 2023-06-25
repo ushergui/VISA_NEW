@@ -6,7 +6,7 @@
         <style>
             @page {
                 size: A4 landscape;
-                margin: 0;
+                margin: 1cm;
             }
             body {
                 margin: 1cm;  /* margem ao redor do conteúdo do body */
@@ -15,68 +15,177 @@
                 font-size: 12px; 
                 text-align: center; 
                 width: 100%; 
+                border-collapse: collapse;
             }
             th { 
                 background-color: #f5f5f5; 
             }
             td, th { 
                 padding: 5px; 
+                border: 1px solid #000; 
+                border-radius: 5px;  /* Arredonda as bordas */
             }
+            tr:nth-child(even) {background-color: #f2f2f2;}  /* Linhas zebradas */
         </style>
     </head>
 <body>
-    <h3> Fisioterapeuta: {% if usf and usf.nome_fisioterapeuta.primeiro_nome_fisioterapeuta %}
-        {{ usf.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}
-     {% else %}
-        Todos
-     {% endif %}
-      -  
-     {% if usf and usf.nome_fantasia_usf %}
-        {{ usf.nome_fantasia_usf }}
-     {% else %}
-        USF: Todas 
-        {% endif %}{% if equipamento_pesquisa %} - Pacientes de {{ equipamento_pesquisa|capitalize_name }}{% else %}
-         - Todos Equipamentos
-        {% endif %}</h3>
+    <h4> 
+        
+        {% if equipamento_pesquisa %}Pacientes de {{ equipamento_pesquisa|capitalize_name }}{% else %}
+        Todos Equipamentos
+       {% endif %}
+    
+    </h4>
+    <h4> Fisioterapeuta:
+        
+           {% if fisioterapeuta_pesquisa %}
+               {{ fisioterapeuta_pesquisa.primeiro_nome_fisioterapeuta|capitalize_name }}
+           {% else %}
+               Todos
+           {% endif %}
+     
+   </h4>
 
+   {% if busca_submetida %}
+    <div class="table-container table-responsive" style="margin-top: 30px;"></div>
+    {% if equipamento_pesquisa == "VENTILAÇÃO" %}
     <table class="table table-striped" style="font-size: 10px;">
-            <thead>
-                <tr>
-                    <th>Prontuário</th>
-                    <th>Paciente</th>
-                    <th>Telefone 1</th>
-                    <th>Telefone 2</th>
-                    <th>Endereço</th>
-                    <th>USF</th>
-                    <th>CID</th>
-                    <th>Equipamento(s)</th>
-                    <th>Modo de Uso</th>
-                    <th>Parâmetros</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for modo in modos_uso %}
-                <tr>
-                    <td>{{ modo.paciente.prontuario_paciente }}</td>
-                    <td>{{ modo.paciente.nome_paciente|capitalize_name }}</td>
-                    <td>{% if modo.paciente.telefone_paciente1 %}{{ modo.paciente.telefone_paciente1 }}</td>{% else %}{% endif %}</td>
-                    <td>{% if modo.paciente.telefone_paciente2 %}{{ modo.paciente.telefone_paciente2 }}</td>{% else %}{% endif %}</td>
-                    <td>{{ modo.paciente.logradouro_paciente.tipo|capitalize_name }} {{ modo.paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ modo.paciente.numero_paciente }} {% if modo.paciente.complemento_paciente %} {{ modo.paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ modo.paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
-                    <td>{{ modo.paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+        <thead>
+            <tr>
+                <th>Prontuário</th>
+                <th>Paciente</th>
+                <th>Telefone 1</th>
+                <th>Endereço</th>
+                <th>USF</th>
+                <th>CID</th>
+                <th>Fisioterapeuta</th>
+                <th>Equipamento(s)</th>
+                <th>Modo de Uso</th>
+                <th>Litros</th>
+                <th>Parâmetros</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente, modos_uso in modos_uso_por_paciente.items %}
+            <tr>
+                <td>{{ paciente.prontuario_paciente }}</td>
+                <td>{{ paciente.nome_paciente|capitalize_name }}</td>
+                <td>{% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                {% with modos_uso|last as modo %}
                     <td>{{ modo.cid.codigo_doenca }}</td>
                     <td>
                         {% for equip in modo.equipamento.all %}
                             {{ equip.nome_equipamento }}
                             {% if not forloop.last %}, {% endif %}
                         {% empty %}
-                            None
+                            Nenhum
                         {% endfor %}
                     </td>
                     <td>{{ modo.tempo_de_uso }}</td>
+                    <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
                     <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                {% endwith %}
+            </tr>
+            {% endfor %}
+        </tbody>
         </table>
+    {% elif equipamento_pesquisa == "OXIGENOTERAPIA" %}
+    <table class="table table-striped" style="font-size: 10px;">
+        <thead>
+            <tr>
+                <th>Prontuário</th>
+                <th>Paciente</th>
+                <th>Telefone 1</th>
+                <th>Endereço</th>
+                <th>USF</th>
+                <th>CID</th>
+                <th>Fisioterapeuta</th>
+                <th>Equipamento(s)</th>
+                <th>Modo de Uso</th>
+                <th>Litros</th>
+                <th>Parâmetros</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente, modos_uso in modos_uso_por_paciente.items %}
+            <tr>
+                <td>{{ paciente.prontuario_paciente }}</td>
+                <td>{{ paciente.nome_paciente|capitalize_name }}</td>
+                <td>{% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                {% with modos_uso|last as modo %}
+                    <td>{{ modo.cid.codigo_doenca }}</td>
+                    <td>
+                        {% for equip in modo.equipamento.all %}
+                            {{ equip.nome_equipamento }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Nenhum
+                        {% endfor %}
+                    </td>
+                    <td>{{ modo.tempo_de_uso }}</td>
+                    <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
+                    <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
+                {% endwith %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% else %}
+    <table class="table table-striped" style="font-size: 10px;">
+        <thead>
+            <tr>
+                <th>Prontuário</th>
+                <th>Paciente</th>
+                <th>Telefone 1</th>
+                <th>Endereço</th>
+                <th>USF</th>
+                <th>CID</th>
+                <th>Fisioterapeuta</th>
+                <th>Equipamento(s)</th>
+                <th>Modo de Uso</th>
+                <th>Litros</th>
+                <th>Parâmetros</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente, modos_uso in modos_uso_por_paciente.items %}
+            <tr>
+                <td>{{ paciente.prontuario_paciente }}</td>
+                <td>{{ paciente.nome_paciente|capitalize_name }}</td>
+                <td>{% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                {% with modos_uso|last as modo %}
+                    <td>{{ modo.cid.codigo_doenca }}</td>
+                    <td>
+                        {% for equip in modo.equipamento.all %}
+                            {{ equip.nome_equipamento }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Nenhum
+                        {% endfor %}
+                    </td>
+                    <td>{{ modo.tempo_de_uso }}</td>
+                    <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
+                    <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
+                {% endwith %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% endif %}
+    </div>
+
+{% else %}
+    <!-- Aqui você pode colocar alguma mensagem indicando que a tabela só será exibida após a busca. -->
+{% endif %}
+
         </body>
     </html>

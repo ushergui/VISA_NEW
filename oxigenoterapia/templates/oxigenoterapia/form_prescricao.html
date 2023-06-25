@@ -10,13 +10,14 @@
     <hr>
     <form action="" method="POST">
 
-        {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
+        {% csrf_token %}
 
-
+        <!-- campos comuns a ambas as classes -->
         {{ form.paciente|as_crispy_field }}
         {{ form.equipamento|as_crispy_field }}
         {{ form.data_inicio_uso|as_crispy_field }}
         {{ form.cid|as_crispy_field }}
+        {{ form.status|as_crispy_field }}
 
         <h3>Oxigenoterapia</h3>
         {{ form.tempo_de_uso|as_crispy_field }}
@@ -25,12 +26,20 @@
         <h3>Ventilação</h3>
         {{ form.parametros|as_crispy_field }}
 
+        <!-- verificar se a classe do objeto de formulário é 'Prescricao' -->
+        {% if form_class == 'Prescricao' %}
+        {{ form.numero_oficio|as_crispy_field }}
+        {{ form.data_oficio|as_crispy_field }}
+        {{ form.destinatario_oficio|as_crispy_field }}
+        {% endif %}
+
         <button type="submit" class="btn btn-primary center-button">
             {{ botao }}
         </button>
     </form>
 </div>
 {% endblock %}
+
 
 
 {% block scripts %}
@@ -42,11 +51,22 @@
         $('#id_logradouro_paciente').select2();
         $('#id_usf_paciente').select2();
         $('#id_equipamento').select2();
+        $('#id_paciente').select2();
+        $('#id_cid').select2();
+        $('#id_tempo_de_uso').select2();
         $('#id_nascimento_paciente').mask("00/00/0000");
         $('#id_data_inicio_uso').mask("00/00/0000");
         $('#id_data_atendimento').mask("00/00/0000");
         $('#id_data_obito').mask("00/00/0000");
+        $('#id_data_oficio').mask("00/00/0000");
         $('#id_data_alta').mask("00/00/0000");
+        $(document).ready(function(){
+            $('#id_numero_oficio').mask('000/0000', { 
+        placeholder: "__/____",
+        reverse: true,
+        maxlength: false
+    });
+});
         
         var $codigoDoenca = $('#id_codigo_doenca');
         $codigoDoenca.mask('S00').on('keyup', function() {

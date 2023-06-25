@@ -1,0 +1,43 @@
+{% extends 'oxigenoterapia/base.html' %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<h4>Pesquisa de Pacientes</h4>
+<form class="form-inline" action="{% url 'pesquisa_paciente' %}" method="get">
+    <div class="form-group">
+        <label for="q" class="mr-2">Pesquisa</label>
+        <input type="text" name="q" id="q" value="{{ request.GET.q }}" class="form-control-sm mr-4">
+    </div>
+
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
+        Pesquisar</button>
+</form>
+
+<br>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th style="text-align: center">Prontuário</th>
+            <th style="text-align: center">Nome</th>
+            <th style="text-align: center">Endereço</th>
+            <th style="text-align: center">USF</th>
+            <th style="text-align: center">Detalhes</th>
+            <th style="text-align: center">Novo atendimento</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for modo in modos_uso %}
+        <tr>
+            <td style="text-align: center">{{ modo.paciente.prontuario_paciente }}</td>
+            <td style="text-align: center">{{ modo.paciente.nome_paciente|capitalize_name }}</td>
+            <td style="text-align: center">{{ modo.paciente.logradouro_paciente.tipo|capitalize_name }} {{ modo.paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ modo.paciente.numero_paciente }} {% if modo.paciente.complemento_paciente %} {{ modo.paciente.complemento_paciente|capitalize_name }} {% else %} {% endif %}- {{ modo.paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+            <td style="text-align: center">{{ modo.paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+            <td style="text-align: center"><a href="{% url 'detalhes_paciente' modo.paciente.id %}" class="btn btn-success"><i class="fa-solid fa-clipboard-list"></i> Detalhes</a></td>
+            <td style="text-align: center"><a href="{% url 'atendimento_new' modo.id %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Atendimento</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

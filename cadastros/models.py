@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime, date
 #Pra deixar cada um ver somente aquilo que cadastrou, exemplo pra usar: Produtividade
 
 # Create your models here.
@@ -456,7 +457,7 @@ class Infracao(models.Model):
             if ano == 2022:
                 vrmAtual = Decimal(2.1972)
             if ano == 2023:
-                if data < datetime.date(2023, 6, 3):
+                if data < date(2023, 6, 3):
                     vrmAtual = Decimal(2.3589)
                 else:
                     vrmAtual = Decimal(2.3589) * 2
@@ -499,9 +500,7 @@ class Infracao(models.Model):
         verbose_name_plural = 'Infrações'
     @property
     def is_pre_june_2023(self):
-        print(self.data_auto)
-        print(datetime.date(2023, 6, 2))
-        return self.data_auto <= datetime.date(2023, 6, 2)
+        return self.data_auto <= date(2023, 6, 2)
 
 
     def __str__(self):
