@@ -31,6 +31,9 @@
     
 }
 
+#tabela-listar td {
+    font-size: 11px; /* Ajuste esse valor conforme necessário */
+}
 
 h3{
     font-size: 25px; font-style: bold; 

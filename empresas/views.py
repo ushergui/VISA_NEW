@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit, EmpresasObservacoesForm
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
 from django.views.generic import TemplateView
+from django.db.models import Q
 
 
 # Contabilidade
@@ -86,8 +87,18 @@ def excluir_cnae(request, id):
 
 # Empresas
 def listar_empresas(request):
-    empresas = Empresas.objects.all()
-    return render(request, 'empresas/listar_empresas.html', {'empresas': empresas})
+    termo_pesquisa = request.GET.get('termo_pesquisa', '')
+    if termo_pesquisa:
+        empresas = Empresas.objects.filter(
+            Q(razao__icontains=termo_pesquisa) |
+            Q(nome_fantasia__icontains=termo_pesquisa) |
+            Q(cnpj__icontains=termo_pesquisa) |
+            Q(responsavel_legal__icontains=termo_pesquisa)
+        )
+    else:
+        empresas = Empresas.objects.all()
+
+    return render(request, 'empresas/listar_empresas.html', {'empresas': empresas, 'termo_pesquisa': termo_pesquisa})
 
 def criar_empresa(request):
     form = EmpresasForm(request.POST or None)
@@ -96,7 +107,7 @@ def criar_empresa(request):
 
     if form.is_valid():
         form.save()
-        return redirect('listar_empresas')
+        return redirect('novo_protocolo')
 
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
 
@@ -108,9 +119,23 @@ def editar_empresa(request, id):
     
     if form.is_valid():
         form.save()
-        return redirect('listar_empresas')
+        return redirect('detalhe_empresa', empresa_id=id)  # Passa o ID da empresa como argumento
 
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
+
+def editar_observacoes(request, id):
+    empresa = Empresas.objects.get(id=id)
+    form = EmpresasObservacoesForm(request.POST or None, instance=empresa)
+    titulo = f"Edição da observação"
+    titulo2 = f"Empresa {empresa.razao}"
+    botao = "Gravar"
+    
+    if form.is_valid():
+        form.save()
+        return redirect('detalhe_empresa', empresa_id=id)  # Passa o ID da empresa como argumento
+
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao, 'titulo2': titulo2})
+
 
 def excluir_empresa(request, id):
     empresa = Empresas.objects.get(id=id)
@@ -124,7 +149,14 @@ def excluir_empresa(request, id):
 def detalhe_empresa(request, empresa_id):
     empresa = Empresas.objects.get(id=empresa_id)
     protocolos = ProtocoloEmpresa.objects.filter(empresa=empresa)
-    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa, 'protocolos': protocolos})
+    
+    try:
+        inspecao_mais_recente = Inspecao.objects.filter(protocolo__empresa=empresa).latest('data_inspecao')
+    except Inspecao.DoesNotExist:
+        inspecao_mais_recente = None
+
+    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa, 'protocolos': protocolos, 'inspecao_mais_recente': inspecao_mais_recente})
+
 
 def listar_risco(request):
     riscos = Risco.objects.all()
@@ -205,17 +237,24 @@ def listar_protocolos(request):
     protocolos = ProtocoloEmpresa.objects.all()
     return render(request, 'empresas/listar_protocolos.html', {'protocolos': protocolos})
 
+
+
 def novo_protocolo(request):
     if request.method == "POST":
         form = ProtocoloEmpresaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('listar_protocolos')
+            protocolo = form.save()  # Salva o protocolo e obtém o objeto ProtocoloEmpresa criado
+            empresa_id = protocolo.empresa_id  # Obtém o ID da empresa associada ao protocolo
+            return redirect('detalhe_empresa', empresa_id=empresa_id)  # Redireciona para a página de detalhes da empresa
+            
     else:
         form = ProtocoloEmpresaForm()
+        
     titulo = "Cadastrar protocolo"
     botao = "Cadastrar"
+    
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
+
 
 def editar_protocolo(request, id):
     protocolo = get_object_or_404(ProtocoloEmpresa, id=id)

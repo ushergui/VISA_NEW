@@ -135,6 +135,13 @@ class EmpresasForm(forms.ModelForm):
         return cnpj
 
 
+class EmpresasObservacoesForm(forms.ModelForm):
+    observacoes = forms.CharField(widget=forms.Textarea)  # Aqui está a mudança
+
+    class Meta:
+        model = Empresas
+        fields = ['observacoes']
+
 class RiscoForm(forms.ModelForm):
     class Meta:
         model = Risco

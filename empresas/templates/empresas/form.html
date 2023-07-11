@@ -8,7 +8,12 @@
 {% block conteudo %}
 <div class="form-container">
 <h3> {{ titulo }}</h3>
+{% if titulo2 %}
 <hr>
+<label> {{ titulo2 }}</label>
+{% else %}
+<hr>
+{% endif %}
 <form action="" method="POST">
 
     {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->

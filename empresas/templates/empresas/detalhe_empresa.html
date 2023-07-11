@@ -93,16 +93,12 @@
 				</div>
 			</div>
             <div class="row">
-				<div class="col-lg-7 ">
+				<div class="col-lg-5 ">
 					<h4>Endereço</h4>
 					<p >{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}, {{ empresa.numero_empresa }}{% if empresa.complemento_empresa %} - {{ empresa.complemento_empresa }}{% else %}{% endif %} - {{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</p>
 				</div>
-				<div class="col-lg-3 ">
-					<h4>Risco empresa</h4>
-					<p>{{ empresa.risco_empresa.risco }}</p>
-				</div>
-                <div class="col-lg-2">
-                    <h4>Status</h4>
+                <div class="col-lg-2 ">
+					<h4>Status</h4>
                     <p> {% if empresa.status_funcionamento == "ATIVA" %}
                             <i class="fa fa-flag" aria-hidden="true" style="color: green; font-size: 24px;"></i>
                         {% elif empresa.status_funcionamento == "BAIXADA" %}
@@ -113,7 +109,22 @@
                             Indefinido
                         {% endif %}    
                     </p>    
+				</div>
+				<div class="col-lg-3 ">
+					<h4>Risco empresa</h4>
+					<p>{{ empresa.risco_empresa.risco }}</p>
+				</div>
+                <div class="col-lg-2">
+                    <h4>Vigi-risco</h4>
+                    <p>
+                        {% if inspecao_mais_recente %}
+                            {{ inspecao_mais_recente.data_inspecao|date:"d/m/Y" }}
+                        {% else %}
+                            ********
+                        {% endif %}
+                    </p>         
                 </div>
+                
                 
 			</div>
             <div class="row">
@@ -178,7 +189,7 @@
 			</div>
             <div class="row">
 				<div class="col-lg-9 ">
-					<h4>Observações</h4>
+					<h4>Observações <a href="{% url 'editar_observacoes' empresa.id %}"><i class="fas fa-pencil-alt"></i></a></h4>
 					<p>{% if empresa.observacoes %}
                             {{ empresa.observacoes }}
                         {% else %}
@@ -196,7 +207,7 @@
         </div>
         </div>
         <div class="protocolos-container">
-            <h3>Protocolos <a href=""><i class="fas fa-plus"></i></a></h3><br>
+            <h3>Protocolos <a href="{% url 'novo_protocolo' %}"><i class="fas fa-plus"></i></a></h3><br>
             <table class="table table-striped" style="font-size: 11px;">
                 <thead>
                     <tr>

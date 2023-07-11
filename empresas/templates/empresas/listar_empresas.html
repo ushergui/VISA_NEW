@@ -1,6 +1,8 @@
 {% extends 'basy.html' %}
 {% load static %}
 
+
+
 {% block conteudo %}
 <h3>Lista de Empresas
 
@@ -9,36 +11,33 @@
 <hr>
 <div class="table responsive">
 <table class="table table-striped" id="tabela-listar">
-	<thead>
-	<tr>
-        <th>Razão Social</th>
-        <th>Nome Fantasia</th>
-        <th>CNAE</th>
-        <th>Risco</th>
-        <th>Ações</th>
-
-
+    <thead>
+    <tr>
+        <th style="text-align:center">Razão Social</th>
+        <th style="text-align:center">CNPJ</th>
+        <th style="text-align:center">Nome Fantasia</th>
+        <th style="text-align:center">CNAE</th>
+        <th style="text-align:center">Responsável Legal</th>
+        <th style="text-align:center">Ações</th>
     </tr>
-	</thead>
-	<tbody>
+    </thead>
+    <tbody>
     {% for empresa in empresas %}
     <tr>
         <td>{{ empresa.razao }}</td>
-	    <td>
-		{% if empresa.nome_fantasia %}
-		{{ empresa.nome_fantasia }}{% else %}********{% endif %}</td>
-		<td>{% for cnae in empresa.cnae.all %}
+        <td>{% if empresa.cnpj %}{{ empresa.cnpj }}{% else %}{% endif %}</td>
+        <td>
+        {% if empresa.nome_fantasia %}
+        {{ empresa.nome_fantasia }}{% else %}********{% endif %}</td>
+        <td>{% for cnae in empresa.cnae.all %}
                         {{ cnae.codigo_cnae }} - {{ cnae.descricao_cnae }}{% if not forloop.last %}; {% endif %}
                         {% endfor %}</td>
-		<td>{{ empresa.risco_empresa.risco }}</td>
-        <td>
+        <td>{{ empresa.responsavel_legal }}</td>
+        <td style="text-align:center; width: 170px">
             <a class="btn btn-primary" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a>
             <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_empresa' empresa.id %}">Editar</a>
             <a class="btn btn-danger" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'excluir_empresa' empresa.id %}">Excluir</a>
         </td>
-
-
-        
     </tr>
     {% empty %}
         <tr>
@@ -92,4 +91,3 @@
 </script>
 
 {% endblock %}
-

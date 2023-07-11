@@ -7,7 +7,7 @@ class Risco(models.Model):
     valor_risco = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(15)])
 
     def __str__(self):
-        return f'{self.valor_risco} - {self.risco}'
+        return f'{self.risco}'
 
 class Contabilidade(models.Model):
     nome_contabilidade = models.CharField(max_length=50, null=False, blank=False)
@@ -54,7 +54,7 @@ class Empresas(models.Model):
     conselho_responsavel_tecnico = models.CharField(max_length=60, verbose_name="Conselho de classe", null=True, blank=True)
     cnae = models.ManyToManyField(Cnae, verbose_name='CNAE')
     alvara = models.DateField(null=True, blank=True)
-    observacoes = models.CharField(max_length=200, verbose_name="Observações", null=True, blank=True)
+    observacoes = models.CharField(max_length=400, verbose_name="Observações", null=True, blank=True)
     risco_empresa = models.ForeignKey(Risco, on_delete=models.PROTECT)
     contabilidade = models.ForeignKey(Contabilidade, on_delete=models.PROTECT)
     STATUS_CHOICES = (
