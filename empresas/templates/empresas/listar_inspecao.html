@@ -1,21 +1,27 @@
 {% extends 'basy.html' %}
-
 {% load static %}
 
 {% block conteudo %}
 <h3>Lista de Inspeções</h3>
+<div class="table-responsive">
 <table class="table table-striped" id="tabela-listar">
+	<thead>
     <tr>
-        <th>Data Inspeção</th>
-        <th>Data Relatório</th>
-        <th>Legislação</th>
+		<th>Protocolo</th>
+		<th>Empresa</th>
+        <th>Data inspeção</th>
+        <th>Data relatório</th>
+        <th>Ações</th>
         <!-- E assim por diante para todos os campos que você quer mostrar -->
     </tr>
+	</thead>
+      <tbody>
     {% for inspecao in inspecoes %}
     <tr>
-        <td>{{ inspecao.data_inspecao }}</td>
-        <td>{{ inspecao.data_relatorio }}</td>
-        <td>{{ inspecao.legislacao }}</td>
+        <td>{{ inspecao.protocolo.numero_protocolo }}</td>
+        <td>{{ inspecao.protocolo.empresa }}</td>
+		<td>{% if inspecao.data_inspecao %}{{ inspecao.data_inspecao|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
+		<td>{% if inspecao.data_relatorio %}{{ inspecao.data_relatorio|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
         <!-- E assim por diante para todos os campos que você quer mostrar -->
         <td>
             <a href="{% url 'alterar_inspecao' inspecao.id %}">Editar</a>
@@ -23,9 +29,10 @@
         </td>
     </tr>
     {% endfor %}
+	</tbody>
 </table>
+</div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 

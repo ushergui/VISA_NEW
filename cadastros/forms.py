@@ -57,7 +57,7 @@ class TerrenoForm(forms.ModelForm):
 
     class Meta:
         model = Terreno
-        fields = ['inscricao', 'logradouro_terreno', 'numero_terreno', 'complemento_terreno',
+        fields = ['inscricao','observacoes_terreno', 'logradouro_terreno', 'numero_terreno', 'complemento_terreno',
                   'proprietario', 'quadra', 'lote', 'area', 'logradouro_correspondencia',
                   'numero_correspondencia', 'complemento_correspondencia', 'tipo_de_imovel']
 
@@ -67,7 +67,7 @@ class TerrenoUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Terreno
-        fields = ['inscricao', 'logradouro_terreno', 'numero_terreno', 'complemento_terreno',
+        fields = ['inscricao','observacoes_terreno', 'logradouro_terreno', 'numero_terreno', 'complemento_terreno',
                   'proprietario', 'lote', 'quadra', 'area', 'logradouro_correspondencia',
                   'numero_correspondencia', 'complemento_correspondencia', 'tipo_de_imovel']
 

@@ -17,6 +17,9 @@
 	
 
     {{ form|crispy }}
+	<label>Observações</label>
+
+	<textarea class="form-control" id="id_observacoes_terreno" readonly></textarea>
 	
 
     <h3 id="valorConvertido1"></h3>
@@ -34,7 +37,21 @@
 
     $(document).ready(function(){
 	
-				
+		$('#id_inspecao').change(function() {
+        var inspecao_id = $(this).val();
+        if (inspecao_id) {
+            $.get('/ajax/get-terreno-observacoes/', { inspecao_id: inspecao_id }, function(data) {
+                // Aqui você deve atualizar seu campo de observações com o valor retornado.
+                // Eu não vejo um campo de observações no seu formulário atual,
+                // então você precisará adicionar um e referenciá-lo aqui.
+                $('#id_observacoes_terreno').text(data.observacoes);
+            });
+        } else {
+            // Limpe o campo de observações se nenhuma inspeção for selecionada.
+            $('#id_observacoes_terreno').text('');
+        }
+    });
+		
         $("#id_cep").mask("00.000-000");
         $("#id_inscricao").mask("00.00.000.0000.000");
         $("#id_data_inspecao1").mask("00/00/0000");

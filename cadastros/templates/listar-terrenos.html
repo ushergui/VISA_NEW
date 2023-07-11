@@ -15,6 +15,7 @@
     <tr>
         <th style="font-size:15px">Inscrição</th>
         <th style="font-size:15px">Proprietário</th>
+        <th style="font-size:15px">Observações</th>
         <th style="font-size:15px">Logradouro</th>
         <th style="font-size:15px">Bairro</th>
         <th style="font-size:15px">Opções</th>
@@ -26,6 +27,7 @@
     <tr>
         <td style="font-size:15px">{{ terreno.inscricao }}</td>
         <td style="font-size:15px">{{ terreno.proprietario }}</td>
+        <td style="font-size:15px">{% if terreno.observacoes_terreno %}{{ terreno.observacoes_terreno }}{% else %}{% endif %}</td>
         <td style="font-size:15px">{{ terreno.logradouro_terreno.nome_logradouro }}</td>
         <td style="font-size:15px">{{ terreno.logradouro_terreno.bairro.nome_bairro }}</td>
         <td style="font-size:15px">

@@ -1,14 +1,16 @@
 {% extends 'basy.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block conteudo %}
-  <h2>Protocolos da Empresa</h2>
+  <h2>Protocolos</h2>
   <div class="table-responsive">
     <table class="table" id="tabela-listar">
       <thead>
         <tr>
-          <th>Número do Protocolo</th>
+          <th>Número</th>
           <th>Empresa</th>
+          <th>Motivo</th>
           <th>Observações</th>
           <th>Status do Protocolo</th>
           <th>Ações</th>
@@ -17,14 +19,71 @@
       <tbody>
         {% for protocolo in protocolos %}
           <tr>
-            <td>{{ protocolo.numero_protocolo }}</td>
-            <td>{{ protocolo.empresa }}</td>
-            <td>{{ protocolo.observacoes_protocolo }}</td>
-            <td>{{ protocolo.status_protocolo }}</td>
+		    <td>{% if protocolo.numero_protocolo %}{{ protocolo.numero_protocolo }}{% else %}*******{% endif %}</td>
+		    <td>{% if protocolo.empresa %}{{ protocolo.empresa.razao|capitalize_name }}{% else %}*******{% endif %}</td>
+			
+			<td>
+			{% if protocolo.motivo == "1"%}
+				Alvará Sanitário Inicial
+				{% elif protocolo.motivo == "2"%}
+				Renovação do alvará
+				{% elif protocolo.motivo == "3"%}
+				Verificação de risco - a pedido
+				{% elif protocolo.motivo == "4"%}
+				Verificação de risco  - busca ativa
+				{% elif protocolo.motivo == "5"%}
+				Denúncia
+				{% elif protocolo.motivo == "6"%}
+				Requisição de outros órgãos
+				{% elif protocolo.motivo == "7"%}
+				Inutilização de produtos
+				{% elif protocolo.motivo == "8"%}
+				Reinspeção a pedido
+				{% elif protocolo.motivo == "9"%}
+				Reinspeção expontânea
+				{% elif protocolo.motivo == "10"%}
+				Busca ativa - sem alvará
+				{% elif protocolo.motivo == "11"%}
+				Assinatura de livro de ótica
+				{% elif protocolo.motivo == "12"%}
+				Assinatura de livro de psicotrópicos
+				{% elif protocolo.motivo == "13"%}
+				Entrega de balanços/notificações de receita
+				{% elif protocolo.motivo == "14"%}
+				Autorização de eventos
+				{% elif protocolo.motivo == "15"%}
+				Autorização de ambulantes
+				{% elif protocolo.motivo == "17"%}
+				Certidão de dispensa
+				{% elif protocolo.motivo == "18"%}
+				Entrega de documentos
+				{% elif protocolo.motivo == "19"%}
+				Alteração de dados
+				{% elif protocolo.motivo == "16"%}
+				Outros assuntos
+				{% else %}
+				Indefinido
+				{% endif %}
+			</td>
+			
+			
+			
+		    <td>{% if protocolo.observacoes_protocolo %}{{ protocolo.observacoes_protocolo }}{% else %}*******{% endif %}</td>
+		    <td>{% if protocolo.status_protocolo == "1"%}
+				Aguardando escolha/entrega de fiscal (Administrativo)
+				{% elif protocolo.status_protocolo == "2"%}
+				Aguardando realização de inspeção/ emissão de relatório (Fiscal)
+				{% elif protocolo.status_protocolo == "3"%}
+				Aguardando avaliação/ revisão (Coordenação)
+				{% elif protocolo.status_protocolo == "4"%}
+				Protocolo finalizado
+				{% else %}
+				Indefinido
+				{% endif %}</td>
             <td>
-              <a class="btn btn-info" href="{% url 'editar_protocolo' protocolo.id %}">Editar</a>
-              <a class="btn btn-danger" href="{% url 'excluir_protocolo' protocolo.id %}">Excluir</a>
-              <a class="btn btn-primary" href="{% url 'criar_produtividade' protocolo.id %}">Criar Produtividade</a>
+              <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_protocolo' protocolo.id %}">Editar</a>
+              <a class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px;" href="{% url 'excluir_protocolo' protocolo.id %}">Excluir</a>
+              <a class="btn btn-primary" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'criar_produtividade' protocolo.id %}">Criar Produtividade</a>
             </td>
           </tr>
         {% endfor %}

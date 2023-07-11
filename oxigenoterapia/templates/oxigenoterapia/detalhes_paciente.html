@@ -89,7 +89,7 @@
 						{% for equipamento in prescricao.equipamento.all %}
 							<li>{{ equipamento.nome_equipamento }}
 							{% if equipamento.finalidade_equipamento.agrupamento == "VENTILAÇÃO" %}
-							<a href="{% url 'termo_de_uso' paciente.id %}"><i class="fas fa-file-contract"></i></a></li>
+							<a href="{% url 'termo_de_uso' paciente.id %}"><i class="fas fa-file-signature"></i></a>
 							<a href="{% url 'oficio_cpap_bipap' paciente.id %}"><i class="fas fa-file-contract"></i></a></li>
 							{% else %}
 

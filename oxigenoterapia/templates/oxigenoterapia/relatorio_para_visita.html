@@ -42,8 +42,8 @@ Pesquisar    </button>
                     <th>Telefone 1</th>
                     <th>Endereço</th>
                     <th>USF</th>
+					<th>Fisioterapeuta</th>
                     <th>CID</th>
-                    <th>Fisioterapeuta</th>
                     <th>Equipamento(s)</th>
                     <th>Modo de Uso</th>
                     <th>Litros</th>
@@ -69,7 +69,7 @@ Pesquisar    </button>
                                 Nenhum
                             {% endfor %}
                         </td>
-                        <td>{{ modo.tempo_de_uso }}</td>
+                        <td>{% if modo.tempo_de_uso %}{{ modo.tempo_de_uso }}{% else %}{% endif %}</td>
                         <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
                         <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
                     {% endwith %}

@@ -1,6 +1,6 @@
 from django import forms
 from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade
-from cadastros.models import Logradouro, Fiscal
+from cadastros.models import Logradouro, Fiscal, Cidade, Bairro
 from django.core.exceptions import ValidationError
 import re
 
@@ -94,9 +94,13 @@ def valida_cnpj(cnpj):
 
     return cnpj[-2:] == f'{digito1}{digito2}'
 
+class LogradouroModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.tipo} {obj.nome_logradouro} - {obj.bairro.nome_bairro}"
+
 
 class EmpresasForm(forms.ModelForm):
-    logradouro_empresa = forms.ModelChoiceField(queryset=Logradouro.objects.select_related('bairro__cidade__estado').all())
+    logradouro_empresa = LogradouroModelChoiceField(queryset=Logradouro.objects.select_related('bairro', 'bairro__cidade').all())
     risco_empresa = forms.ModelChoiceField(queryset=Risco.objects.all())
     cnae = forms.ModelMultipleChoiceField(queryset=Cnae.objects.select_related('risco_cnae').all())
     contabilidade = forms.ModelChoiceField(queryset=Contabilidade.objects.all())
@@ -107,6 +111,16 @@ class EmpresasForm(forms.ModelForm):
         widgets = {
             'risco_empresa': forms.Select(attrs={'id': 'id_risco_empresa'}),
         }
+    def __init__(self, *args, **kwargs):
+        super(EmpresasForm, self).__init__(*args, **kwargs)
+        cidade_ss_paraiso = Cidade.objects.filter(nome_cidade="SAO SEBASTIAO DO PARAISO").first()
+        
+        if cidade_ss_paraiso:
+            bairros_ss_paraiso = Bairro.objects.filter(cidade=cidade_ss_paraiso)
+            logradouros_ss_paraiso = Logradouro.objects.filter(bairro__in=bairros_ss_paraiso)
+            self.fields['logradouro_empresa'].queryset = logradouros_ss_paraiso
+        else:
+            self.fields['logradouro_empresa'].queryset = Logradouro.objects.none()
 
     def clean_cpf_responsavel_legal(self):
         cpf = self.cleaned_data.get('cpf_responsavel_legal')

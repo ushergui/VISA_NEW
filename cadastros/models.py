@@ -110,6 +110,7 @@ class Proprietario(models.Model):
 
 class Terreno(models.Model):
     inscricao = models.CharField(max_length=18, null=False, unique=True, verbose_name="Inscrição imobiliária")
+    observacoes_terreno = models.TextField(null=True, blank=True, verbose_name="Observações")
     logradouro_terreno = models.ForeignKey(Logradouro, on_delete=models.PROTECT, verbose_name="Logradouro do terreno", related_name="logradouro_terreno")
     numero_terreno = models.CharField(max_length=20, verbose_name="Número do terreno")
     complemento_terreno = models.CharField(max_length=40, verbose_name="Complemento", null=True, blank=True)

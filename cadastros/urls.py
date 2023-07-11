@@ -101,6 +101,8 @@ urlpatterns = [
     path('gerar_auto/<int:pk>/', gerar_auto, name='gerar_auto'),
     path('gerar_manifestacao/<int:pk>/', gerar_manifestacao, name='gerar_manifestacao'),
     path('gerar_julgamento/<int:pk>/', gerar_julgamento, name='gerar_julgamento'),
+    path('ajax/get-terreno-observacoes/', views.GetTerrenoObservacoes.as_view(), name='get-terreno-observacoes'),
+
 
 
     path('feriados/', views.FeriadoRecessoList.as_view(), name='lista_feriados'),

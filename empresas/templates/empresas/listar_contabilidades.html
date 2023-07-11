@@ -1,5 +1,5 @@
 {% extends 'basy.html' %}
-
+{% load custom_filters %}
 {% load static %}
 
 {% block conteudo %}
@@ -13,13 +13,19 @@
 	<thead>
 	<tr>
         <th>Contabilidade</th>
+        <th>Telefone</th>
+        <th>Email</th>
+        <th>Contato</th>
 
     </tr>
 	</thead>
 	<tbody>
     {% for contabilidade in contabilidades %}
     <tr>
-    <td>{{ contabilidade.nome_contabilidade }}</td>
+    <td>{% if contabilidade.nome_contabilidade %}{{ contabilidade.nome_contabilidade }}{% else %}*******{% endif %}</td>
+    <td>{{ contabilidade.telefone1_contabilidade }}</td>
+    <td>{{ contabilidade.email_contabilidade }}</td>
+    <td>{{ contabilidade.contato_contabilidade }}</td>
 
         
     </tr>

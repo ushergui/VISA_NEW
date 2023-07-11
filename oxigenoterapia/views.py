@@ -494,11 +494,11 @@ def consulta_atendimentos(request):
     inicio_contagem = date(2013, 1, 1)
     total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).count()
     #total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).exclude(paciente__status__in=["ÓBITO", "ALTA"]).count()
-    print(total_ativos_periodo)
+    
     total_ativos_periodo -= Paciente.objects.filter(data_obito__range=[inicio_contagem, data_final]).count()
-    print(total_ativos_periodo)
+   
     total_ativos_periodo -= Paciente.objects.filter(data_alta__range=[inicio_contagem, data_final]).count()
-    print(total_ativos_periodo)
+    
     
     total_ativos = Paciente.objects.filter(status="ATIVO").count()
     fisioterapeutas = Fisioterapeuta.objects.all()
@@ -953,26 +953,33 @@ def aparelhos_alugados_pdf(request):
         cpap_count = pacientes.filter(equipamento__finalidade_equipamento__finalidade='CPAP').count()
         bipap_count = pacientes.filter(equipamento__finalidade_equipamento__finalidade='BiPAP').count()
         ventilador_count = pacientes.filter(equipamento__finalidade_equipamento__finalidade='VENTILADOR').count()
-        locale.setlocale(locale.LC_TIME, 'pt_BR.utf8')
-
-        mes_nome = calendar.month_name[mes].capitalize()
-
+        
         context = {
-        'pacientes': pacientes,
-        'cpap_count': cpap_count,
-        'bipap_count': bipap_count, 'ventilador_count': ventilador_count,
-        'mes': mes_nome,
-        'ano': ano,
+            'pacientes': pacientes, 
+            'cpap_count': cpap_count, 
+            'bipap_count': bipap_count, 
+            'ventilador_count': ventilador_count,
+            'mes': mes,
+            'ano': ano
         }
-    
- # Aqui o código renderiza o HTML e cria o PDF
-    html_template = get_template('oxigenoterapia/aparelhos_alugados_pdf.html').render(context)
-    html = HTML(string=html_template)
-    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])  # Adicione esta linha
 
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename=aparelhos_alugados_pdf.html'
-    return response
+        # Aqui o código renderiza o HTML e cria o PDF
+        html_template = get_template('oxigenoterapia/aparelhos_alugados_pdf.html').render(context)
+        html = HTML(string=html_template)
+        pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename=aparelhos_alugados_pdf.html'
+        return response
+    else:
+        # Se mes e ano não forem passados, renderiza um PDF em branco ou com um template padrão
+        html_template = get_template('oxigenoterapia/aparelhos_alugados_pdf.html').render()
+        html = HTML(string=html_template)
+        pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename=aparelhos_alugados_pdf.html'
+        return response
 
 def pesquisa_paciente(request):
     termo_pesquisa = request.GET.get('q', '')

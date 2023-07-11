@@ -10,11 +10,11 @@ class Risco(models.Model):
         return f'{self.valor_risco} - {self.risco}'
 
 class Contabilidade(models.Model):
-    nome_contabilidade = models.CharField(max_length=40, null=False, blank=False)
+    nome_contabilidade = models.CharField(max_length=50, null=False, blank=False)
     telefone1_contabilidade = models.CharField(max_length=15, verbose_name="Telefone", null=True, blank=True)
     telefone2_contabilidade = models.CharField(max_length=15, verbose_name="Telefone 2", null=True, blank=True)
     email_contabilidade = models.EmailField(null=True, blank=True)
-    contato_contabilidade = models.CharField(max_length=40, null=True, blank=True)
+    contato_contabilidade = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return self.nome_contabilidade
@@ -27,8 +27,8 @@ class Legislacao(models.Model):
 
 class Cnae(models.Model):
     codigo_cnae = models.CharField(max_length=9, null=False, blank=False)
-    descricao_cnae = models.CharField(max_length=100, null=False, blank=False)
-    observacoes_cnae = models.CharField(max_length=220, null=True, blank=True)
+    descricao_cnae = models.CharField(max_length=250, null=False, blank=False)
+    observacoes_cnae = models.CharField(max_length=300, null=True, blank=True)
     risco_cnae = models.ForeignKey(Risco, on_delete=models.PROTECT)
     legislacao = models.ManyToManyField(Legislacao, related_name='Legislação')
 
@@ -82,19 +82,22 @@ class ProtocoloEmpresa(models.Model):
         ("1", "Alvará Sanitário Inicial"),    
         ("2", "Renovação do alvará"),    
         ("3", "Verificação de risco - a pedido"),    
-        ("3", "Verificação de risco  - busca ativa"),    
-        ("4", "Denúncia"),    
-        ("5", "Requisição de outros órgãos"),    
-        ("6", "Inutilização de produtos"),    
-        ("7", "Reinspeção a pedido"),    
-        ("8", "Reinspeção expontânea"),    
-        ("9", "Busca ativa - sem alvará"),    
-        ("10", "Assinatura de livro de ótica"),    
-        ("11", "Assinatura de livro de psicotrópicos"),    
-        ("12", "Entrega de balanços/notificações de receita"),    
-        ("13", "Autorização de eventos"),    
-        ("14", "Autorização de ambulantes"),    
-        ("15", "Outros assuntos"),    
+        ("4", "Verificação de risco  - busca ativa"),    
+        ("5", "Denúncia"),    
+        ("6", "Requisição de outros órgãos"),    
+        ("7", "Inutilização de produtos"),    
+        ("8", "Reinspeção a pedido"),    
+        ("9", "Reinspeção expontânea"),    
+        ("10", "Busca ativa - sem alvará"),    
+        ("11", "Assinatura de livro de ótica"),    
+        ("12", "Assinatura de livro de psicotrópicos"),    
+        ("13", "Entrega de balanços/notificações de receita"),    
+        ("14", "Autorização de eventos"),    
+        ("15", "Autorização de ambulantes"),    
+        ("17", "Certidão de dispensa"),    
+        ("18", "Entrega de documentos"),    
+        ("19", "Alteração de dados"),    
+        ("16", "Outros assuntos"),    
     )
     motivo = models.CharField(max_length=120, null=False, choices=MOTIVO_CHOICES)
     FORMA_CHOICES = (

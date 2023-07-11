@@ -165,8 +165,6 @@ def excluir_risco(request, id):
 class GetRisco(View):
     def get(self, request, *args, **kwargs):
         cnaes = [int(i) for i in request.GET.getlist('cnaes')]
-        print(Cnae.objects.filter(id__in=cnaes))
-        print(Cnae.objects.filter(id__in=cnaes).values('risco_cnae__valor_risco'))
         max_risco = Cnae.objects.filter(id__in=cnaes).aggregate(Max('risco_cnae__valor_risco'))['risco_cnae__valor_risco__max']
         return JsonResponse({'risco': max_risco})
 
@@ -228,8 +226,8 @@ def editar_protocolo(request, id):
             return redirect('listar_protocolos')
     else:
         form = ProtocoloEmpresaForm(instance=protocolo)
-    return render(request, 'empresas/form.html', {'form': form})
-
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': 'Editar protocolo', 'botao': 'Atualizar'})
+   
 def excluir_protocolo(request, id):
     protocolo = get_object_or_404(ProtocoloEmpresa, id=id)
     if request.method == "POST":

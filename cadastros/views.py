@@ -31,6 +31,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from datetime import timedelta
 from django.http import QueryDict
+from django.views import View
 
 
 
@@ -224,7 +225,7 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')
     model = Infracao
     form_class = InfracaoCreateForm
-    template_name = 'form.html'
+    template_name = 'form5.html'
     success_url = reverse_lazy('listar-infracoes-ativos')
 
     def get_context_data(self, **kwargs):
@@ -244,6 +245,15 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
         context['titulo'] = "Cadastro de infração"
         context['botao'] = "Cadastrar"
         return context
+        
+class GetTerrenoObservacoes(View):
+    def get(self, request, *args, **kwargs):
+        inspecao_id = request.GET.get('inspecao_id', None)
+        observacoes = ''
+        if inspecao_id:
+            inspecao = get_object_or_404(Inspecao, id=inspecao_id)
+            observacoes = inspecao.terreno.observacoes_terreno
+        return JsonResponse({'observacoes': observacoes})
 
 class EstadoUpdate(LoginRequiredMixin, UpdateView):
     login_url = reverse_lazy('login')
@@ -702,7 +712,9 @@ class MultadosList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(situacao__in=["3", "8"])
+        queryset = queryset.order_by('julgamento')
         return queryset
+
 
 
 class InformacoesList(LoginRequiredMixin, ListView):
@@ -717,14 +729,16 @@ def gerar_relatorio(request, pk, template_name="gerar_relatorio.html"):
 
 def gerar_manifestacao(request, pk, template_name="gerar_manifestacao.html"):
     infracao = get_object_or_404(Infracao, pk=pk)
-    return render(request, template_name, {'infracao': infracao})
+    is_pre_june_2023 = infracao.is_pre_june_2023
+    return render(request, template_name, {'infracao': infracao, 'is_pre_june_2023': is_pre_june_2023})
 
 
 def gerar_julgamento(request, pk, template_name="gerar_julgamento.html"):
     infracao = get_object_or_404(Infracao, pk=pk)
-    return render(request, template_name, {'infracao': infracao})
-
-
+    is_pre_june_2023 = infracao.is_pre_june_2023
+    return render(request, template_name, {'infracao': infracao, 'is_pre_june_2023': is_pre_june_2023})
+    
+    
 def gerar_ar1(request, pk, template_name="gerar_ar1.html"):
     infracao = get_object_or_404(Infracao, pk=pk)
     return render(request, template_name, {'infracao': infracao})

@@ -70,7 +70,7 @@ $(document).ready(function() {
     $(document).ready(function(){
         $("#id_cep").mask("00.000-000");
         $("#id_cnpj").mask("00.000.000/0000-00");
-        $("#id_codigo").mask("0000-0/00");
+        $("#id_codigo_cnae").mask("0000-0/00");
         $('#id_alvara').mask("00/00/0000");
         $('#id_entrada_protocolo').mask("00/00/0000");
         $('#id_entrada_fiscal').mask("00/00/0000");
@@ -78,6 +78,7 @@ $(document).ready(function() {
         $('#id_data_relatorio').mask("00/00/0000");
         $('#id_encerramento_protocolo').mask("00/00/0000");
 		$('#id_cpf_responsavel_legal').mask("000.000.000-00");
+		$('#id_cpf_responsavel_tecnico').mask("000.000.000-00");
 		$('#id_numero_protocolo').mask("SSS-00000/00");
         $('#id_numero_protocolo').on('input', function() {
             var input = $(this);
@@ -96,7 +97,9 @@ $(document).ready(function() {
         $('#id_logradouro_empresa').select2();
         $('#id_logradouro_terreno').select2();
         $('#id_logradouro_correspondencia').select2();
+        $('#id_contabilidade').select2();
         $('#id_proprietario').select2();
+        $('#id_fiscal_responsavel').select2();
         $('#id_tipo_de_imovel').select2();
         $('#id_solicitante_protocolo').select2();
         $('#id_logradouro').select2();
@@ -122,16 +125,16 @@ $(document).ready(function() {
     $('#id_telefone2').mask(behavior, options);
 
 
-    $(document).ready(function() {
+	$(document).ready(function() {
     $('#id_razao').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &'\.-]/gi, '');
         $(this).val(textoSemAcentos);
     });
 });
 
 $(document).ready(function() {
     $('#id_nome_fantasia').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &'\.-]/gi, '');
         $(this).val(textoSemAcentos);
     });
 });
@@ -139,6 +142,13 @@ $(document).ready(function() {
 
     $(document).ready(function() {
         $('#id_responsavel_legal').on('keyup', function() {
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+        $(this).val(textoSemAcentos);
+        });
+    });
+	
+	$(document).ready(function() {
+        $('#id_responsavel_tecnico').on('keyup', function() {
         var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
         $(this).val(textoSemAcentos);
         });
