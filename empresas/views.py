@@ -262,10 +262,11 @@ def editar_protocolo(request, id):
         form = ProtocoloEmpresaForm(request.POST, instance=protocolo)
         if form.is_valid():
             form.save()
-            return redirect('listar_protocolos')
+            return redirect('detalhe_empresa', empresa_id=protocolo.empresa.id)
     else:
         form = ProtocoloEmpresaForm(instance=protocolo)
     return render(request, 'empresas/form.html', {'form': form, 'titulo': 'Editar protocolo', 'botao': 'Atualizar'})
+
    
 def excluir_protocolo(request, id):
     protocolo = get_object_or_404(ProtocoloEmpresa, id=id)
@@ -278,31 +279,41 @@ def listar_inspecao(request):
     inspecoes = Inspecao.objects.all()
     return render(request, 'empresas/listar_inspecao.html', {'inspecoes': inspecoes})
 
-def cadastrar_inspecao(request):
+def cadastrar_inspecao(request, protocolo_id):
+    protocolo = ProtocoloEmpresa.objects.get(id=protocolo_id)
+    empresa_id = protocolo.empresa.id
     titulo = "Cadastro de Inspeção"
     botao = "Cadastrar"
+
     if request.method == "POST":
-        form = InspecaoForm(request.POST, request.FILES) 
+        form = InspecaoForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('listar_inspecao')
+            inspecao = form.save(commit=False)
+            inspecao.protocolo = protocolo
+            inspecao.save()
+            return redirect('detalhe_empresa', empresa_id=empresa_id)
     else:
         form = InspecaoForm()
-    return render(request, 'empresas/form-upload.html', {'form': form, 'titulo':titulo, 'botao':botao})
+
+    return render(request, 'empresas/form-upload.html', {'form': form, 'titulo': titulo, 'botao': botao, 'protocolo': protocolo})
 
 
 def alterar_inspecao(request, id):
     titulo = "Alterar Inspeção"
     botao = "Gravar"
     inspecao = Inspecao.objects.get(id=id)
+    protocolo = inspecao.protocolo  # Pegando o protocolo a partir da inspeção
+    empresa_id = protocolo.empresa.id  # Pegando o ID da empresa a partir do protocolo
+
     if request.method == "POST":
-        form = InspecaoForm(request.POST, request.FILES, instance=inspecao)  # Adicionado request.FILES
+        form = InspecaoForm(request.POST, request.FILES, instance=inspecao)
         if form.is_valid():
             form.save()
-            return redirect('listar_inspecao')
+            return redirect('detalhe_empresa', empresa_id=empresa_id)  # Modificado para redirecionar para detalhe_empresa
     else:
         form = InspecaoForm(instance=inspecao)
-    return render(request, 'empresas/form.html', {'form': form, 'titulo':titulo, 'botao':botao})
+
+    return render(request, 'empresas/form-upload.html', {'form': form, 'titulo':titulo, 'botao':botao, 'protocolo': protocolo})  # Adicionado 'protocolo': protocolo
 
 
 def excluir_inspecao(request, id):
@@ -343,11 +354,6 @@ def excluir_acao_produtividade(request, id):
         acao.delete()
         return redirect('listar_acao_produtividade')
     return render(request, 'empresas/form-excluir.html', {'obj': acao})
-
-
-
-
-
 
 def listar_produtividade(request):
     produtividades = Produtividade.objects.all()

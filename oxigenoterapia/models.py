@@ -178,4 +178,5 @@ class Atendimento(models.Model):
     fisioterapeuta_atendimento = models.ForeignKey(Fisioterapeuta, null=True, related_name="atendimentos", on_delete=models.PROTECT)
     
     def __str__(self):
-        return f"Atendimento {self.id} para a prescrição {self.prescricao.id}"
+        data_atendimento = self.data_atendimento.strftime('%d/%m/%Y')
+        return f"Atendimento do(a) paciente {self.prescricao.paciente} na data {data_atendimento}"

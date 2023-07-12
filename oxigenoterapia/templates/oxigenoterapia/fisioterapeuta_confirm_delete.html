@@ -4,13 +4,13 @@
 <h2>Deletar Fisioterapeuta</h2>
 
 <p>Você tem certeza que deseja deletar "{{ object }}"?</p>
+<div class="form-group">
+    <form method="POST" style="display: inline-block;">
+        {% csrf_token %}
+        <input type="submit" value="Confirmar" class="btn btn-danger">
+    </form>
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="submit" value="Confirmar">
-</form>
-
-<a href="{% url 'fisioterapeuta_list' %}">Cancelar</a>
+    <a href="{% url 'fisioterapeuta_list' %}" class="btn btn-primary" style="display: inline-block; margin-left: 10px;">Cancelar</a>
+</div>
 
 {% endblock %}
-

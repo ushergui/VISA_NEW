@@ -136,7 +136,7 @@ class EmpresasForm(forms.ModelForm):
 
 
 class EmpresasObservacoesForm(forms.ModelForm):
-    observacoes = forms.CharField(widget=forms.Textarea)  # Aqui está a mudança
+    observacoes = forms.CharField(widget=forms.Textarea, required=False)  # Aqui está a mudança
 
     class Meta:
         model = Empresas
@@ -161,7 +161,9 @@ class ProtocoloEmpresaForm(forms.ModelForm):
 class InspecaoForm(forms.ModelForm):
     class Meta:
         model = Inspecao
-        fields = ['protocolo','data_inspecao', 'vigirisco','data_relatorio', 'legislacao', 'desenvolvimento', 'inadequacoes', 'observacoes', 'conclusao' ]
+        # remover o protocolo dos fields
+        fields = ['data_inspecao', 'vigirisco','data_relatorio', 'legislacao', 'desenvolvimento', 'inadequacoes', 'observacoes', 'conclusao']
+
 
 class AcaoProdutividadeForm(forms.ModelForm):
     class Meta:

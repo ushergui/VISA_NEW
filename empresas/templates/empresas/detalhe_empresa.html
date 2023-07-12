@@ -216,8 +216,11 @@
                         <th style="text-align: center">Motivo</th>
                         <th style="text-align: center">Fiscal</th>
                         <th style="text-align: center">Data fiscal</th>
+                        <th style="text-align: center">Inspeção</th>
                         <th style="text-align: center">Status</th>
                         <th style="text-align: center">Encerramento</th>
+                        
+                        <th style="text-align: center">Editar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -269,6 +272,14 @@
 				{% endif %}</td>
                             <td style="text-align: center">{{ protocolo.fiscal_responsavel.primeiro_nome|capitalize_name }}</td>
                             <td style="text-align: center">{{ protocolo.entrada_fiscal|date:"d/m/Y" }}</td>
+                            <td style="text-align: center">
+                                {% if protocolo.inspecao %}
+                                 {{ protocolo.inspecao.data_inspecao|date:"d/m/Y" }} <a href="{% url 'alterar_inspecao' protocolo.inspecao.id %}"><i class="fas fa-pencil-alt"></i></a>
+                                {% else %}
+                                <a href="{% url 'cadastrar_inspecao' protocolo.id %}"><i class="fas fa-plus"></i></a>
+
+                                {% endif %}
+                            </td>
                             <td style="text-align: center">{% if protocolo.status_protocolo == "1"%}
 				Aguardando escolha/entrega de fiscal (Administrativo)
 				{% elif protocolo.status_protocolo == "2"%}
@@ -281,10 +292,12 @@
 				Indefinido
 				{% endif %}</td>
                             <td style="text-align: center">{{ protocolo.encerramento_protocolo|date:"d/m/Y" }}</td>
+                                                       
+                            <td style="text-align: center"><a href="{% url 'editar_protocolo' protocolo.id %}"><i class="fas fa-pencil-alt"></i></a></td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" style="text-align: center">Nenhum protocolo encontrado para esta empresa.</td>
+                            <td colspan="9" style="text-align: center">Nenhum protocolo encontrado para esta empresa.</td>
                         </tr>
                     {% endfor %}
                         

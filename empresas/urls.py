@@ -44,7 +44,7 @@ urlpatterns = [
 
 
     path('inspecao/', views.listar_inspecao, name='listar_inspecao'),
-    path('inspecao/novo', views.cadastrar_inspecao, name='cadastrar_inspecao'),
+    path('inspecao/novo/<int:protocolo_id>/', views.cadastrar_inspecao, name='cadastrar_inspecao'),
     path('inspecao/editar/<int:id>', views.alterar_inspecao, name='alterar_inspecao'),
     path('inspecao/excluir/<int:id>', views.excluir_inspecao, name='excluir_inspecao'),
 

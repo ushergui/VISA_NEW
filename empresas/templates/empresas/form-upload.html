@@ -10,18 +10,17 @@
 <h3> {{ titulo }}</h3>
 <hr>
 <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <label>Protocolo <strong>{{ protocolo }}</strong></label>
 
-    {% csrf_token %} <!--dispositivo de segurança do Django pra evitar hack -->
-
-    {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
-    fields, por isto escrever desta forma. -->
-
+    {{ form|crispy }}
 
     <button type="submit" class="btn btn-primary">
     {{ botao }}
     </button>
-
 </form>
+
 </div>
 {% endblock %}
 

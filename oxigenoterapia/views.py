@@ -1,5 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .models import Paciente, Fisioterapeuta, Equipamento, Descartavel, Cid, Prescricao, Usf, Atendimento, ModoDeUso, Finalidade
 from .forms import PacienteForm, FisioterapeutaForm, EquipamentoForm, DescartavelForm, CidForm, PrescricaoForm, AtendimentoForm, UsfForm, AtendimentoForm, ModoDeUsoForm, FinalidadeForm
 from cadastros.models import Logradouro
@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.db.models import Count, F, Q, Max
 from django.template.loader import render_to_string
 from weasyprint import HTML
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 import datetime
 from datetime import date
 from django.utils import timezone
@@ -255,12 +255,13 @@ class PrescricaoCreateView(CreateView):
     template_name = 'oxigenoterapia/form_prescricao.html'
 
     def get_success_url(self):
-        return reverse_lazy('prescricoes_list')
+        return reverse('detalhes_paciente', args=[self.object.paciente.id])
     
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['titulo'] = 'Cadastrar Prescrição'
         data['botao'] = 'Cadastrar'
+        data['form_class'] = self.form_class.__name__
         return data
 
     @transaction.atomic  # Garante que ambos os objetos sejam criados ou nenhum seja
@@ -308,7 +309,7 @@ class ModoDeUsoListView(ListView):
 class ModoDeUsoCreateView(CreateView):
     model = ModoDeUso
     form_class = ModoDeUsoForm
-    template_name = 'oxigenoterapia/form_prescricao.html'
+    template_name = 'oxigenoterapia/form_mododeuso.html'
 
     def get_success_url(self):
         return reverse_lazy('mododeuso_list')
@@ -322,7 +323,7 @@ class ModoDeUsoCreateView(CreateView):
 class ModoDeUsoUpdateView(UpdateView):
     model = ModoDeUso
     form_class = ModoDeUsoForm
-    template_name = 'oxigenoterapia/form_prescricao.html'
+    template_name = 'oxigenoterapia/form_mododeuso.html'
 
     def get_success_url(self):
         return reverse_lazy('mododeuso_list')
@@ -373,10 +374,26 @@ class AtendimentoCreateView(CreateView):
         # Obtém o id da prescrição da URL
         prescricao_id = self.kwargs.get('prescricao_id')
 
-        # Atribui o valor do campo 'prescricao' antes de salvar o formulário
+        # Atribui o valor do campo 'prescrição' antes de salvar o formulário
         if prescricao_id:
-            form.instance.prescricao = ModoDeUso.objects.get(id=prescricao_id)
-        return super().form_valid(form)
+            prescricao = ModoDeUso.objects.get(id=prescricao_id)
+            form.instance.prescricao = prescricao
+
+        # Chama o método form_valid da classe base e salva o formulário
+        response = super().form_valid(form)
+
+        # Atualiza o objeto ModoDeUso com os novos valores
+        if prescricao_id:
+            prescricao.equipamento.set(form.cleaned_data['equipamento'])
+            prescricao.tempo_de_uso = form.cleaned_data['tempo_de_uso']
+            prescricao.litros = form.cleaned_data['litros']
+            prescricao.parametros = form.cleaned_data['parametros']
+            prescricao.save()
+
+        # Redireciona para a página de detalhes do paciente
+        paciente_id = self.object.prescricao.paciente.id
+        return HttpResponseRedirect(reverse('detalhes_paciente', kwargs={'paciente_id': paciente_id}))
+
 
     
 class AtendimentoUpdateView(UpdateView):

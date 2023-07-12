@@ -97,7 +97,10 @@
 						{% endfor %} 
 					</ul>
 					<p>Data de início do uso: {{ prescricao.data_inicio_uso|date:"d/m/Y" }}</p>
+					{% if prescricao.tempo_de_uso %}
 					<p>Tempo de uso: {{ prescricao.tempo_de_uso }}</p>
+					{% else %}
+					{% endif %}
 					<p>CID: {{ prescricao.cid.codigo_doenca }}</p>
 					{% if prescricao.litros %}
 					<p>Litros: {{ prescricao.litros }}</p>
@@ -123,8 +126,14 @@
 						{% endfor %}
 					</ul>
 					<p>Data de início do uso: {{ mododeuso.data_inicio_uso|date:"d/m/Y" }}</p>
+					{% if mododeuso.tempo_de_uso %}
 					<p>Tempo de uso: {{ mododeuso.tempo_de_uso }}</p>
+					{% else %}
+					{% endif %}
+					{% if mododeuso.cid.codigo_doenca %}
 					<p>CID: {{ mododeuso.cid.codigo_doenca }}</p>
+					{% else %}
+					{% endif %}
 					{% if mododeuso.litros %}
 					<p>Litros: {{ mododeuso.litros }}</p>
 					{% else %}
@@ -150,7 +159,7 @@
 					<th style="text-align: center">Troca de Máscara</th>
 					<th style="text-align: center">Relatório</th>
 					<th style="text-align: center">Fisioterapeuta</th>
-					<th style="text-align: center">Editar</th>
+					<th style="text-align: center">Ações</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -169,7 +178,8 @@
 					{% endif %}
 					<td>{{ atendimento.relatorio_atendimento }}</td>
 					<td style="text-align: center">{{ atendimento.fisioterapeuta_atendimento.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
-                    <td style="text-align: center"><a href="{% url 'atendimento_edit' atendimento.id %}"><i class="fas fa-pencil-alt"></i></a></td>
+                    <td style="text-align: center"><a href="{% url 'atendimento_edit' atendimento.id %}"><i class="fas fa-pencil-alt"></i></a>  <a href="{% url 'atendimento_delete' atendimento.id %}"><i class="fas fa-trash-alt"></i></a></td>
+
 				</tr>
 				{% endfor %}
 			</tbody>

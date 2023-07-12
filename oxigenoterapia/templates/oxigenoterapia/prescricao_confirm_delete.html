@@ -5,11 +5,13 @@
 
 <p>Você tem certeza que deseja deletar "{{ object }}"?</p>
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="submit" value="Confirmar">
-</form>
+<div class="form-group">
+    <form method="POST" style="display: inline-block;">
+        {% csrf_token %}
+        <input type="submit" value="Confirmar" class="btn btn-danger">
+    </form>
 
-<a href="{% url 'prescricoes_list' %}">Cancelar</a>
+    <a href="{% url 'prescricoes_list' %}" class="btn btn-primary" style="display: inline-block; margin-left: 10px;">Cancelar</a>
+</div>
 
 {% endblock %}
