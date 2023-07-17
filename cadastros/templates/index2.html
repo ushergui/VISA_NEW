@@ -3,14 +3,6 @@
 
 {% block conteudo %}
 
-{% if user.perfil.nome_completo %}
-<h3>Bem vindo ao sistema {{ user.perfil.nome_completo }}</h3>
-{% else %}
-<h3>Você precisa completar seu cadastro. Acesse os <a href="{% url 'atualizar-dados' %}">meus dados</a> para atualizar.</h3>
-{% endif %}
-
-<br>
-<br>
 <h2>Buscar inspeção</h2>
 <form class="form-inline" action="{% url 'listar-inspecoes' %}" method="get">
   <div class="form-group mx-sm-1 mb-2">

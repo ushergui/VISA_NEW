@@ -1,5 +1,6 @@
 {% extends 'bases.html' %}
 {% block extra_css %}
+{% load static %}
 <style>
     .chart-container {
         height: 400px;
@@ -91,8 +92,8 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<script src="{% static 'js/chart.js' %}"></script>
+<script src="{% static 'js/chartjs-plugin-datalabels.js' %}"></script>
 <script>
     const labels = [{% for resultado in resultado_agrupado %}'{{ resultado.semana_epidemiologica }}'{% if not forloop.last %},{% endif %}{% endfor %}];
     const casos_positivos = [{% for resultado in resultado_agrupado %}{{ resultado.casos_positivos }}{% if not forloop.last %},{% endif %}{% endfor %}];

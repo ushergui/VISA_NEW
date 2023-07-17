@@ -120,8 +120,8 @@ class ReinspecaoForm(forms.ModelForm):
                     ("", "---------"),
                     ("6", "Não recebeu e limpou"),
                     ("4", "Manifesto e julgamento fora do sistema"),
-                    ("11", "Erro na identificação"),
-                    ("12", "Mudança do proprietário no decorrer do processo")
+                    ("11", "Erro na identificação")
+                    
                 )
             elif instance.status_rastreio == 'ENTREGUE' and not instance.protocolo_defesa:
                 self.fields['situacao'].choices = (
@@ -134,8 +134,8 @@ class ReinspecaoForm(forms.ModelForm):
                     ("9", "Não defendeu e limpou via Edital"),
                     ("15", "Não defendeu e limpou (razoável) via Edital"),
                     ("10", "Perda de prazo"),
-                    ("11", "Erro na identificação"),
-                    ("12", "Mudança do proprietário no decorrer do processo")
+                    ("11", "Erro na identificação")
+                    
                 )
             elif instance.status_rastreio == 'ENTREGUE' and instance.protocolo_defesa:
                 self.fields['situacao'].choices = (

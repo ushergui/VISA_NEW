@@ -102,7 +102,10 @@ class LogradouroModelChoiceField(forms.ModelChoiceField):
 class EmpresasForm(forms.ModelForm):
     logradouro_empresa = LogradouroModelChoiceField(queryset=Logradouro.objects.select_related('bairro', 'bairro__cidade').all())
     risco_empresa = forms.ModelChoiceField(queryset=Risco.objects.all())
-    cnae = forms.ModelMultipleChoiceField(queryset=Cnae.objects.select_related('risco_cnae').all())
+    cnae = forms.ModelMultipleChoiceField(
+        queryset=Cnae.objects.select_related('risco_cnae').all(),
+        widget=forms.SelectMultiple(attrs={'class': 'cnae'}), # Adicione esta linha
+    )
     contabilidade = forms.ModelChoiceField(queryset=Contabilidade.objects.all())
 
     class Meta:

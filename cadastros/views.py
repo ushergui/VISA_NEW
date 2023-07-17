@@ -220,7 +220,6 @@ class InspecaoCreate(LoginRequiredMixin, CreateView):
 
 
 
-
 class InfracaoCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')
     model = Infracao
@@ -228,13 +227,27 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     template_name = 'form5.html'
     success_url = reverse_lazy('listar-infracoes-ativos')
 
+    def form_valid(self, form):
+        # Obtenha o terreno associado à inspeção selecionada
+        terreno = form.cleaned_data['inspecao'].terreno
+
+        # Obtenha a data do julgamento mais recente para infrações neste terreno
+        ultima_infracao = Infracao.objects.filter(inspecao__terreno=terreno).order_by('-julgamento').first()
+
+        # Se houver uma infração e a data do julgamento for menos de 183 dias atrás e a situação for 3 ou 8, não permita criar uma nova infração
+        if ultima_infracao and ultima_infracao.julgamento and ultima_infracao.numero_format_ano and (datetime.today().date() - ultima_infracao.julgamento).days < 183 and ultima_infracao.situacao in ["3", "8"]:
+            form.add_error(None, f'Este terreno foi multado há menos de seis meses (Data do Julgamento: {ultima_infracao.julgamento.strftime("%d/%m/%Y")}) através do Auto de Infração número {ultima_infracao.numero_format_ano}.')
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         if self.request.method == 'POST':
             # O formulário está sendo enviado, então pegue a data do POST request
             data_auto_str = self.request.POST.get('data_auto')
-            data_auto = datetime.strptime(data_auto_str, "%Y-%m-%d").date()
+            data_auto = datetime.strptime(data_auto_str, "%d/%m/%Y").date()
         else:
             # O formulário está sendo exibido, então use a data atual
             data_auto = datetime.today().date()
@@ -245,6 +258,7 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
         context['titulo'] = "Cadastro de infração"
         context['botao'] = "Cadastrar"
         return context
+
         
 class GetTerrenoObservacoes(View):
     def get(self, request, *args, **kwargs):

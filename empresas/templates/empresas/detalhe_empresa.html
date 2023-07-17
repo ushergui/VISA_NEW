@@ -1,9 +1,15 @@
 {% extends 'basy.html' %}
 {% load static %}
 {% load custom_filters %}
-<style type="text/css">
+{% block styles %}
 
+    
+<style type="text/css">
+    .container-fluid.py-5 {
+     padding-top:1rem!important;
+    }
     </style>
+   {% endblock %} 
 
     <!-- Bloco de conteúdo -->
 {% block conteudo %}
@@ -73,7 +79,7 @@
 				</div>
                 <div class="col-lg-3 ">
 					<h4>Email</h4>
-                    <p>
+                    <p style="word-break: break-all;">
                         {% if empresa.email %}
                             {{ empresa.email }}
                         {% else %}
@@ -81,7 +87,7 @@
                         {% endif %}
                     </p>
 				</div>
-                <div class="col-lg-1 ">
+                <div class="col-lg-2 ">
 					<h4>Alvará</h4>
                     <p>
                         {% if empresa.alvara %}
@@ -208,9 +214,9 @@
         </div>
         <div class="protocolos-container">
             <h3>Protocolos <a href="{% url 'novo_protocolo' %}"><i class="fas fa-plus"></i></a></h3><br>
-            <table class="table table-striped" style="font-size: 11px;">
+            <table class="table table-striped">
                 <thead>
-                    <tr>
+                    <tr style="font-size: 11px;">
                         <th style="text-align: center">Número</th>
                         <th style="text-align: center">Abertura</th>
                         <th style="text-align: center">Motivo</th>
@@ -225,7 +231,7 @@
                 </thead>
                 <tbody>
                     {% for protocolo in protocolos %}
-                        <tr>
+                        <tr style="font-size: 9px;">
                             <td style="text-align: center">{{ protocolo.numero_protocolo }}</td>
                             <td style="text-align: center">{{ protocolo.entrada_protocolo|date:"d/m/Y" }}</td>
                             <td style="text-align: center">

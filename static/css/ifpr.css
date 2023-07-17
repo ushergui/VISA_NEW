@@ -10,6 +10,12 @@ Cores do IFPR
     border-radius: 5px; /* Isso faz com que as bordas do formulário sejam levemente arredondadas */
 }
 
+.center-button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @media screen and (max-width: 768px) {
     .form-container {
         background-color: #76a2ce; /* Este é um tom de azul claro, você pode alterá-lo de acordo com suas necessidades */

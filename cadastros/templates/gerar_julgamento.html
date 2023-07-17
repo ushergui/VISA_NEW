@@ -70,7 +70,16 @@
 <p style="position:absolute;top:260px;left:10px;white-space:nowrap" class="ft01">A&#160; notificação &#160;do &#160;Auto &#160;de &#160;Infração &#160;nº&#160; {{ infracao.numero_format_ano }} referente à limpeza do terreno citado acima foi &#160;entregue </p>
 
 
-    <p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">no endereço &#160;de correspondência do imóvel em&#160; {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}. &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro- </p>
+<p style="position:absolute;top:286px;left:10px;white-space:nowrap" class="ft01">
+  no endereço &#160;de correspondência do imóvel em&#160; 
+  {% if infracao.data_entrega_autuacao %}
+      {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}
+  {% else %}
+      <span style="background-color: red;">LANÇAR RECEBIMENTO DA AR</span>
+  {% endif %}.
+  &#160;O proprietário teria até dia {{ infracao.prazo_defesa|date:"d/m/Y" }} para pro-
+</p>
+
     <p style="position:absolute;top:312px;left:10px;white-space:nowrap" class="ft01">ceder &#160;à &#160;limpeza/ capina/ roçada/ drenagem &#160;do imóvel em conformidade aos arts. 3º e 4º da Lei Municipal nº </p>
     <p style="position:absolute;top:338px;left:10px;white-space:nowrap" class="ft01">4778/2021 e apresentar defesa solicitando nova inspeção ao terreno para arquivamento do Auto de Infração.</p>
 

@@ -69,7 +69,8 @@
 <p style="position:absolute;top:198px;left:10px;white-space:nowrap" class="ft01">O responsável acima apresentou defesa ao Auto de Inf. nº {{ infracao.numero_format_ano }}, conforme requerimento {{ infracao.protocolo_defesa }}</p>
 <p style="position:absolute;top:224px;left:10px;white-space:nowrap" class="ft01">de {{ infracao.entrada_protocolo|date:"d/m/Y" }}, contendo os documentos relacionados &#160;no art. 9º da Lei Municipal nº 4778/2021. &#160;A defesa foi</p>
 <p style="position:absolute;top:250px;left:10px;white-space:nowrap" class="ft01">apresentada &#160;no prazo estabelecido &#160;no art. 8º da Lei Municipal &#160;nº 4778/2021, considerando que a notificação</p>
-<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">do Auto de Infração foi entregue em {{ infracao.data_entrega_autuacao|date:"d/m/Y" }}.</p>
+<p style="position:absolute;top:276px;left:10px;white-space:nowrap" class="ft01">do Auto de Infração foi entregue em {% if infracao.data_entrega_autuacao %}{{ infracao.data_entrega_autuacao|date:"d/m/Y" }}{% else %}<span style="background-color: red;">LANÇAR RECEBIMENTO DA AR</span>
+  {% endif %}.</p>
 <p style="position:absolute;top:302px;left:10px;white-space:nowrap" class="ft01">Em sua defesa, o responsável solicita nova inspeção ao terreno para comprovação da limpeza e &#160;arquivamento</p>
 <p style="position:absolute;top:328px;left:10px;white-space:nowrap" class="ft01">da autuação.</p>
 <p style="position:absolute;top:354px;left:10px;white-space:nowrap" class="ft01">No &#160;dia &#160;{{ infracao.data_inspecao2|date:"d/m/Y" }}, &#160;as &#160;{{ infracao.horario_inspecao2 }}, o terreno foi inspecionado novamente e, conforme registro fotográfico consta-</p>

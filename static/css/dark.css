@@ -1,38 +1,62 @@
-
 .form-container {
+    background-color: #000; /* fundo preto */
+    color: #FFF; /* texto branco */
     width: 33.33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
     margin: auto; /* isso centraliza o formulário */
+    padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+    border-radius: 5px; 
 }
+.select2-selection__choice__display {
+    font-size: 11px;
+    color: #000000;
+}
+
 .form-container-2 {
     width: 58%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
     margin: auto;
 }
 
+.center-button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center-title {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .empresa-container {
     box-sizing: border-box;
     border: 4px solid #76a2ce;
-    padding: 20px;
+    padding: 17px;
     background-color: #ffffff;
     border-radius: 15px;
-    margin-bottom: 20px;
-    margin-right: 10px;
+    margin-bottom: 10px;
+    margin-right: 0px;
     margin-left: 10px;
+}
+.empresa-container p {
+    word-break: break-all;
+
 }
 
 .protocolos-container {
     box-sizing: border-box;
     border: 4px solid #76a2ce;
-    width: calc(100% - 50% - 20px); 
-    padding: 20px;
+    width: calc(100% - 50%  - 8px); 
+    padding: 17px;
     background-color: #ffffff;
     border-radius: 15px;
-    margin-bottom: 20px;
-    margin-right: 4px;
+    margin-bottom: 10px;
+    margin-right: 0px;
     
 }
 
 #tabela-listar td {
-    font-size: 11px; /* Ajuste esse valor conforme necessário */
+    font-size: 16px; /* Ajuste esse valor conforme necessário */
 }
 
 h3{
@@ -87,7 +111,7 @@ p{
 
 
 .bg-ifpr {
-    background-color: #343a40;
+    background-color: #000;
 }
 
 .text-ifpr {
@@ -179,6 +203,11 @@ Alerta na validação dos formulários (login com senha errada, por exemplo)
 /*
 Largura máxima das tabelas para não ficar mal formatada
 */
-table td{
-    max-width: 500px;
+
+.table {
+    table-layout: fixed;
+}
+.table td {
+    word-break: break-word; /*ou word-wrap: break-word;*/
+    width: 100px; /*ajuste conforme necessário*/
 }

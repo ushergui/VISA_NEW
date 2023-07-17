@@ -7,7 +7,7 @@
 
 {% block conteudo %}
 <div class="form-container">
-<h3> {{ titulo }}</h3>
+    <h3 class="text-center"> {{ titulo }}</h3>
 <hr>
 <form method="POST">
     {% csrf_token %}
@@ -21,7 +21,7 @@
     {% endfor %}
     <br>
 
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary center-button">
         {{ botao }}
     </button>
 

@@ -7,7 +7,7 @@
 
 {% block conteudo %}
 <div class="form-container">
-<h3> {{ titulo }}</h3>
+    <h3 class="text-center"> {{ titulo }}</h3>
 {% if titulo2 %}
 <hr>
 <label> {{ titulo2 }}</label>
@@ -22,8 +22,8 @@
     fields, por isto escrever desta forma. -->
 
 
-    <button type="submit" class="btn btn-primary">
-    {{ botao }}
+    <button type="submit" class="btn btn-primary center-button">
+        {{ botao }}
     </button>
 
 </form>
@@ -55,19 +55,6 @@ $(document).ready(function() {
             });
 
             
-        }
-    });
-
-    $('#id_risco_empresa').change(function() {
-        var selectedRisco = $(this).val();
-        // Verifique se o risco selecionado é 1 ou 2
-        if (selectedRisco == "1" || selectedRisco == "2") {
-            // Se for, ajuste o status de funcionamento para 'DISPENSADA'
-            $('#id_status_funcionamento').val('DISPENSADA');
-        }
-
-        else {
-            $('#id_status_funcionamento').val('');
         }
     });
 });

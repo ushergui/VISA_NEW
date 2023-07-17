@@ -20,7 +20,7 @@
     {{ form|crispy }} <!-- Toda vez que eu tenho um create view ele cria como se fosse uma variável com os
     fields, por isto escrever desta forma. -->
 
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary center-button">
        {{ botao }}
     </button>
 
@@ -106,7 +106,7 @@
 }
 
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+<script src="{% static 'js/exif.min.js' %}"></script>
 <script>
     document.getElementById("id_foto_inspecao_2").addEventListener("change", function() {
   var fileInput = this;
