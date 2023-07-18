@@ -119,14 +119,14 @@ $(document).ready(function() {
 
 	$(document).ready(function() {
     $('#id_razao').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &'\.-]/gi, '');
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &',\.-]/gi, '');
         $(this).val(textoSemAcentos);
     });
 });
 
 $(document).ready(function() {
     $('#id_nome_fantasia').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &'\.-]/gi, '');
+        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 &',\.-]/gi, '');
         $(this).val(textoSemAcentos);
     });
 });

@@ -23,7 +23,7 @@ def capitalize_name(name):
     articles = ['de', 'da', 'do', 'das', 'dos']
 
     # lista de números romanos que devem ser mantidos em maiúsculo
-    roman_numerals = ['II', 'III', 'VI', 'VII', 'XIII', 'XXIII', 'IV']
+    roman_numerals = ['II', 'III', 'VI', 'VII', 'XIII', 'XXIII', 'IV', 'LTDA']
 
     # separa o nome em palavras
     words = name.split(' ')

@@ -1,5 +1,5 @@
 {% extends 'modelo-ifpr.html' %}
-
+{% load custom_filters %}
 {% load static %}
 
 {% block conteudo %}
@@ -19,7 +19,6 @@
     <tr>
         
         <th class="text-center" style="font-size:12px">Auto </th>
-        <th class="text-center" style="font-size:12px">Imprimir</th>
         <th class="text-center" style="font-size:12px">AR</th>
 	<th class="text-center" style="font-size:12px">Fiscal</th>
 	<th class="text-center" style="font-size:12px">Protocolo / Imóvel / Proprietário</th>
@@ -32,8 +31,8 @@
         <th class="text-center" style="font-size:12px">AR</th>
 	<th class="text-center" style="font-size:12px">Rastreio julgamento</th>
         <th class="text-center" style="font-size:12px">Detalhes</th>
-        <th class="text-center" style="font-size:12px">Opções</th>
-		<th class="text-center" style="font-size:1px; width=1%">ID</th>
+        <th class="text-center" style="font-size:12px">Editar</th>
+		<th class="text-center" style="font-size:1px; width:1%">ID</th>
 
     </tr>
     </thead>
@@ -41,52 +40,48 @@
     {% for infracao in object_list %}
     <tr>
 		
-        <td style="font-size:11px"  class="text-center">{{ infracao.numero_format_ano }} </td>
-        <td class="text-center">
-        <a href="{% url 'gerar_auto' pk=infracao.pk %}" >
-        <i class="fa fa-file" aria-hidden="true"></i>
-        </a>
-        </td>
+        <td style="font-size:11px;vertical-align:middle;"  class="text-center"><a href="{% url 'gerar_auto' pk=infracao.pk %}">{{ infracao.numero_format_ano }}</a></td>
 
-        <td class="text-center">
+        <td style="vertical-align:middle;width:80px;" class="text-center">
+
         <a href="{% url 'gerar_ar1' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
         
 
         
         <a href="{% url 'gerar_ar2' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
        
 
         <a href="{% url 'gerar_ar3' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
        
 
        
         <a href="{% url 'gerar_ar4' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
         </td>
 
-	<td style="font-size:11px"  class="text-center">{{ infracao.inspecao.fiscal }} </td>
+	<td style="font-size:11px;vertical-align:middle;"  class="text-center">{{ infracao.inspecao.fiscal.primeiro_nome|capitalize_name }} </td>
 
-	<td style="font-size:11px">{{ infracao.inspecao.protocolo }} - {{ infracao.inspecao.terreno.inscricao }} - {{ infracao.inspecao.terreno.logradouro_terreno.tipo }} {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }} - {{ infracao.inspecao.terreno.proprietario }}</td>
+	<td style="font-size:11px;vertical-align:middle;">{{ infracao.inspecao.protocolo }} - <strong>{{ infracao.inspecao.terreno.inscricao }}</strong> - {{ infracao.inspecao.terreno.logradouro_terreno.tipo|capitalize_name }} {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro|capitalize_name }} - {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro|capitalize_name }} - <strong>{{ infracao.inspecao.terreno.proprietario.nome_proprietario|capitalize_name }}</strong></td>
 
-	<td class="text-center"><a href="{% url 'gerar_relatorio' pk=infracao.inspecao.pk %}">
+	<td class="text-center" style="vertical-align:middle;"><a href="{% url 'gerar_relatorio' pk=infracao.inspecao.pk %}">
             <i class="fa fa-file" aria-hidden="true"></i>
 
         </a> </th>
-       <td class="text-center">
+        <td class="text-center" style="vertical-align:middle;">
 
             <a href="{% url 'editar_infracao' infracao.pk %}" class="text-center">
             <i class="fa fa-plus" aria-hidden="true"></i>
             </a>
            </td>
 
-           <td class="text-center">
+           <td class="text-center" style="vertical-align:middle;">
 		   {% if infracao.data_entrega_autuacao != NULL %}
            <a href="{% url 'gerenciar_defesa' infracao.pk %}" >
             <i class="fa fa-suitcase" aria-hidden="true"></i>
@@ -96,13 +91,13 @@
 
            </td>
 
-            <td class="text-center">
+           <td class="text-center" style="vertical-align:middle;">
            <a href="{% url 'cadastrar-reinspecao' infracao.pk %}" >
             <i class="fa fa-camera" aria-hidden="true"></i>
             </a>
             </td>
 
-            <td class="text-center">
+            <td class="text-center" style="vertical-align:middle;">
                 {% if infracao.data_manifesto != NULL %}
 
            <a href="{% url 'gerar_manifestacao' infracao.pk %}">
@@ -113,7 +108,7 @@
                 {% endif %}
             </td>
 
-        <td class="text-center">
+            <td class="text-center" style="vertical-align:middle;">
             {% if infracao.julgamento != NULL %}
            <a href="{% url 'gerar_julgamento' infracao.pk %}" >
             <i class="fa fa-gavel" aria-hidden="true"></i>
@@ -122,25 +117,25 @@
 
                 {% endif %}
             </td>
-        <td class="text-center">
+            <td style="vertical-align:middle;width:80px;" class="text-center">
 		{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
         <a href="{% url 'gerar_ar5' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
 
         <a href="{% url 'gerar_ar6' pk=infracao.pk %}">
-          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
 
 	<a href="{% url 'gerar_ar7' pk=infracao.pk %}">
-		<i class="fa fa-envelope" aria-hidden="true"></i>
+		<i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
 	</a>
              {% else %}
 
              {% endif %}
 
         </td>
-	<td class="text-center">
+        <td class="text-center" style="vertical-align:middle;">
 	{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
 
         <a href="{% url 'cadastrar-AR2' pk=infracao.pk %}">
@@ -149,18 +144,14 @@
 	{% else %}
 	{% endif %}
         </td>
-<td style='text-align:center;vertical-align:middle'><a href="{% url 'detalhes-infracao' pk=infracao.pk %}">
+        <td class="text-center" style="vertical-align:middle;"><a href="{% url 'detalhes-infracao' pk=infracao.pk %}">
             <i class="fa fa-file" aria-hidden="true"></i>
 
         </a></td>
 
-        <td>
+        <td class="text-center" style="vertical-align:middle;">
         <a href="{% url 'editar-infracao' infracao.pk %}" >
             <i class="fa fa-pencil" aria-hidden="true"></i>
-            </a>
-
-            <a href="{% url 'deletar-infracao' infracao.pk %}" >
-            <i class="fa fa-trash" aria-hidden="true"></i>
             </a>
         </td>
 		<td style="font-size:1px"  class="text-center">{{ infracao.id }} </td>
