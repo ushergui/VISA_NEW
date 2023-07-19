@@ -39,7 +39,7 @@
     margin-left: 10px;
 }
 .empresa-container p {
-    word-break: break-all;
+    word-break: break-word;
 
 }
 

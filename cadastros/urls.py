@@ -41,7 +41,7 @@ urlpatterns = [
     path('editar/fiscal/<int:pk>/', FiscalUpdate.as_view(), name="editar-fiscal"),
     path('editar/inspecao/<int:pk>/', InspecaoUpdate.as_view(), name="editar-inspecao"),
     path('editar/infracao/<int:pk>/', InfracaoUpdate.as_view(), name="editar-infracao"),
-    path('cadastrar/defesa/<int:pk>/', DefesasCreate.as_view(), name="cadastrar-defesa"),
+    path('cadastrar/defesa/<int:pk>/', DefesasCreate.as_view(), name="cadastrar-defesa"), # Defesa individual
     path('cadastrar/AR/<int:pk>/', ARCreate.as_view(), name="cadastrar-AR"),
 
     path('cadastrar/reinspecao/<int:pk>/', ReinspecoesCreate.as_view(), name="cadastrar-reinspecao"),
@@ -110,7 +110,7 @@ urlpatterns = [
     path('feriados/editar/<int:pk>/', views.FeriadoRecessoUpdate.as_view(), name='editar_feriado'),
     path('feriados/excluir/<int:pk>/', views.FeriadoRecessoDelete.as_view(), name='excluir_feriado'),
     path('editar_infracao/<int:pk>/', views.editar_infracao, name='editar_infracao'),
-    path('gerenciar_defesa/<int:pk>/', views.gerenciar_defesa, name='gerenciar_defesa'),
+    path('gerenciar_defesa/<int:pk>/', views.gerenciar_defesa, name='gerenciar_defesa'),#Defesa coletiva
 
     path('vrm/', views.vrm_list, name='vrm_list'),
     path('vrm/create/', VRMCreate.as_view(), name='vrm_create'),

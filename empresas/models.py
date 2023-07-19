@@ -97,6 +97,7 @@ class ProtocoloEmpresa(models.Model):
         ("17", "Certidão de dispensa"),    
         ("18", "Entrega de documentos"),    
         ("19", "Alteração de dados"),    
+        ("20", "Orientações"),    
         ("16", "Outros assuntos"),    
     )
     motivo = models.CharField(max_length=120, null=False, choices=MOTIVO_CHOICES)

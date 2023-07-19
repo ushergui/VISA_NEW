@@ -711,11 +711,47 @@ class ProdutividadeList3(LoginRequiredMixin, ListView):
     model = Infracao
     template_name = 'listar-produtividades3.html'
 
-
 class GerenciarList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('login')
     model = Infracao
     template_name = 'gerenciar-infracoes.html'
+
+    def get_queryset(self):
+        q = self.request.GET.get('q')
+        if q:
+            words = q.split()  # quebra a string de entrada em palavras
+            queryset = super().get_queryset().select_related(
+                'inspecao__protocolo',
+                'inspecao__terreno',
+                'inspecao__fiscal',
+                'inspecao__terreno__logradouro_terreno',
+                'inspecao__terreno__proprietario'
+            )
+
+            querysets = []  # lista para armazenar os resultados de cada palavra
+
+            # para cada palavra, adiciona na consulta
+            for word in words:
+                query = Q()
+                query |= Q(inspecao__protocolo__protocolo__icontains=word)
+                query |= Q(inspecao__terreno__inscricao__icontains=word)
+                query |= Q(inspecao__fiscal__primeiro_nome__icontains=word)
+                query |= Q(inspecao__terreno__logradouro_terreno__nome_logradouro__icontains=word)
+                query |= Q(inspecao__terreno__proprietario__nome_proprietario__icontains=word)
+                query |= Q(inspecao__terreno__logradouro_terreno__bairro__nome_bairro__icontains=word)
+                query |= Q(numero_format_ano__icontains=word)
+
+                querysets.append(queryset.filter(query))
+
+            # encontra a interseção de todas as consultas
+            result_queryset = querysets[0]
+            for qs in querysets[1:]:
+                result_queryset = result_queryset.intersection(qs)
+
+            return result_queryset
+        else:
+            return Infracao.objects.none()  # retorna uma queryset vazia
+
 
 
 class MultadosList(LoginRequiredMixin, ListView):

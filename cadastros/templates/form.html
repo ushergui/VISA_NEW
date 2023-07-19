@@ -90,6 +90,45 @@
 	}
  }
 
+ 
+document.getElementById("id_entrada_protocolo").addEventListener("keyup", function () {
+    const entrada_protocolo = this.value.split('/').reverse().join('-');
+
+    if (entrada_protocolo && entrada_protocolo.length === 10) {
+        fetch(`/calcular_prazo_manifesto?entrada_protocolo=${entrada_protocolo}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.prazo_manifesto) {
+                    document.getElementById("id_prazo_manifesto").value = data.prazo_manifesto;
+                } else {
+                    console.error(data.error);
+                }
+            })
+            .catch((error) => console.error(error));
+    } else {
+        document.getElementById("id_prazo_manifesto").value = "";
+    }
+});
+
+	function calcularPrazoDefesa() {
+        const entrada_protocoloField = document.getElementById("{{ form.entrada_protocolo.auto_id }}");
+        const entrada_protocolo = entrada_protocolo.value;
+
+        if (entrada_protocolo) {
+            const url = new URL("/calcular_prazo_manifesto", window.location.origin);
+            url.searchParams.append("entrada_protocolo", entrada_protocolo);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById("{{ form.entrada_protocolo.auto_id }}").value = data.entrada_protocolo;
+                    }
+                });
+        }
+    }
+
 
 </script>
 {% endblock %}

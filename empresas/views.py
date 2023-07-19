@@ -148,6 +148,7 @@ def excluir_empresa(request, id):
 
 def detalhe_empresa(request, empresa_id):
     empresa = Empresas.objects.get(id=empresa_id)
+    cnaes_ordenados = empresa.cnae.order_by('-risco_cnae__valor_risco')
     protocolos = ProtocoloEmpresa.objects.filter(empresa=empresa)
     
     try:
@@ -155,7 +156,8 @@ def detalhe_empresa(request, empresa_id):
     except Inspecao.DoesNotExist:
         inspecao_mais_recente = None
 
-    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa, 'protocolos': protocolos, 'inspecao_mais_recente': inspecao_mais_recente})
+    return render(request, 'empresas/detalhe_empresa.html', {'empresa': empresa, 'cnaes_ordenados': cnaes_ordenados, 'protocolos': protocolos, 'inspecao_mais_recente': inspecao_mais_recente})
+
 
 
 def listar_risco(request):

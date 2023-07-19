@@ -1,13 +1,20 @@
 {% extends 'modelo-ifpr.html' %}
-
 {% load static %}
-
 {% block conteudo %}
-<h3>Controle dos autos de infração
 
-</h3>
+<h4>Pesquisar Infração</h4>
+<form class="form-inline" action="{% url 'gerenciar-infracoes' %}" method="get">
+    <div class="form-group">
+        <label for="q" class="mr-2">Pesquisa</label>
+        <input type="text" name="q" id="q" value="{{ request.GET.q }}" class="form-control-sm mr-4">
+    </div>
 
-<hr>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
+        Pesquisar</button>
+</form>
+
+<br>
+
 <div class="table responsive">
 <table class="table table-striped table-hover table-condensed" id="tabela-listar">
     <thead>
@@ -15,6 +22,7 @@
         <th style="font-size:11px" class="text-center">Auto</th>
         <th style="font-size:11px" class="text-center">Protocolo / Imóvel / Proprietário</th>
         <th style="font-size:11px" class="text-center">Fiscal</th>
+        <th style="font-size:11px" class="text-center">Rastreio</th>
         <th style="font-size:11px" class="text-center">Entrega</th>
         <th style="font-size:11px" class="text-center">Prazo</th>
         <th style="font-size:11px" class="text-center">Defesa</th>
@@ -22,7 +30,6 @@
         <th style="font-size:11px" class="text-center">Manifesto</th>
         <th style="font-size:11px" class="text-center">Julgamento</th>
 	<th style="font-size:11px" class="text-center">Situação</th>
-	<th style="font-size:11px" class="text-cneter">Entrega</th>
         <th style="font-size:11px" class="text-center">Editar</th>
     </tr>
     </thead>
@@ -32,6 +39,7 @@
         <td style="font-size:10px" class="text-center">{{ infracao.numero_format_ano }}</td>
 	<td style="font-size:10px" >{{ infracao.inspecao.protocolo }} - {{ infracao.inspecao.terreno.inscricao }} - {{ infracao.inspecao.terreno.logradouro_terreno.tipo }} {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }} - {{ infracao.inspecao.terreno.proprietario }}</td>
         <td style="font-size:10px" class="text-center">{{ infracao.inspecao.fiscal }}</td>
+        <td style="font-size:10px" class="text-center">{{ infracao.rastreio_infracao }}</td>
         <td style="font-size:10px" class="text-center">{{ infracao.data_entrega_autuacao|date:"d/m/Y" }}</td>
         <td style="font-size:10px" class="text-center">{{ infracao.prazo_defesa|date:"d/m/Y" }}</td>
 	<td style="font-size:10px" class="text-center">{{ infracao.entrada_protocolo|date:"d/m/Y" }}</td>
@@ -52,7 +60,6 @@
         {% endif %}
 
         </td>
-	<td style="font-size:10px" class="text-center">{{ infracao.data_entrega_julgamento|date:"d/m/Y" }}</td>
 
 	<td style="font-size:10px" class="text-center">
             <a href="{% url 'editar-infracao' infracao.pk %}" >
@@ -61,13 +68,10 @@
            
         </td>
 
-
-
-
     </tr>
     {% empty %}
         <tr>
-            <td colspan="3">Nenhum campo registrado.</td>
+            <td colspan="12">Nenhum campo registrado.</td>
         </tr>
     {% endfor %}
 </tbody>
