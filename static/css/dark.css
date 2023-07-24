@@ -6,6 +6,29 @@
     padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
     border-radius: 5px; 
 }
+.acao-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.acao-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px; /* Este é um exemplo. Ajuste o valor conforme necessário */
+}
+
+.form-container-3 {
+    background-color: #000; /* fundo preto */
+    color: #FFF; /* texto branco */
+    width: 33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    margin: auto; /* isso centraliza o formulário */
+    padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
+    border-radius: 5px; 
+}
 .select2-selection__choice__display {
     font-size: 11px;
     color: #000000;

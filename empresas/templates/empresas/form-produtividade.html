@@ -4,21 +4,44 @@
 
 {% load crispy_forms_tags %}
 
-
 {% block conteudo %}
-<div class="form-container">
+<div class="form-container-3">
     <h3 class="text-center"> {{ titulo }}</h3>
 <hr>
 <form method="POST">
     {% csrf_token %}
-    {{ form|crispy }}
-    {% for acao in acoes %}
-    <label for="acao-{{ acao.id }}">{{ acao }}</label>
-    <input type="checkbox" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
+    <label>Protocolo: <strong>{{ protocolo }}</strong></label><br>
+    <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label>
 
-    <label for="multiplicador-{{ acao.id }}">Multiplicador</label>
-    <input type="number" id="multiplicador-{{ acao.id }}" name="multiplicadores" step="0.1">
+
+    
+    <!-- Exibindo o campo inspecao -->
+    <p>{{ form.inspecao|as_crispy_field }}</p>
+
+    
+    {% for acao in acoes %}
+    <div class="acao-row">
+        <input type="checkbox" class="form-check-input" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
+        <label for="acao-{{ acao.id }}" class="form-check-label">{{ acao }}</label>
+        <label for="multiplicador-{{ acao.id }}" class="form-label">Multiplicador</label>
+        <input type="number" class="form-control" id="multiplicador-{{ acao.id }}" name="multiplicador-{{ acao.id }}" value=1>
+        <label for="totalmultiplicado">Total</label>
+        <input type="number" class="totalmultiplicado">
+        
+    </div>
     {% endfor %}
+    
+    <p>{{ form.total|as_crispy_field }}</p>
+
+    <!-- Exibindo o resto dos campos -->
+    <p>{{ form.tempo_gasto|as_crispy_field }}</p>
+    <p>{{ form.mes_produtividade|as_crispy_field }}</p>
+    <p>{{ form.fiscal_responsavel|as_crispy_field }}</p>
+
+    <p>{{ form.data_saida_fiscal|as_crispy_field }}</p>
+
+    <p>{{ form.fiscal_auxiliar|as_crispy_field }}</p>
+    
     <br>
 
     <button type="submit" class="btn btn-primary center-button">
@@ -81,6 +104,8 @@ $(document).ready(function() {
         $('#id_entrada_fiscal').mask("00/00/0000");
         $('#id_data_inspecao').mask("00/00/0000");
         $('#id_data_relatorio').mask("00/00/0000");
+        $('#id_data_saida_fiscal').mask("00/00/0000");
+        $('#id_mes_produtividade').mask("00/00/0000");
         $('#id_encerramento_protocolo').mask("00/00/0000");
 		$('#id_cpf_responsavel_legal').mask("000.000.000-00");
 		$('#id_numero_protocolo').mask("SSS-00000/00");
@@ -170,5 +195,52 @@ $(document).ready(function() {
   });
 });
 
+$(document).ready(function() {
+    $('.form-check-input, .form-control').change(function() {
+        var acaoId = $(this).parent().find('.form-check-input').val();
+        var isChecked = $(this).parent().find('.form-check-input').is(":checked");
+        var multiplicadorField = $("#multiplicador-" + acaoId);
+        var totalField = $(this).parent().find('.totalmultiplicado');
+        if (isChecked) {
+            $.ajax({
+                url: '/get_pontos/',
+                data: {
+                    'acao_id': acaoId
+                },
+                dataType: 'json',
+                success: function(data) {
+                    var pontos = parseFloat(data.pontos);
+                    var multiplicador = parseFloat(multiplicadorField.val());
+                    var total = pontos * multiplicador;
+                    totalField.val(total.toFixed(1));
+                    totalField.trigger('change');
+                }
+            });
+        } else {
+            totalField.val('');
+            totalField.trigger('change');
+        }
+    });
+
+    // Quando qualquer campo 'totalmultiplicado' é alterado, atualiza o total.
+    $('.totalmultiplicado').on('change', function() {
+        var total = 0;
+        // Passa por todos os campos 'totalmultiplicado' e soma os valores.
+        $('.totalmultiplicado').each(function() {
+            total += Number($(this).val()) || 0; // Se o campo estiver vazio, considera como 0.
+        });
+        // Atualiza o campo total.
+        $('#id_total').val(total.toFixed(1)); // Supõe que 'id_total' é o id do campo total.
+    });
+
+    $('#multiplicador-{{ acao.id }}').each(function() {
+        $(this).on('input', function(e) {
+            const allowedValues = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5];
+            if (!allowedValues.includes(parseFloat(e.target.value))) {
+                e.target.value = '';
+            }
+        });
+    });
+});
 </script>
 {% endblock %}

@@ -6,6 +6,7 @@ from django.db.models import Max
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.db.models import Q
+from datetime import date
 
 
 # Contabilidade
@@ -364,50 +365,72 @@ def listar_produtividade(request):
 def criar_produtividade(request, protocolo_id):
     acoes = AcaoProdutividade.objects.all()
     protocolo = ProtocoloEmpresa.objects.get(id=protocolo_id)
+    try:
+        inspecao = Inspecao.objects.get(protocolo=protocolo)
+    except Inspecao.DoesNotExist:
+        inspecao = None
 
+    print("Método da requisição: ", request.method)
     if request.method == "POST":
-        form = ProdutividadeForm(request.POST, initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
-
-
+        initial = {'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel}
+        form = ProdutividadeForm(request.POST, initial=initial)
         fiscais_auxiliares_ids = request.POST.getlist('fiscal_auxiliar')
-        acoes_ids = request.POST.getlist('acoes')
-        multiplicadores = request.POST.getlist('multiplicadores')
 
+        # As linhas abaixo não são mais necessárias, pois os campos de multiplicador estão agora no formulário
+        # acoes_ids = request.POST.getlist('acoes')
+        # multiplicadores = request.POST.getlist('multiplicadores')
+
+        print("Antes da verificação do formulário")
         if form.is_valid():
+            print("O formulário é válido.")
             produtividade = form.save(commit=False)
             produtividade.protocolo = protocolo
             produtividade.fiscal_responsavel = protocolo.fiscal_responsavel
+            
+            if inspecao:
+                produtividade.inspecao = inspecao
             produtividade.save()
             produtividade.fiscal_auxiliar.set(fiscais_auxiliares_ids)
 
-            for acao_id, multiplicador in zip(acoes_ids, multiplicadores):
-                AcaoProdutividadeRel.objects.create(
-                    acao_id=acao_id,
-                    produtividade=produtividade,
-                    multiplicador=multiplicador
-                )
-
-            produtividade.total = sum([
-                rel.acao.pontos * rel.multiplicador
-                for rel in produtividade.acaoprodutividaderel_set.all()
-            ])
-            produtividade.save()
+            for acao in acoes:
+                multiplicador_field = f'multiplicador_{acao.id}'
+                if multiplicador_field in form.cleaned_data and form.cleaned_data[multiplicador_field]:
+                    AcaoProdutividadeRel.objects.create(
+                        acao=acao,
+                        produtividade=produtividade,
+                        multiplicador=form.cleaned_data[multiplicador_field]
+                    )
+                    print("Objeto AcaoProdutividadeRel criado: ", acao_produtividade_rel)
 
             return redirect('listar_produtividade')
+        else:
+            print("O formulário não é válido.")
+            print(form.errors)
+        print("Depois da verificação do formulário")
     else:
-        form = ProdutividadeForm(initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
+        form = ProdutividadeForm(inspecao=inspecao, initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
 
     return render(request, 'empresas/form-produtividade.html', {
         'form': form, 
         'acoes': acoes, 
-        'titulo': 'Criar Produtividade', 
-        'botao': 'Salvar'
-        
+        'titulo': 'Lançamento da produtividade', 
+        'botao': 'Salvar',
+        'protocolo': protocolo,
+        'fiscal_responsavel': protocolo.fiscal_responsavel,
     })
 
-"""Resolveu sim; Agora que o campo total  seja dinâmico usando ajax por exemplo para mostrar a prévia de quantos pontos serão enviados para o banco de dados, visto que ao selecionar o checkbox referente a cada acao, este já terá um valor de pontos associados, assim como quando digito um total no input do multiplicador relacionado a acao da produtividade:
 
-"""
+def get_pontos(request):
+    acao_id = request.GET.get('acao_id', None)
+    pontos = 0
+    if acao_id is not None:
+        try:
+            acao = AcaoProdutividade.objects.get(id=acao_id)
+            pontos = acao.pontos
+        except AcaoProdutividade.DoesNotExist:
+            pass
+    return JsonResponse({'pontos': str(pontos)})
+
 
 def editar_produtividade(request, id):
     produtividade = get_object_or_404(Produtividade, id=id)

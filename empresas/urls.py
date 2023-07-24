@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo
+from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos
 
 
 urlpatterns = [
@@ -57,5 +57,6 @@ urlpatterns = [
     path('produtividade/novo/<int:protocolo_id>/', views.criar_produtividade, name='criar_produtividade'),
     path('produtividade/editar/<int:id>/', views.editar_produtividade, name='editar_produtividade'),
     path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
+    path('get_pontos/', get_pontos, name='get_pontos'),
 
 ]

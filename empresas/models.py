@@ -152,7 +152,7 @@ class Inspecao(models.Model):
         ordering = ["data_inspecao"]
 
     def __str__(self):
-        return f"Inspeção {self.protocolo.numero_protocolo}"
+        return f"{self.protocolo.numero_protocolo} - {self.protocolo.empresa}"
 
 class AcaoProdutividade(models.Model):
     codigo_produtividade = models.CharField(max_length=15, unique=True, verbose_name="Código")
@@ -177,7 +177,7 @@ class Produtividade(models.Model):
     data_saida_fiscal = models.DateField(null=False, blank=False, verbose_name="Data de Saída do Fiscal")
     tempo_gasto = models.DecimalField(max_digits=2, decimal_places=1, verbose_name="Tempo gasto")
     mes_produtividade = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
-    inspecao = models.OneToOneField(Inspecao, on_delete=models.CASCADE, null=True, blank=True)
+    inspecao = models.OneToOneField(Inspecao, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Inspeção")
     fiscal_responsavel = models.ForeignKey(Fiscal, on_delete=models.PROTECT, blank=True, null=True)
     fiscal_auxiliar = models.ManyToManyField(Fiscal, related_name='fiscais_auxiliares', blank=True)
     validacao = models.BooleanField(default=False)

@@ -286,14 +286,15 @@ class PrescricaoUpdateView(UpdateView):
     template_name = 'oxigenoterapia/form_prescricao.html'
 
     def get_success_url(self):
-        return reverse_lazy('prescricoes_list')
-    
+        paciente_id = self.object.paciente.id  # Pegar o id do paciente a partir da prescrição
+        return reverse_lazy('detalhes_paciente', kwargs={'paciente_id': paciente_id})  # Redirecionar para a página de detalhes do paciente
+
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['titulo'] = 'Editar Prescrição'
         data['botao'] = 'Gravar'
         return data
-
+    
 class PrescricaoDeleteView(DeleteView):
     model = Prescricao
     template_name = 'oxigenoterapia/prescricao_confirm_delete.html'
@@ -326,7 +327,8 @@ class ModoDeUsoUpdateView(UpdateView):
     template_name = 'oxigenoterapia/form_mododeuso.html'
 
     def get_success_url(self):
-        return reverse_lazy('mododeuso_list')
+        paciente_id = self.object.paciente.id  # Pegar o id do paciente a partir da prescrição
+        return reverse_lazy('detalhes_paciente', kwargs={'paciente_id': paciente_id})  # Redirecionar para a página de detalhes do paciente
     
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -400,44 +402,58 @@ class AtendimentoUpdateView(UpdateView):
     model = Atendimento
     form_class = AtendimentoForm
     template_name = 'oxigenoterapia/form.html'
-
-    def get_success_url(self):
-        return reverse_lazy('atendimento_list')
+    success_url = reverse_lazy('atendimento_list')
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        data['titulo'] = 'Editar Atendimento'
-        data['botao'] = 'Atualizar'
+        data['titulo'] = 'Alteração de atendimento'
+        data['botao'] = 'Alterar'
         return data
-    def form_valid(self, form):
-        # Primeiro, chame a implementação padrão para salvar o objeto Atendimento
-        response = super().form_valid(form)
-        
-        # Em seguida, obtenha os dados do formulário para o ModoDeUso
-        equipamento = form.cleaned_data['equipamento']
-        tempo_de_uso = form.cleaned_data['tempo_de_uso']
-        litros = form.cleaned_data['litros']
-        parametros = form.cleaned_data['parametros']
-        
-        # Obtenha o objeto ModoDeUso relacionado
-        mododeuso = self.object.prescricao
 
-        # Atualize os campos de ModoDeUso
-        mododeuso.equipamento.set(equipamento)
-        mododeuso.tempo_de_uso = tempo_de_uso
-        mododeuso.litros = litros
-        mododeuso.parametros = parametros
-        
-        # Salve o objeto ModoDeUso
-        mododeuso.save()
-        
-        # Retorne a resposta
-        return response
+    def form_valid(self, form):
+        # Chama o método form_valid da classe base e salva o formulário
+        response = super().form_valid(form)
+
+        # Obtém o id da prescrição da URL
+        prescricao_id = self.kwargs.get('prescricao_id')
+
+        # Atribui o valor do campo 'prescrição' antes de salvar o formulário
+        if prescricao_id:
+            prescricao = ModoDeUso.objects.get(id=prescricao_id)
+            form.instance.prescricao = prescricao
+
+        # Atualiza o objeto ModoDeUso com os novos valores
+        if prescricao_id:
+            prescricao.equipamento.set(form.cleaned_data['equipamento'])
+            prescricao.tempo_de_uso = form.cleaned_data['tempo_de_uso']
+            prescricao.litros = form.cleaned_data['litros']
+            prescricao.parametros = form.cleaned_data['parametros']
+            prescricao.save()
+
+        # Redireciona para a página de detalhes do paciente
+        paciente_id = self.object.prescricao.paciente.id
+        return HttpResponseRedirect(reverse('detalhes_paciente', kwargs={'paciente_id': paciente_id}))
+
 
 class AtendimentoDeleteView(DeleteView):
     model = Atendimento
     template_name = 'oxigenoterapia/atendimento_confirm_delete.html'
-    success_url = reverse_lazy('atendimento_list')
+    
+    def delete(self, request, *args, **kwargs):
+        # Guarda o objeto em uma variável antes dele ser deletado
+        self.object = self.get_object()
+
+        # Chama o método delete da superclasse
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        # Obtendo o id do paciente relacionado ao atendimento
+        paciente_id = self.object.prescricao.paciente.id
+
+        # Retornando a URL de redirecionamento após a exclusão
+        return reverse('detalhes_paciente', kwargs={'paciente_id': paciente_id})
+
+
 
 class AtendimentoListView(ListView):
     model = Atendimento

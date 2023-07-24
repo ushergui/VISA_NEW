@@ -134,6 +134,14 @@ class AtendimentoForm(forms.ModelForm):
         # Define o widget para botões do tipo "radio"
         self.fields['troca_de_filtro'].widget = forms.RadioSelect(choices=[(True, 'Sim'), (False, 'Não')])
         self.fields['troca_de_mascara'].widget = forms.RadioSelect(choices=[(True, 'Sim'), (False, 'Não')])
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        data_atendimento = cleaned_data.get('data_atendimento')
+        prescricao = cleaned_data.get('prescricao')
+
+        if data_atendimento and prescricao and data_atendimento < prescricao.data_inicio_uso:
+            raise ValidationError("A data do atendimento não pode ser anterior à data de início do uso.")
 
 """
 class AtendimentoForm(forms.ModelForm):
