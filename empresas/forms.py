@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
 from cadastros.models import Logradouro, Fiscal, Cidade, Bairro
 from django.core.exceptions import ValidationError
 import re
@@ -173,7 +173,42 @@ class AcaoProdutividadeForm(forms.ModelForm):
         model = AcaoProdutividade
         fields = ['codigo_produtividade', 'acao', 'pontos']
 
+class ProdutividadeForm(forms.ModelForm):
+    class Meta:
+        model = Produtividade
+        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscal_auxiliar', 'validacao']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'fiscal_responsavel' in self.initial:
+            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
+        if self.instance:
+            self.fields['fiscal_responsavel'].disabled = True
+            if self.instance.inspecao:
+                self.fields['inspecao'].initial = self.instance.inspecao
+                self.fields['inspecao'].disabled = True
+            else:
+                self.fields['inspecao'].disabled = True
+        # Adicionando campos de multiplicador para cada ação
+        for acao in AcaoProdutividade.objects.all():
+            self.fields[f'multiplicador-{acao.id}'] = forms.DecimalField(max_digits=3, decimal_places=1, required=False)
+
+    def save(self, commit=True):
+        instance = super().save(commit)
+        if commit:
+            for acao in AcaoProdutividade.objects.all():
+                multiplicador_field = f'multiplicador-{acao.id}'
+                if multiplicador_field in self.cleaned_data and self.cleaned_data[multiplicador_field] is not None:
+                    AcaoProdutividadeRel.objects.update_or_create(
+                        acao=acao,
+                        produtividade=instance,
+                        defaults={'multiplicador': self.cleaned_data[multiplicador_field]}
+                    )
+        return instance
+
+
+
+'''ESTAVA FUNCIONANDO MEDIO
 class ProdutividadeForm(forms.ModelForm):
     class Meta:
         model = Produtividade
@@ -215,7 +250,7 @@ class ProdutividadeForm(forms.ModelForm):
         
         return cleaned_data
 
-    
+    '''
 # SE DER PAU EMBAIXO TA PRONTO
 '''class ProdutividadeForm(forms.ModelForm):
     class Meta:

@@ -73,6 +73,9 @@ class Empresas(models.Model):
 
     def __str__(self):
         return self.razao
+    
+    def get_cnae_max_risco(self):
+        return self.cnae.order_by('-risco_cnae__valor_risco').first()
 
 class ProtocoloEmpresa(models.Model):
     numero_protocolo = models.CharField(max_length=12, null=False, verbose_name="Número do protocolo")

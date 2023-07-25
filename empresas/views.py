@@ -4,9 +4,11 @@ from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, Legisla
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from datetime import date
+from django.db.models import Max, Subquery, OuterRef
+
 
 
 # Contabilidade
@@ -363,6 +365,31 @@ def listar_produtividade(request):
     return render(request, 'empresas/listar_produtividade.html', {'produtividades': produtividades})
 
 def criar_produtividade(request, protocolo_id):
+    protocolo = get_object_or_404(ProtocoloEmpresa, id=protocolo_id)
+    if request.method == 'POST':
+        form = ProdutividadeForm(request.POST)
+        if form.is_valid():
+            produtividade = form.save(commit=False)
+            produtividade.protocolo = protocolo
+            produtividade.fiscal_responsavel = protocolo.fiscal_responsavel
+            produtividade.save()
+            form.save_m2m()
+            return redirect('empresas:listar_produtividade')
+    else:
+        form = ProdutividadeForm(initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
+    acoes = AcaoProdutividade.objects.all()
+    produtividade_acoes_ids = []
+    if form.is_valid():
+        produtividade_acoes_ids = [acao.id for acao in form.cleaned_data.get('acoes', [])]
+    multiplicadores = [f'multiplicador-{acao.id}' for acao in acoes]
+    return render(request, 'empresas/form-produtividade.html', {'protocolo': protocolo,'fiscal_responsavel': protocolo.fiscal_responsavel,'titulo': 'Lançamento da produtividade', 
+        'botao': 'Salvar', 'form': form, 'acoes': acoes, 'produtividade_acoes_ids': produtividade_acoes_ids, 'multiplicadores': multiplicadores})
+
+
+
+
+'''
+def criar_produtividade(request, protocolo_id):
     acoes = AcaoProdutividade.objects.all()
     protocolo = ProtocoloEmpresa.objects.get(id=protocolo_id)
     try:
@@ -418,7 +445,7 @@ def criar_produtividade(request, protocolo_id):
         'protocolo': protocolo,
         'fiscal_responsavel': protocolo.fiscal_responsavel,
     })
-
+'''
 
 def get_pontos(request):
     acao_id = request.GET.get('acao_id', None)
@@ -460,3 +487,19 @@ def excluir_produtividade(request, id):
     return render(request, 'empresas/form-excluir.html', {'obj': produtividade})
 
 
+class EmpresasCnaeListView(ListView):
+    model = Empresas
+    template_name = 'empresas/lista_empresas_cnae.html'
+    context_object_name = 'empresas'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            empresas = Empresas.objects.filter(
+                Q(cnae__codigo_cnae__icontains=query) | 
+                Q(cnae__descricao_cnae__icontains=query)
+            ).distinct()
+
+            return empresas.order_by('razao')
+        else:
+            return Empresas.objects.none()

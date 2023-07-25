@@ -80,6 +80,8 @@ TEMPLATES = [
             'libraries': {
                 'custom_filters': 'cadastros.templatestags.custom_filters',
                 'my_tags': 'cadastros.templatestags.my_tags',
+                'zip': 'cadastros.templatestags.zip',
+                'form_field': 'cadastros.templatestags.form_field',
             },
         },
     },

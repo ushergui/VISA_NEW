@@ -58,5 +58,6 @@ urlpatterns = [
     path('produtividade/editar/<int:id>/', views.editar_produtividade, name='editar_produtividade'),
     path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
     path('get_pontos/', get_pontos, name='get_pontos'),
+    path('lista_empresas_cnae/', views.EmpresasCnaeListView.as_view(), name='lista_empresas_cnae'),
 
 ]
