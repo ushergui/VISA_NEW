@@ -35,26 +35,16 @@
 <script>
     
 
-$(document).ready(function() {
-    $('#id_cnae').change(function() {
-        var selectedCnaes = $(this).val();
-        if (selectedCnaes) {
-            // Criamos uma string de parâmetros manualmente
-            var dataString = '';
-            for (var i = 0; i < selectedCnaes.length; i++) {
-                dataString += 'cnaes=' + selectedCnaes[i] + '&';
-            }
-            
-            dataString = dataString.slice(0, -1);
-
+    $(document).ready(function() {
+    $('#id_cnae_principal').change(function() {
+        var cnaePrincipal = $(this).val();
+        if (cnaePrincipal) {
             $.ajax({
-                url: '/api/get_risco/?' + dataString,
+                url: '/api/get_risco/?cnaes=' + cnaePrincipal,
                 success: function(data) {
                     $('#id_risco_empresa').val(data.risco).change();  
                 }
-            });
-
-            
+            });  
         }
     });
 });
@@ -98,6 +88,7 @@ $(document).ready(function() {
         $('#id_status_protocolo').select2();
         $('#id_infracao').select2();
         $('#id_fiscal').select2();
+        $('#id_cnae_principal').select2();
         $('#id_terreno').select2();
         $('#id_inspecao').select2();
     });
@@ -130,6 +121,7 @@ $(document).ready(function() {
         $(this).val(textoSemAcentos);
     });
 });
+
 
 
     $(document).ready(function() {

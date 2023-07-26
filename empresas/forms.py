@@ -104,7 +104,13 @@ class EmpresasForm(forms.ModelForm):
     risco_empresa = forms.ModelChoiceField(queryset=Risco.objects.all())
     cnae = forms.ModelMultipleChoiceField(
         queryset=Cnae.objects.select_related('risco_cnae').all(),
-        widget=forms.SelectMultiple(attrs={'class': 'cnae'}), # Adicione esta linha
+        widget=forms.SelectMultiple(attrs={'class': 'cnae'}), 
+        label='CNAE(s) Secundário(s)',
+        required=False,  
+    )
+    cnae_principal = forms.ModelChoiceField(
+        queryset=Cnae.objects.select_related('risco_cnae').all(),
+        label='CNAE Principal'  
     )
     contabilidade = forms.ModelChoiceField(queryset=Contabilidade.objects.all())
 
@@ -136,6 +142,17 @@ class EmpresasForm(forms.ModelForm):
         if cnpj and not valida_cnpj(cnpj):
             raise ValidationError("CNPJ inválido!")
         return cnpj
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        cnae_principal = cleaned_data.get('cnae_principal')
+        cnaes_secundarios = cleaned_data.get('cnae')
+
+        # Checa se o cnae_principal está na lista de cnaes_secundarios
+        if cnae_principal and cnaes_secundarios and cnae_principal in cnaes_secundarios:
+            raise forms.ValidationError("O CNAE principal não pode ser o mesmo que um dos CNAEs secundários.")
+
+        return cleaned_data
 
 
 class EmpresasObservacoesForm(forms.ModelForm):
@@ -299,3 +316,29 @@ class ProdutividadeFormEdit(forms.ModelForm):
 
 
 
+class EmpresaCnaeForm(forms.ModelForm):
+    cnae = forms.ModelMultipleChoiceField(
+        queryset=Cnae.objects.select_related('risco_cnae').all(),
+        widget=forms.SelectMultiple(attrs={'class': 'cnae'}), 
+        label='CNAE(s) Secundário(s)',
+        required=False,  
+    )
+    cnae_principal = forms.ModelChoiceField(
+        queryset=Cnae.objects.select_related('risco_cnae').all(),
+        label='CNAE Principal'  
+    )
+
+    class Meta:
+        model = Empresas
+        fields = ['razao', 'cnae_principal', 'cnae', 'risco_empresa']
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        cnae_principal = cleaned_data.get('cnae_principal')
+        cnaes_secundarios = cleaned_data.get('cnae')
+
+        # Checa se o cnae_principal está na lista de cnaes_secundarios
+        if cnae_principal and cnaes_secundarios and cnae_principal in cnaes_secundarios:
+            raise forms.ValidationError("O CNAE principal não pode ser o mesmo que um dos CNAEs secundários.")
+
+        return cleaned_data

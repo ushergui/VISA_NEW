@@ -158,8 +158,8 @@
             <div class="row">
                 <div class="col-lg-12 ">
                     <h4>CNAE(s)</h4>
-                    <p >{% for cnae in cnaes_ordenados %}
-                        <strong>{{ cnae.codigo_cnae }} -</strong>  {{ cnae.descricao_cnae }}{% if not forloop.last %}; {% endif %}
+                    <p ><strong>{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</strong>{% if cnaes_ordenados %};{% else %}{% endif %}{% for cnae in cnaes_ordenados %}
+                        {{ cnae.codigo_cnae }} -  {{ cnae.descricao_cnae }}{% if not forloop.last %}; {% endif %}
                     {% endfor %}</p>
                 </div>
             </div>

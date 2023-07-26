@@ -115,7 +115,7 @@ class Terreno(models.Model):
     numero_terreno = models.CharField(max_length=20, verbose_name="Número do terreno")
     complemento_terreno = models.CharField(max_length=40, verbose_name="Complemento", null=True, blank=True)
     proprietario = models.ForeignKey(Proprietario, on_delete=models.PROTECT, verbose_name="Proprietário")
-    lote = models.CharField(max_length=10, null=False)
+    lote = models.CharField(max_length=12, null=False)
     quadra = models.CharField(max_length=8, null=False)
     area = models.FloatField(null=False)
     logradouro_correspondencia = models.ForeignKey(Logradouro, on_delete=models.PROTECT, verbose_name="Endereço de correspondência", related_name="logradouro_correspondencia")

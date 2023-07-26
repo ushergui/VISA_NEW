@@ -18,6 +18,7 @@ urlpatterns = [
 
     # Empresas
     path('empresas/listar', views.listar_empresas, name='listar_empresas'),
+    path('empresas/listar2', views.listar_empresas2, name='listar_empresas2'),
     path('empresas/novo/', views.criar_empresa, name='criar_empresa'),
     path('empresas/editar/<int:id>/', views.editar_empresa, name='editar_empresa'),
     path('empresas/editar_observacoes/<int:id>/', views.editar_observacoes, name='editar_observacoes'),
@@ -59,5 +60,6 @@ urlpatterns = [
     path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
     path('get_pontos/', get_pontos, name='get_pontos'),
     path('lista_empresas_cnae/', views.EmpresasCnaeListView.as_view(), name='lista_empresas_cnae'),
+    path('editar_empresa_cnae/<int:id>/', views.editar_empresa_cnae, name='editar_empresa_cnae'),
 
 ]

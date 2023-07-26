@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit, EmpresasObservacoesForm
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit, EmpresasObservacoesForm, EmpresaCnaeForm
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
@@ -102,6 +102,12 @@ def listar_empresas(request):
         empresas = Empresas.objects.all()
 
     return render(request, 'empresas/listar_empresas.html', {'empresas': empresas, 'termo_pesquisa': termo_pesquisa})
+
+def listar_empresas2(request):
+    empresas = Empresas.objects.filter(cnae_principal__codigo_cnae='1111-1/11')
+    total_registros = empresas.count()
+    return render(request, 'empresas/listar_empresas2.html', {'empresas': empresas, 'total_registros': total_registros})
+
 
 def criar_empresa(request):
     form = EmpresasForm(request.POST or None)
@@ -386,67 +392,6 @@ def criar_produtividade(request, protocolo_id):
         'botao': 'Salvar', 'form': form, 'acoes': acoes, 'produtividade_acoes_ids': produtividade_acoes_ids, 'multiplicadores': multiplicadores})
 
 
-
-
-'''
-def criar_produtividade(request, protocolo_id):
-    acoes = AcaoProdutividade.objects.all()
-    protocolo = ProtocoloEmpresa.objects.get(id=protocolo_id)
-    try:
-        inspecao = Inspecao.objects.get(protocolo=protocolo)
-    except Inspecao.DoesNotExist:
-        inspecao = None
-
-    print("Método da requisição: ", request.method)
-    if request.method == "POST":
-        initial = {'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel}
-        form = ProdutividadeForm(request.POST, initial=initial)
-        fiscais_auxiliares_ids = request.POST.getlist('fiscal_auxiliar')
-
-        # As linhas abaixo não são mais necessárias, pois os campos de multiplicador estão agora no formulário
-        # acoes_ids = request.POST.getlist('acoes')
-        # multiplicadores = request.POST.getlist('multiplicadores')
-
-        print("Antes da verificação do formulário")
-        if form.is_valid():
-            print("O formulário é válido.")
-            produtividade = form.save(commit=False)
-            produtividade.protocolo = protocolo
-            produtividade.fiscal_responsavel = protocolo.fiscal_responsavel
-            
-            if inspecao:
-                produtividade.inspecao = inspecao
-            produtividade.save()
-            produtividade.fiscal_auxiliar.set(fiscais_auxiliares_ids)
-
-            for acao in acoes:
-                multiplicador_field = f'multiplicador_{acao.id}'
-                if multiplicador_field in form.cleaned_data and form.cleaned_data[multiplicador_field]:
-                    AcaoProdutividadeRel.objects.create(
-                        acao=acao,
-                        produtividade=produtividade,
-                        multiplicador=form.cleaned_data[multiplicador_field]
-                    )
-                    print("Objeto AcaoProdutividadeRel criado: ", acao_produtividade_rel)
-
-            return redirect('listar_produtividade')
-        else:
-            print("O formulário não é válido.")
-            print(form.errors)
-        print("Depois da verificação do formulário")
-    else:
-        form = ProdutividadeForm(inspecao=inspecao, initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
-
-    return render(request, 'empresas/form-produtividade.html', {
-        'form': form, 
-        'acoes': acoes, 
-        'titulo': 'Lançamento da produtividade', 
-        'botao': 'Salvar',
-        'protocolo': protocolo,
-        'fiscal_responsavel': protocolo.fiscal_responsavel,
-    })
-'''
-
 def get_pontos(request):
     acao_id = request.GET.get('acao_id', None)
     pontos = 0
@@ -491,15 +436,42 @@ class EmpresasCnaeListView(ListView):
     model = Empresas
     template_name = 'empresas/lista_empresas_cnae.html'
     context_object_name = 'empresas'
-
+    
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
             empresas = Empresas.objects.filter(
-                Q(cnae__codigo_cnae__icontains=query) | 
-                Q(cnae__descricao_cnae__icontains=query)
+                Q(cnae_principal__codigo_cnae__icontains=query) |
+                Q(cnae_principal__descricao_cnae__icontains=query)
             ).distinct()
 
             return empresas.order_by('razao')
         else:
             return Empresas.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q')
+
+        if query:
+            empresas = Empresas.objects.filter(
+                Q(cnae_principal__codigo_cnae__icontains=query) |
+                Q(cnae_principal__descricao_cnae__icontains=query)
+            ).distinct()
+
+            context['total_registros'] = empresas.count()
+
+        return context
+
+def editar_empresa_cnae(request, id):
+    empresa = Empresas.objects.get(id=id)
+    titulo = "Edição Cnae principal"
+    botao = "Gravar"
+    if request.method == "POST":
+        form = EmpresaCnaeForm(request.POST, instance=empresa)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_empresas2')
+    else:
+        form = EmpresaCnaeForm(instance=empresa)
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})

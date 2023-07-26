@@ -4,7 +4,11 @@
 {% load custom_filters %}
 {% block conteudo %}
 
+{% if total_registros %}
+<h4>Pesquisa por CNAE - Total de registros: {{ total_registros }}</h4>
+{% else %}
 <h4>Pesquisa por CNAE</h4>
+{% endif %}
 <form class="form-inline" action="{% url 'lista_empresas_cnae' %}" method="get">
     <div class="form-group">
         <input type="text" name="q" id="q" value="{{ request.GET.q }}" class="form-control-sm mr-4">
@@ -39,9 +43,7 @@
             ********
         {% endif %}</td>
         <td style="font-size:10px" class="text-center">
-            {% with cnae_max_risco=empresa.get_cnae_max_risco %}
-                {{ cnae_max_risco.codigo_cnae }} - {{ cnae_max_risco.descricao_cnae }}
-            {% endwith %}
+            {{ empresa.cnae_principal }}
         </td>
     </tr>
     {% empty %}
