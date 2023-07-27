@@ -105,6 +105,13 @@ class Notificacao(models.Model):
     status_obito = models.CharField(max_length=25, null=True, blank=True, verbose_name="Status óbito", choices=OBITO_CHOICES)
     data_agendamento = models.DateField(null=True, verbose_name="Data de agendamento", blank=True)
     observacoes = models.CharField(max_length=200, verbose_name="Observações", null=True, blank=True)
+    MOTIVO_CHOICES = (
+        ("Clínico", "Clínico"),
+        ("Laboratorial positivo", "Laboratorial positivo"),
+        ("Laboratorial negativo", "Laboratorial negativo"),
+    )
+    motivo_encerramento = models.CharField(max_length=30, null=True, blank=True, verbose_name="Motivo do encerramento", choices=MOTIVO_CHOICES)
+    data_encerramento = models.DateField(null=True, verbose_name="Data de encerramento", blank=True)
 
     @classmethod
     def existe_paciente_logradouro(cls, nome, logradouro_paciente):

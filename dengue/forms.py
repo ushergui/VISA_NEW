@@ -34,6 +34,8 @@ class NotificacaoForm(forms.ModelForm):
             'status_obito',
             'data_agendamento',
             'observacoes',
+            'motivo_encerramento',
+            'data_encerramento',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -58,3 +60,37 @@ class SemanaForm(forms.ModelForm):
     class Meta:
         model = Semana
         fields = ['semana', 'ano','data_inicio_semana', 'data_fim_semana']
+
+class EncerrarNotificacaoForm(forms.ModelForm):
+    class Meta:
+        model = Notificacao
+        fields = [
+            'nome',
+            'data_notificacao',
+            'data_inicio_sintomas',
+            'semana_epidemiologica',
+            'sinan',
+            'resultado',
+            'internacao',
+            'obito',
+            'data_agendamento',
+            'observacoes',
+            'motivo_encerramento',
+            'data_encerramento',
+        ]
+        widgets = {
+            'motivo_encerramento': forms.RadioSelect
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        data_encerramento = cleaned_data.get('data_encerramento')
+        data_notificacao = cleaned_data.get('data_notificacao')
+        motivo_encerramento = cleaned_data.get('motivo_encerramento')
+
+        if data_encerramento and not motivo_encerramento:
+            self.add_error('motivo_encerramento', 'Por favor, selecione o motivo do encerramento.')
+        elif motivo_encerramento and not data_encerramento:
+            self.add_error('data_encerramento', 'Por favor, preencha a data do encerramento.')
+        elif data_encerramento and data_notificacao and data_encerramento < data_notificacao:
+            self.add_error('data_encerramento', 'A data de encerramento não pode ser inferior à data de notificação.')

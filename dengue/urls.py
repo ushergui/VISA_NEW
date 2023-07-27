@@ -22,4 +22,6 @@ urlpatterns = [
     path('agendados/', views.agendados, name='agendados'),
     path('aguardando_resultados/', views.aguardando_resultados, name='aguardando_resultados'),
     path('pesquisar_notificacoes/', views.pesquisar_notificacoes, name='pesquisar_notificacoes'),
+    path('listar_casos_abertos/', views.listar_casos_abertos, name='listar_casos_abertos'),
+    path('encerrar_notificacao/<int:pk>/', views.encerrar_notificacao, name='encerrar_notificacao'),
 ]

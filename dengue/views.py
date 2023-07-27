@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Notificacao, Semana
-from .forms import NotificacaoForm, SemanaForm
+from .forms import NotificacaoForm, SemanaForm, EncerrarNotificacaoForm
 from django.db.models import Q, Count
 from django.core.exceptions import ValidationError
 from cadastros.models import Logradouro
@@ -378,3 +378,30 @@ def pesquisar_notificacoes(request):
     }
 
     return render(request, 'dengue/listar_notificacoes.html', context)
+
+def listar_casos_abertos(request):
+    query = request.GET.get('q')
+    notificacoes = Notificacao.objects.none()  # Inicializa como um queryset vazio
+    total_registros = 0
+
+    if query:  # Se um termo de pesquisa foi fornecido
+        notificacoes = Notificacao.objects.filter(
+            Q(data_encerramento__isnull=True),
+            Q(sinan__icontains=query) | Q(nome__icontains=query)
+        )
+        total_registros = notificacoes.count()
+
+    return render(request, 'dengue/listar_casos_abertos.html', {'notificacoes': notificacoes, 'total_registros': total_registros})
+
+def encerrar_notificacao(request, pk):
+    notificacao = get_object_or_404(Notificacao, pk=pk)
+    if request.method == 'POST':
+        form = EncerrarNotificacaoForm(request.POST, instance=notificacao)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_casos_abertos')  # Redireciona para a página de listagem após o encerramento
+    else:
+        form = EncerrarNotificacaoForm(instance=notificacao)
+    return render(request, 'dengue/form_encerramento.html', {'form': form})
+
+
