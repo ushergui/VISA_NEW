@@ -16,6 +16,7 @@
         <th>Ação</th>
         <th>Códigos</th>
         <th>Pontos</th>
+        <th>Auxiliar</th>
         <th>Ações</th>
     </tr>
 	</thead>
@@ -33,6 +34,17 @@
     </td>
     
     <td>{{ produtividade.total }}</td>
+    <td>
+        {% for rel in produtividade.fiscalauxiliarrel_set.all %}
+            {{ rel.fiscal_auxiliar }},
+            {{ rel.data_fiscal_auxiliar|date:"d/m/Y" }}
+            {% if not forloop.last %} e {% endif %}
+        {% empty %}
+            N/A
+        {% endfor %}
+    </td>
+    
+        
  
 
 

@@ -137,7 +137,7 @@ def editar_notificacao(request, pk):
         form = NotificacaoForm(request.POST, instance=notificacao)
         if form.is_valid():
             form.save()
-            return redirect('listar_notificacoes') # Substitua 'listar_notificacoes' pelo nome da URL da lista de notificações, se necessário.
+            return redirect('index_dengue') # Substitua 'listar_notificacoes' pelo nome da URL da lista de notificações, se necessário.
     else:
         form = NotificacaoForm(instance=notificacao)
 

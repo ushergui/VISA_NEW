@@ -12,39 +12,51 @@
 <hr>
 <form method="POST">
     {% csrf_token %}
-    <label>Protocolo: <strong>{{ protocolo }}</strong></label><br>
-    <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label>
-
-
-    
+    <label>Protocolo: <strong>{{ protocolo_empresa }}</strong></label><br>
+    <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label><br>
+    {% if inspecao %}
+    <label>Inspeção <strong>{{ inspecao }}</strong></label>
+    {% else %}
+    <label>Não há inspeção neste protocolo</label>
+    {% endif%}
     <!-- Exibindo o campo inspecao -->
-    <p>{{ form.inspecao|as_crispy_field }}</p>
-
     
     {% for acao, multiplicador in acoes|zip_lists:multiplicadores %}
     <div class="acao-row">
         <input type="checkbox" class="form-check-input" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
         <label for="acao-{{ acao.id }}" class="form-check-label">{{ acao }}</label>
         <label for="{{ multiplicador }}" class="form-label">Multiplicador</label>
-        {% form_field form multiplicador %}
+        <input type="number" class="multiplicador-field" id="multiplicador-{{ acao.id }}" name="multiplicador-{{ acao.id }}" value="{{ multiplicador }}">
         <label for="totalmultiplicado">Total</label>
-        <input type="number" class="totalmultiplicado">
+        <input type="number" class="totalmultiplicado" id="totalmultiplicado-{{ acao.id }}">
+
     </div>
 {% endfor %}
 
+<input type="hidden" name="inspecao" value="{{ inspecao.id|default_if_none:'' }}">
+<input type="hidden" name="protocolo" value="{{ protocolo_empresa.id }}">
 
-
-    
+   
     <p>{{ form.total|as_crispy_field }}</p>
 
     <!-- Exibindo o resto dos campos -->
     <p>{{ form.tempo_gasto|as_crispy_field }}</p>
     <p>{{ form.mes_produtividade|as_crispy_field }}</p>
-    <p>{{ form.fiscal_responsavel|as_crispy_field }}</p>
 
     <p>{{ form.data_saida_fiscal|as_crispy_field }}</p>
 
-    <p>{{ form.fiscal_auxiliar|as_crispy_field }}</p>
+    {% for fiscal in fiscais %}
+    <div class="fiscal-row">
+        
+        <input type="checkbox" name="fiscal" value="{{ fiscal.id }}" id="id_fiscal_{{ fiscal.id }}">
+
+
+        <label>{{ fiscal.nome_fiscal }}:</label>
+        <input type="date" name="data_fiscal_auxiliar-{{ fiscal.id }}" id="id_data_fiscal_auxiliar-{{ fiscal.id }}">
+
+
+    </div>
+{% endfor %}
     
     <br>
 
@@ -62,150 +74,36 @@
 <script>
     
 
-$(document).ready(function() {
-    $('#id_cnae').change(function() {
-        var selectedCnaes = $(this).val();
-        if (selectedCnaes) {
-            // Criamos uma string de parâmetros manualmente
-            var dataString = '';
-            for (var i = 0; i < selectedCnaes.length; i++) {
-                dataString += 'cnaes=' + selectedCnaes[i] + '&';
-            }
-            
-            dataString = dataString.slice(0, -1);
-
-            $.ajax({
-                url: '/api/get_risco/?' + dataString,
-                success: function(data) {
-                    $('#id_risco_empresa').val(data.risco).change();  
-                }
-            });
-
-            
-        }
-    });
-
-    $('#id_risco_empresa').change(function() {
-        var selectedRisco = $(this).val();
-        // Verifique se o risco selecionado é 1 ou 2
-        if (selectedRisco == "1" || selectedRisco == "2") {
-            // Se for, ajuste o status de funcionamento para 'DISPENSADA'
-            $('#id_status_funcionamento').val('DISPENSADA');
-        }
-
-        else {
-            $('#id_status_funcionamento').val('');
-        }
-    });
-});
-
-    $(document).ready(function(){
-        $("#id_cep").mask("00.000-000");
-        $("#id_cnpj").mask("00.000.000/0000-00");
-        $("#id_codigo").mask("0000-0/00");
-        $('#id_alvara').mask("00/00/0000");
-        $('#id_entrada_protocolo').mask("00/00/0000");
-        $('#id_entrada_fiscal').mask("00/00/0000");
-        $('#id_data_inspecao').mask("00/00/0000");
-        $('#id_data_relatorio').mask("00/00/0000");
-        $('#id_data_saida_fiscal').mask("00/00/0000");
-        $('#id_mes_produtividade').mask("00/00/0000");
-        $('#id_encerramento_protocolo').mask("00/00/0000");
-		$('#id_cpf_responsavel_legal').mask("000.000.000-00");
-		$('#id_numero_protocolo').mask("SSS-00000/00");
-        $('#id_numero_protocolo').on('input', function() {
-            var input = $(this);
-            var val = input.val();
-            var uppercaseVal = val.toUpperCase();
-            input.val(uppercaseVal);
-        });
-
-		$('#id_cnae').select2();
-        $('#id_tipo').select2();
-        $('#id_empresa').select2();
-        $('#id_protocolo').select2();
-        $('#id_forma_de_recebimento').select2();
-        $('#id_motivo').select2();
-        $('#id_bairro').select2();
-        $('#id_logradouro_empresa').select2();
-        $('#id_logradouro_terreno').select2();
-        $('#id_logradouro_correspondencia').select2();
-        $('#id_proprietario').select2();
-        $('#id_tipo_de_imovel').select2();
-        $('#id_solicitante_protocolo').select2();
-        $('#id_logradouro').select2();
-        $('#id_status_protocolo').select2();
-        $('#id_infracao').select2();
-        $('#id_fiscal').select2();
-        $('#id_terreno').select2();
-        $('#id_inspecao').select2();
-    });
-
-    var behavior = function (val) {
-    return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
-    },
-    options = {
-        onKeyPress: function (val, e, field, options) {
-            field.mask(behavior.apply({}, arguments), options);
-        }
-    };
-    $('#id_telefone1_contabilidade').mask(behavior, options);
-    $('#id_telefone2_contabilidade').mask(behavior, options);
-    $('#id_telefone').mask(behavior, options);
-    $('#id_telefone1').mask(behavior, options);
-    $('#id_telefone2').mask(behavior, options);
-
-
     $(document).ready(function() {
-    $('#id_razao').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
-        $(this).val(textoSemAcentos);
+    $('.form-check-input').change(function() {
+        var acaoId = $(this).val();
+        var multiplicadorField = $('#multiplicador-' + acaoId);
+        var totalmultiplicadoField = $('#totalmultiplicado-' + acaoId);
+
+        if($(this).is(':checked')) {
+            multiplicadorField.val(1);
+
+            // Aqui você já tem o código para fazer a requisição AJAX
+            // e atualizar o campo totalmultiplicado-{{ acao.id }}.
+        } else {
+            multiplicadorField.val('');
+            totalmultiplicadoField.val('');
+            totalmultiplicadoField.trigger('change');
+        }
     });
+    // ...
 });
 
 $(document).ready(function() {
-    $('#id_nome_fantasia').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 -]/gi, '');
-        $(this).val(textoSemAcentos);
-    });
-});
+    $('.form-check-input').change(function() {
+        var acaoId = $(this).val();
+        var multiplicadorField = $('#multiplicador-' + acaoId);
+        var totalmultiplicadoField = $('#totalmultiplicado-' + acaoId);
 
+        if($(this).is(':checked')) {
+            multiplicadorField.val(1);
 
-    $(document).ready(function() {
-        $('#id_responsavel_legal').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
-        $(this).val(textoSemAcentos);
-        });
-    });
-
-    $(document).ready(function() {
-        $('#id_descricao').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
-        $(this).val(textoSemAcentos);
-        });
-    });
-
-
-    $(document).ready(function() {
-  $('#id_email_contabilidade').on('keyup', function() {
-    var textoSemAcentos = $(this).val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9@._-]/gi, '');
-    $(this).val(textoSemAcentos);
-  });
-});
-$(document).ready(function() {
-  $('#id_email').on('keyup', function() {
-    var textoSemAcentos = $(this).val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9@._-]/gi, '');
-    $(this).val(textoSemAcentos);
-  });
-});
-
-$(document).ready(function() {
-    $('.form-check-input, .form-control').change(function() {
-        var acaoId = $(this).parent().find('.form-check-input').val();
-        var isChecked = $(this).parent().find('.form-check-input').is(":checked");
-        var multiplicadorField = $("#id_multiplicador-" + acaoId); // Alterado para selecionar pelo ID
-        var totalField = $(this).parent().find('.totalmultiplicado');
-        if (isChecked) {
+            // Realiza a solicitação AJAX para buscar o valor dos pontos
             $.ajax({
                 url: '/get_pontos/',
                 data: {
@@ -216,13 +114,32 @@ $(document).ready(function() {
                     var pontos = parseFloat(data.pontos);
                     var multiplicador = parseFloat(multiplicadorField.val());
                     var total = pontos * multiplicador;
-                    totalField.val(total.toFixed(1));
-                    totalField.trigger('change');
+                    totalmultiplicadoField.val(total.toFixed(1));
+                    multiplicadorField.data('pontos', pontos);
+                    totalmultiplicadoField.trigger('change');
                 }
             });
         } else {
-            totalField.val('');
-            totalField.trigger('change');
+            multiplicadorField.val('');
+            totalmultiplicadoField.val('');
+            totalmultiplicadoField.trigger('change');
+        }
+    });
+
+    // Adicionando evento de mudança ao campo multiplicador
+    $('.multiplicador-field').change(function() {
+        var acaoId = $(this).attr('id').split('-')[1];
+        var totalmultiplicadoField = $('#totalmultiplicado-' + acaoId);
+        var pontos = $(this).data('pontos'); // Obtemos o valor dos pontos do campo do multiplicador.
+        var multiplicador = parseFloat($(this).val());
+
+        if (multiplicador) {
+            var total = pontos * multiplicador;
+            totalmultiplicadoField.val(total.toFixed(1));
+            totalmultiplicadoField.trigger('change');
+        } else {
+            totalmultiplicadoField.val('');
+            totalmultiplicadoField.trigger('change');
         }
     });
 
@@ -245,6 +162,35 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#id_data_saida_fiscal').mask("00/00/0000");
+    $('#id_mes_produtividade').mask("00/00/0000");
+    $('#id_encerramento_protocolo').mask("00/00/0000");
+    $('#id_inspecao').select2();
 });
+
+
+   
+
+    // Quando qualquer campo 'totalmultiplicado' é alterado, atualiza o total.
+    $('.totalmultiplicado').on('change', function() {
+        var total = 0;
+        // Passa por todos os campos 'totalmultiplicado' e soma os valores.
+        $('.totalmultiplicado').each(function() {
+            total += Number($(this).val()) || 0; // Se o campo estiver vazio, considera como 0.
+        });
+        // Atualiza o campo total.
+        $('#id_total').val(total.toFixed(1)); // Supõe que 'id_total' é o id do campo total.
+    });
+
+    $('.multiplicador-field').each(function() {
+        $(this).on('input', function(e) {
+            const allowedValues = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5];
+            if (!allowedValues.includes(parseFloat(e.target.value))) {
+                e.target.value = '';
+            }
+        });
+    });
+
 </script>
 {% endblock %}

@@ -24,7 +24,7 @@
 .form-container-3 {
     background-color: #000; /* fundo preto */
     color: #FFF; /* texto branco */
-    width: 33%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
+    width: 50%; /* isso faz com que o formulário ocupe 1/3 da largura da tela */
     margin: auto; /* isso centraliza o formulário */
     padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
     border-radius: 5px; 

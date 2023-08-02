@@ -5,7 +5,8 @@
 {% block conteudo %}
 
 {% if total_registros %}
-<h4>Pesquisa por CNAE - Total de registros: {{ total_registros }}</h4>
+<h4>Pesquisa por CNAE - Total de registros: {{ total_registros }} </h4> 
+
 {% else %}
 <h4>Pesquisa por CNAE</h4>
 {% endif %}
@@ -23,38 +24,44 @@
 <div class="table responsive">
 <table class="table table-striped table-hover table-condensed" id="tabela-listar">
     <thead>
-    <tr>
-        <th style="font-size:11px" class="text-center">Razão Social/Nome</th>
-        <th style="font-size:11px" class="text-center">Fantasia</th>
-        <th style="font-size:11px" class="text-center">Endereço</th>
-        <th style="font-size:11px" class="text-center">Telefone</th>
-        <th style="font-size:11px" class="text-center">Cnae principal VISA</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for empresa in empresas %}
-    <tr>
-        <td style="font-size:10px" class="text-center">{{ empresa.razao|capitalize_name }}</td>
-        <td style="font-size:10px" class="text-center">{% if empresa.nome_fantasia%}{{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
-        <td style="font-size:10px" class="text-center">{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}, {{ empresa.numero_empresa }}{% if empresa.complemento_empresa %} - {{ empresa.complemento_empresa }}{% else %}{% endif %} - {{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</td>
-        <td style="font-size:10px" class="text-center">{% if empresa.telefone1 %}
-            {{ empresa.telefone1 }}
-        {% else %}
-            ********
-        {% endif %}</td>
-        <td style="font-size:10px" class="text-center">
-            {{ empresa.cnae_principal }}
-        </td>
-    </tr>
-    {% empty %}
         <tr>
-            <td colspan="5">Pesquise algum termo</td>
+            <th style="font-size:14px" class="text-center">Razão Social/Nome</th>
+            <th style="font-size:14px" class="text-center">Fantasia</th>
+            <th style="font-size:14px" class="text-center">Endereço</th>
+            <th style="font-size:14px" class="text-center">Nº</th>
+            <th style="font-size:14px" class="text-center">Bairro</th>
+            <th style="font-size:14px" class="text-center">Alvará</th>
+            <th style="font-size:14px" class="text-center">CNAE</th>
         </tr>
-    {% endfor %}
-</tbody>
+        </thead>
+        <tbody>
+        {% for empresa in empresas %}
+        <tr>
+            <td style="font-size:13px; text-align:left;">{{ empresa.razao|capitalize_name }}</td>
+            
+            <td style="font-size:13px; text-align:left;">{% if empresa.nome_fantasia%}{{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
+            <td style="font-size:13px; text-align:left;">{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}</td>
+            <td style="font-size:13px; text-align:left;">{{ empresa.numero_empresa }}{% if empresa.complemento_empresa %}, {{ empresa.complemento_empresa }}{% else %}{% endif %} </td>    
+            <td style="font-size:13px; text-align:left;">{{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</td>
+    
+            <td style="font-size:13px" class="text-center">{% if empresa.mei == True %}MEI{% else %}
+                {{ empresa.alvara|date:"d/m/Y" }}{% endif %}</td>
+                <td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>
+                
+        </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5">Pesquise algum termo</td>
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>
 </div>
-
+<div class="text-center mt-4">
+<a href="{% url 'empresas_cnae_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
+    <i class="fas fa-file-pdf"></i> Gerar PDF
+</a>
+</div>
 {% endblock %}
 
 

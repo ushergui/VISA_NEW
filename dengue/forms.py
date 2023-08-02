@@ -34,7 +34,9 @@ class NotificacaoForm(forms.ModelForm):
             'status_obito',
             'data_agendamento',
             'observacoes',
+            'classificacao',
             'motivo_encerramento',
+            'evolucao',
             'data_encerramento',
         ]
 
@@ -75,12 +77,17 @@ class EncerrarNotificacaoForm(forms.ModelForm):
             'obito',
             'data_agendamento',
             'observacoes',
+            'classificacao',
             'motivo_encerramento',
+            'evolucao',
             'data_encerramento',
         ]
-        widgets = {
-            'motivo_encerramento': forms.RadioSelect
-        }
+        #widgets = {
+        #    'motivo_encerramento': forms.RadioSelect,
+        #    'classificacao': forms.RadioSelect,
+        #    'evolucao': forms.RadioSelect
+       # }
+
 
     def clean(self):
         cleaned_data = super().clean()

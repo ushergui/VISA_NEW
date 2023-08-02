@@ -107,7 +107,7 @@ class ModoDeUsoForm(forms.ModelForm):
 
 class AtendimentoForm(forms.ModelForm):
     equipamento = forms.ModelMultipleChoiceField(queryset=Equipamento.objects.all(), required=False)
-    tempo_de_uso = forms.ChoiceField(choices=ModoDeUso.TEMPO_USO_CHOICES, required=False)
+    tempo_de_uso = forms.ChoiceField(choices=[('', '---------')] + list(ModoDeUso.TEMPO_USO_CHOICES), required=False)
     litros = forms.CharField(max_length=50, required=False)
     parametros = forms.CharField(max_length=300, required=False)
 
@@ -142,32 +142,6 @@ class AtendimentoForm(forms.ModelForm):
 
         if data_atendimento and prescricao and data_atendimento < prescricao.data_inicio_uso:
             raise ValidationError("A data do atendimento não pode ser anterior à data de início do uso.")
-
-"""
-class AtendimentoForm(forms.ModelForm):
-    paciente_nome = forms.CharField(max_length=100, required=False)
-
-    class Meta:
-        model = Prescricao
-        fields = ['paciente_nome', 'paciente', 'equipamento', 'tempo_de_uso', 'litros', 'parametros', 'data_atendimento', 'troca_de_filtro', 'troca_de_mascara', 'relatorio_atendimento', 'fisioterapeuta_atendimento']
-
-    def __init__(self, *args, **kwargs):
-        super(AtendimentoForm, self).__init__(*args, **kwargs)
-        if self.instance.pk:
-            self.fields['paciente'].widget = forms.HiddenInput()
-            self.fields['paciente_nome'].initial = self.instance.paciente.nome_paciente
-            self.fields['paciente_nome'].widget.attrs['readonly'] = True
-            
-        # Define o widget para botões do tipo "radio"
-        self.fields['troca_de_filtro'].widget = forms.RadioSelect(choices=[(True, 'Sim'), (False, 'Não')])
-        self.fields['troca_de_mascara'].widget = forms.RadioSelect(choices=[(True, 'Sim'), (False, 'Não')])
-
-    def clean_paciente(self):
-        if self.instance.pk:
-            return self.instance.paciente
-        else:
-            return self.cleaned_data['paciente']
-"""
 
 class UsfForm(forms.ModelForm):
     class Meta:

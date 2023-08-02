@@ -40,6 +40,7 @@ Pesquisar    </button>
                     <th>Prontuário</th>
                     <th>Paciente</th>
                     <th>Telefone 1</th>
+                    <th>Telefone 2</th>
                     <th>Endereço</th>
                     <th>USF</th>
 					<th>Fisioterapeuta</th>
@@ -55,7 +56,8 @@ Pesquisar    </button>
                 <tr>
                     <td>{{ paciente.prontuario_paciente }}</td>
                     <td>{{ paciente.nome_paciente|capitalize_name }}</td>
-                    <td>{% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                    <td>{% if paciente.contato_1 %}{{ paciente.contato_1|capitalize_name }}{% endif %} {% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                    <td>{% if paciente.contato_2 %}{{ paciente.contato_2|capitalize_name }}{% endif %} {% if paciente.telefone_paciente2 %}{{ paciente.telefone_paciente2 }}{% endif %}</td>
                     <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
                     <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
                     <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>

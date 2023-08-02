@@ -173,19 +173,23 @@ class AcaoProdutividadeRel(models.Model):
 
     def __str__(self):
         return f"{self.acao} (multiplicador: {self.multiplicador})"
-    
+
+class FiscalAuxiliarRel(models.Model):
+    fiscal_auxiliar = models.ForeignKey(Fiscal, on_delete=models.CASCADE)
+    produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE)
+    data_fiscal_auxiliar = models.DateField(null=False, blank=False)
+
 class Produtividade(models.Model):
-    protocolo = models.ForeignKey(ProtocoloEmpresa, on_delete=models.CASCADE)
+    protocolo = models.ForeignKey(ProtocoloEmpresa, on_delete=models.PROTECT)
     acoes = models.ManyToManyField(AcaoProdutividade, through=AcaoProdutividadeRel, verbose_name="Ações de Produtividade")
     total = models.DecimalField(max_digits=5, decimal_places=1, verbose_name="Total de Pontos", null=True, blank=True)
     data_saida_fiscal = models.DateField(null=False, blank=False, verbose_name="Data de Saída do Fiscal")
     tempo_gasto = models.DecimalField(max_digits=2, decimal_places=1, verbose_name="Tempo gasto")
     mes_produtividade = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
-    inspecao = models.OneToOneField(Inspecao, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Inspeção")
+    inspecao = models.OneToOneField(Inspecao, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Inspeção")
     fiscal_responsavel = models.ForeignKey(Fiscal, on_delete=models.PROTECT, blank=True, null=True)
-    fiscal_auxiliar = models.ManyToManyField(Fiscal, related_name='fiscais_auxiliares', blank=True)
+    fiscais_auxiliar = models.ManyToManyField(Fiscal, through=FiscalAuxiliarRel, related_name='fiscais_auxiliares', blank=True)
     validacao = models.BooleanField(default=False)
-    
 
     def save(self, *args, **kwargs):
         if self.protocolo and not self.fiscal_responsavel:
@@ -194,6 +198,9 @@ class Produtividade(models.Model):
 
     def __str__(self):
         return f"Produtividade do protocolo {self.protocolo.numero_protocolo}"
+    
+
+
 
 
 

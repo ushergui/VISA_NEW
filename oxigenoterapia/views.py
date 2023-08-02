@@ -414,25 +414,20 @@ class AtendimentoUpdateView(UpdateView):
         # Chama o método form_valid da classe base e salva o formulário
         response = super().form_valid(form)
 
-        # Obtém o id da prescrição da URL
-        prescricao_id = self.kwargs.get('prescricao_id')
-
-        # Atribui o valor do campo 'prescrição' antes de salvar o formulário
-        if prescricao_id:
-            prescricao = ModoDeUso.objects.get(id=prescricao_id)
-            form.instance.prescricao = prescricao
+        # Obtém o objeto prescricao diretamente da instância do atendimento
+        prescricao = self.object.prescricao  # Aqui é a mudança chave
 
         # Atualiza o objeto ModoDeUso com os novos valores
-        if prescricao_id:
-            prescricao.equipamento.set(form.cleaned_data['equipamento'])
-            prescricao.tempo_de_uso = form.cleaned_data['tempo_de_uso']
-            prescricao.litros = form.cleaned_data['litros']
-            prescricao.parametros = form.cleaned_data['parametros']
-            prescricao.save()
+        prescricao.equipamento.set(form.cleaned_data['equipamento'])
+        prescricao.tempo_de_uso = form.cleaned_data['tempo_de_uso']
+        prescricao.litros = form.cleaned_data['litros']
+        prescricao.parametros = form.cleaned_data['parametros']
+        prescricao.save()
 
         # Redireciona para a página de detalhes do paciente
         paciente_id = self.object.prescricao.paciente.id
         return HttpResponseRedirect(reverse('detalhes_paciente', kwargs={'paciente_id': paciente_id}))
+
 
 
 class AtendimentoDeleteView(DeleteView):
@@ -840,13 +835,17 @@ def relatorio_para_visita_pdf(request):
     modos_uso_por_paciente = defaultdict(list)
     for modo_uso in modos_uso:
         modos_uso_por_paciente[modo_uso.paciente].append(modo_uso)
+
+    fisioterapeuta_pesquisa = None
+    if fisioterapeuta_id:
+        fisioterapeuta_pesquisa = Fisioterapeuta.objects.get(id=fisioterapeuta_id)
     
     context = {
         'modos_uso_por_paciente': dict(modos_uso_por_paciente),
         'modos_uso': modos_uso,
         'fisioterapeutas': fisioterapeutas,
         'equipamentos': equipamentos,
-        'fisioterapeuta_pesquisa': fisioterapeuta_id,
+        'fisioterapeuta_pesquisa': fisioterapeuta_pesquisa,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
     }

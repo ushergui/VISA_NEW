@@ -190,37 +190,33 @@ class AcaoProdutividadeForm(forms.ModelForm):
         model = AcaoProdutividade
         fields = ['codigo_produtividade', 'acao', 'pontos']
 
+#FUNCIONANDO
 class ProdutividadeForm(forms.ModelForm):
     class Meta:
         model = Produtividade
-        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscal_auxiliar', 'validacao']
+        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscais_auxiliar', 'validacao']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'fiscal_responsavel' in self.initial:
-            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
-        if self.instance:
-            self.fields['fiscal_responsavel'].disabled = True
-            if self.instance.inspecao:
-                self.fields['inspecao'].initial = self.instance.inspecao
-                self.fields['inspecao'].disabled = True
-            else:
-                self.fields['inspecao'].disabled = True
+        if self.instance.inspecao:
+            self.fields['inspecao'].initial = self.instance.inspecao
+            self.fields['inspecao'].disabled = True
+        else:
+            self.fields['inspecao'].disabled = True
         # Adicionando campos de multiplicador para cada ação
         for acao in AcaoProdutividade.objects.all():
             self.fields[f'multiplicador-{acao.id}'] = forms.DecimalField(max_digits=3, decimal_places=1, required=False)
 
     def save(self, commit=True):
-        instance = super().save(commit)
+        instance = super().save(commit=False)
+        if 'inspecao' in self.cleaned_data:
+            try:
+                instance.inspecao = Inspecao.objects.get(id=self.cleaned_data['inspecao'])
+            except (Inspecao.DoesNotExist, ValueError):
+                instance.inspecao = None
         if commit:
-            for acao in AcaoProdutividade.objects.all():
-                multiplicador_field = f'multiplicador-{acao.id}'
-                if multiplicador_field in self.cleaned_data and self.cleaned_data[multiplicador_field] is not None:
-                    AcaoProdutividadeRel.objects.update_or_create(
-                        acao=acao,
-                        produtividade=instance,
-                        defaults={'multiplicador': self.cleaned_data[multiplicador_field]}
-                    )
+            instance.save()
+        # Resto do seu código aqui
         return instance
 
 
@@ -296,7 +292,7 @@ class ProdutividadeForm(forms.ModelForm):
 class ProdutividadeFormEdit(forms.ModelForm):
     class Meta:
         model = Produtividade
-        fields = ('total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_auxiliar')
+        fields = ('total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscais_auxiliar')
 
     protocolo = forms.CharField(max_length=200, disabled=True, required=False)
     fiscal_responsavel = forms.CharField(max_length=200, disabled=True, required=False)

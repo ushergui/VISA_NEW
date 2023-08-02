@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, FiscalAuxiliarRel
 from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit, EmpresasObservacoesForm, EmpresaCnaeForm
 from django.views import View
 from django.db.models import Max
@@ -8,6 +8,10 @@ from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from datetime import date
 from django.db.models import Max, Subquery, OuterRef
+from cadastros.models import Fiscal
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
+from django.template.loader import get_template
+from weasyprint import HTML, CSS
 
 
 
@@ -102,11 +106,6 @@ def listar_empresas(request):
         empresas = Empresas.objects.all()
 
     return render(request, 'empresas/listar_empresas.html', {'empresas': empresas, 'termo_pesquisa': termo_pesquisa})
-
-def listar_empresas2(request):
-    empresas = Empresas.objects.filter(cnae_principal__codigo_cnae='1111-1/11')
-    total_registros = empresas.count()
-    return render(request, 'empresas/listar_empresas2.html', {'empresas': empresas, 'total_registros': total_registros})
 
 
 def criar_empresa(request):
@@ -370,26 +369,93 @@ def listar_produtividade(request):
     produtividades = Produtividade.objects.all()
     return render(request, 'empresas/listar_produtividade.html', {'produtividades': produtividades})
 
+
+from datetime import datetime
 def criar_produtividade(request, protocolo_id):
-    protocolo = get_object_or_404(ProtocoloEmpresa, id=protocolo_id)
+    protocolo_empresa = get_object_or_404(ProtocoloEmpresa, pk=protocolo_id)
+    acoes = AcaoProdutividade.objects.all()
+    fiscais = Fiscal.objects.all()
+    
     if request.method == 'POST':
         form = ProdutividadeForm(request.POST)
         if form.is_valid():
             produtividade = form.save(commit=False)
-            produtividade.protocolo = protocolo
-            produtividade.fiscal_responsavel = protocolo.fiscal_responsavel
-            produtividade.save()
+            produtividade.fiscal_responsavel = protocolo_empresa.fiscal_responsavel
+            produtividade.inspecao = protocolo_empresa.inspecao
+            produtividade.protocolo = protocolo_empresa
+            produtividade.save() 
+
+            for acao in acoes:
+                multiplicador = form.cleaned_data.get(f'multiplicador-{acao.id}')
+                if multiplicador is not None:
+                    AcaoProdutividadeRel.objects.update_or_create(
+                        acao=acao,
+                        produtividade=produtividade,
+                        defaults={'multiplicador': multiplicador},
+                    )
             form.save_m2m()
-            return redirect('empresas:listar_produtividade')
+            fiscais_auxiliares = []
+            fiscais_ids = request.POST.getlist('fiscal')
+            for fiscal_id in fiscais_ids:
+                try:
+                    fiscal = Fiscal.objects.get(id=fiscal_id)
+                except Fiscal.DoesNotExist:
+                    print(f"Fiscal with ID {fiscal_id} does not exist")
+                    continue
+                data_fiscal_auxiliar_str = request.POST.get(f'data_fiscal_auxiliar-{fiscal.id}')
+                if data_fiscal_auxiliar_str:
+                    try:
+                        data_fiscal_auxiliar = datetime.strptime(data_fiscal_auxiliar_str, "%Y-%m-%d").date()
+                    except ValueError:
+                        print(f"Invalid date string {data_fiscal_auxiliar_str} for fiscal ID {fiscal_id}")
+                        continue
+                    fiscal_aux_rel, created = FiscalAuxiliarRel.objects.update_or_create(
+                        fiscal_auxiliar=fiscal,
+                        produtividade=produtividade,
+                        defaults={'data_fiscal_auxiliar': data_fiscal_auxiliar},
+                    )
+                    if created:
+                        print(f"Created new FiscalAuxiliarRel: {fiscal_aux_rel}")
+                    else:
+                        print(f"Updated FiscalAuxiliarRel: {fiscal_aux_rel}")
+                    print("No exceptions after creating FiscalAuxiliarRel")  # Adiciona essa linha 
+                    try:
+                        saved_fiscal_aux_rel = FiscalAuxiliarRel.objects.get(
+                            fiscal_auxiliar=fiscal,
+                            produtividade=produtividade,
+                        )
+                        print(f"Successfully retrieved FiscalAuxiliarRel from DB: {saved_fiscal_aux_rel}")
+                    except FiscalAuxiliarRel.DoesNotExist:
+                        print("Failed to retrieve FiscalAuxiliarRel from DB")
+                       
+                    fiscais_auxiliares.append(fiscal)
+
+            
+
+            return redirect('listar_produtividade')
+        else:
+            print(form.errors)  # Mostra erros do formulário no console
     else:
-        form = ProdutividadeForm(initial={'protocolo': protocolo, 'fiscal_responsavel': protocolo.fiscal_responsavel})
-    acoes = AcaoProdutividade.objects.all()
-    produtividade_acoes_ids = []
-    if form.is_valid():
-        produtividade_acoes_ids = [acao.id for acao in form.cleaned_data.get('acoes', [])]
-    multiplicadores = [f'multiplicador-{acao.id}' for acao in acoes]
-    return render(request, 'empresas/form-produtividade.html', {'protocolo': protocolo,'fiscal_responsavel': protocolo.fiscal_responsavel,'titulo': 'Lançamento da produtividade', 
-        'botao': 'Salvar', 'form': form, 'acoes': acoes, 'produtividade_acoes_ids': produtividade_acoes_ids, 'multiplicadores': multiplicadores})
+        form = ProdutividadeForm(initial={'protocolo': protocolo_empresa, 'fiscal_responsavel': protocolo_empresa.fiscal_responsavel})
+
+    # Inicializar multiplicadores com valores padrões
+    multiplicadores = [None for _ in range(acoes.count())]
+
+    context = {
+        'form': form,
+        'protocolo_empresa': protocolo_empresa,
+        'acoes': acoes,
+        'multiplicadores': multiplicadores,
+        'inspecao': protocolo_empresa.inspecao,
+        'protocolo_empresa': protocolo_empresa,
+        'fiscal_responsavel': protocolo_empresa.fiscal_responsavel,
+        'titulo': 'Lançamento da produtividade', 
+        'botao': 'Salvar',
+        'fiscais': fiscais,
+    }
+
+    return render(request, 'empresas/form-produtividade.html', context)
+
 
 
 def get_pontos(request):
@@ -462,6 +528,39 @@ class EmpresasCnaeListView(ListView):
             context['total_registros'] = empresas.count()
 
         return context
+
+def empresas_cnae_pdf(request):
+    # Recupera o parâmetro da URL
+    query = request.GET.get('q')
+    # Inicia a query como vazia
+    empresas = Empresas.objects.none()
+
+    if query:
+        # Faz a consulta caso a query tenha sido preenchida
+        empresas = Empresas.objects.filter(
+            Q(cnae_principal__codigo_cnae__icontains=query) |
+            Q(cnae_principal__descricao_cnae__icontains=query)
+        ).distinct().order_by(
+            'cnae_principal__descricao_cnae', 
+            'logradouro_empresa__bairro__nome_bairro', 
+            'logradouro_empresa__nome_logradouro', 
+            'numero_empresa'
+        )
+
+    context = {
+        'empresas': empresas,
+        'total_registros': empresas.count(),
+    }
+    
+    # Aqui o código renderiza o HTML e cria o PDF
+    html_template = get_template('empresas/empresas_cnae_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=empresas_cnae_pdf.html'
+    return response
+
 
 def editar_empresa_cnae(request, id):
     empresa = Empresas.objects.get(id=id)
