@@ -30,5 +30,4 @@ class PaginaInicial4(LoginRequiredMixin, TemplateView):
 class SobreView(TemplateView):
     template_name = 'sobre.html'
 
-class EmpresasView(TemplateView):
-    template_name = 'empresas/empresas.html'
+

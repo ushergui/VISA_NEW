@@ -10,7 +10,45 @@
       <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise pela razão ou nome fantasia ou cnpj ou proprietario" size="58" class="form-control-sm">
       <button type="submit" class="btn btn-primary">Buscar</button>
     </div>
-  </form>
-  
+</form>
+
+<div style="width: 50%; margin: 0 auto;">
+  <table class="table table-bordered text-center" style="width: 100%;">
+      <thead>
+          <tr>
+              <th colspan="3" style="background-color: rgb(35, 172, 35);">Nível de risco I - Baixo risco A (40%)</th>
+              <th colspan="3" style="background-color: pink;">Nível de risco II - Baixo risco B (80%)</th>
+              <th colspan="3" style="background-color: yellow;">Nível de risco III - Alto risco (100%)</th>
+          </tr>
+          <tr>
+              <th style="background-color: rgb(35, 172, 35);">Cadastrado</th>
+              <th style="background-color: rgb(35, 172, 35);">Executado</th>
+              <th style="background-color: rgb(35, 172, 35);">Percentual</th>
+              <th style="background-color: pink;">Cadastrado</th>
+              <th style="background-color: pink;">Executado</th>
+              <th style="background-color: pink;">Percentual</th>
+              <th style="background-color: yellow;">Cadastrado</th>
+              <th style="background-color: yellow;">Executado</th>
+              <th style="background-color: yellow;">Percentual</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td style="background-color: rgb(35, 172, 35);">{{ nivel_risco_i }}</td>
+              <td style="background-color: rgb(35, 172, 35);">{{ executado_i }}</td>
+              <td style="background-color: rgb(35, 172, 35);">{{ porcentagem_i }}%</td>
+              <td style="background-color: pink;">{{ nivel_risco_ii }}</td>
+              <td style="background-color: pink;">{{ executado_ii }}</td>
+              <td style="background-color: pink;">{{ porcentagem_ii }}%</td>
+              <td style="background-color: yellow;">{{ nivel_risco_iii }}</td>
+              <td style="background-color: yellow;">{{ executado_iii }}</td>
+              <td style="background-color: yellow;">{{ porcentagem_iii }}%</td>
+          </tr>
+      </tbody>
+  </table>
+</div>
+
+
+
 
 {% endblock %}

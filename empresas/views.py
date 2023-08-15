@@ -574,3 +574,23 @@ def editar_empresa_cnae(request, id):
     else:
         form = EmpresaCnaeForm(instance=empresa)
     return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
+
+
+class EmpresasView(TemplateView):
+    template_name = 'empresas/empresas.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['nivel_risco_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3).count()
+        context['executado_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['porcentagem_i'] = round(context['executado_i'] / context['nivel_risco_i'] * 100, 1) if context['nivel_risco_i'] > 0 else 0
+
+        context['nivel_risco_ii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4).count()
+        context['executado_ii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['porcentagem_ii'] = round(context['executado_ii'] / context['nivel_risco_ii'] * 100, 1) if context['nivel_risco_ii'] > 0 else 0
+
+        context['nivel_risco_iii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=5).count()
+        context['executado_iii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['porcentagem_iii'] = round(context['executado_iii'] / context['nivel_risco_iii'] * 100, 1) if context['nivel_risco_iii'] > 0 else 0
+
+        return context

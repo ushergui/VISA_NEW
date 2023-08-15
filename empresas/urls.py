@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos
+from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos, EmpresasView
 
 
 urlpatterns = [
@@ -62,5 +62,6 @@ urlpatterns = [
     path('editar_empresa_cnae/<int:id>/', views.editar_empresa_cnae, name='editar_empresa_cnae'),
     path('empresas-cnae-pdf/', views.empresas_cnae_pdf, name='empresas_cnae_pdf'),
 
+    path('empresas/', EmpresasView.as_view(), name='empresas'),
 
 ]
