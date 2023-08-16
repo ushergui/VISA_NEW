@@ -1,0 +1,67 @@
+{% extends 'basy.html' %}
+
+{% block conteudo %}
+<style>
+    #tabela-listar td, #tabela-listar th {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+<h3>Lista de Empresas - Risco 1</h3>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+    <thead>
+        <tr>
+            <th>Razão</th>
+            <th>MEI</th>
+            <th>Alvará</th>
+            <th>CNAE Principal</th>
+            <th>Inspeção</th>
+            <th>Meta</th>
+            <th>Risco</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for empresa in empresas %}
+        <tr>
+            <td>{{ empresa.razao }}</td>
+            <td>{% if empresa.mei == False %} Não {% else %}Sim {% endif %}</td>
+            <td>{% if empresa.alvara %}{{ empresa.alvara|date:"d/m/Y" }}{% else %}{% endif %}</td>
+            <td>{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>
+            <td>
+                {% if empresa.inspecao_mais_recente %}
+                    {{ empresa.inspecao_mais_recente|date:"d/m/Y" }}
+                {% else %}
+                    ********
+                {% endif %}
+            </td>
+            <td>
+                {% if empresa.inspecao_mais_recente %}
+                    {% if empresa.inspecao_mais_recente.year == 2023 %}
+                        <i class="fas fa-thumbs-up" style="color:green;"></i>
+                    {% else %}
+                        <i class="fas fa-thumbs-down" style="color:red;"></i>
+                    {% endif %}
+                {% else %}
+                    <i class="fas fa-thumbs-down" style="color:red;"></i>
+                {% endif %}
+            </td>
+            
+            <td>{{ empresa.risco_empresa }}</td>
+            <td><a class="btn btn-primary" title="Detalhe" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a></td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="6">A tabela está vazia.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+<div class="text-center mt-4">
+    <a href="{% url 'listar_risco_um_pdf' %}" target="_blank" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Gerar PDF
+    </a>
+    </div>
+{% endblock %}

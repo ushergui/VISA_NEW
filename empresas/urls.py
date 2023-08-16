@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos, EmpresasView
+from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos, EmpresasView, listar_risco_um, listar_risco_um_pdf, listar_risco_dois, listar_risco_dois_pdf, listar_risco_tres, listar_risco_tres_pdf
 
 
 urlpatterns = [
@@ -63,5 +63,11 @@ urlpatterns = [
     path('empresas-cnae-pdf/', views.empresas_cnae_pdf, name='empresas_cnae_pdf'),
 
     path('empresas/', EmpresasView.as_view(), name='empresas'),
+    path('listar_risco_um/', listar_risco_um, name='listar_risco_um'),
+    path('listar_risco_um_pdf/', listar_risco_um_pdf, name='listar_risco_um_pdf'),
+    path('listar_risco_dois/', listar_risco_dois, name='listar_risco_dois'),
+    path('listar_risco_dois_pdf/', listar_risco_dois_pdf, name='listar_risco_dois_pdf'),
+    path('listar_risco_tres/', listar_risco_tres, name='listar_risco_tres'),
+    path('listar_risco_tres_pdf/', listar_risco_tres_pdf, name='listar_risco_tres_pdf'),
 
 ]

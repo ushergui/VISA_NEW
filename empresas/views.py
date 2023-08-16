@@ -7,11 +7,12 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from datetime import date
-from django.db.models import Max, Subquery, OuterRef
+from django.db.models import Max, Subquery, OuterRef, Prefetch
 from cadastros.models import Fiscal
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from weasyprint import HTML, CSS
+
 
 
 
@@ -581,7 +582,7 @@ class EmpresasView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['nivel_risco_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3).count()
+        context['nivel_risco_i'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),cnae_principal__risco_cnae__valor_risco=3).count()
         context['executado_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
         context['porcentagem_i'] = round(context['executado_i'] / context['nivel_risco_i'] * 100, 1) if context['nivel_risco_i'] > 0 else 0
 
@@ -594,3 +595,134 @@ class EmpresasView(TemplateView):
         context['porcentagem_iii'] = round(context['executado_iii'] / context['nivel_risco_iii'] * 100, 1) if context['nivel_risco_iii'] > 0 else 0
 
         return context
+    
+
+def listar_risco_um(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=3
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    return render(request, 'empresas/listar_riscos_um.html', {'empresas': empresas})
+
+
+def listar_risco_um_pdf(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=3
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    context = {
+        'empresas': empresas,
+    }
+
+    html_template = get_template('empresas/listar_riscos_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=empresas_cnae_pdf.html'
+    return response
+
+def listar_risco_dois(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=4
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    return render(request, 'empresas/listar_riscos_dois.html', {'empresas': empresas})
+
+
+def listar_risco_dois_pdf(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=4
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    context = {
+        'empresas': empresas,
+    }
+
+    html_template = get_template('empresas/listar_riscos_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=empresas_cnae_pdf.html'
+    return response
+
+
+def listar_risco_tres(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=5
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    return render(request, 'empresas/listar_riscos_tres.html', {'empresas': empresas})
+
+
+def listar_risco_tres_pdf(request):
+    ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
+        empresa=OuterRef('pk')
+    ).order_by(
+        '-inspecao__data_inspecao'
+    ).values('inspecao__data_inspecao')[:1]
+
+    empresas = Empresas.objects.filter(
+        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        cnae_principal__risco_cnae__valor_risco=5
+    ).annotate(
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
+    )
+
+    context = {
+        'empresas': empresas,
+    }
+
+    html_template = get_template('empresas/listar_riscos_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=empresas_cnae_pdf.html'
+    return response
