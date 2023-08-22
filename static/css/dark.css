@@ -6,20 +6,32 @@
     padding: 20px; /* Isso adiciona algum preenchimento ao redor do conteúdo do formulário */
     border-radius: 5px; 
 }
-.acao-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
+
 
 .acao-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 20px; /* Este é um exemplo. Ajuste o valor conforme necessário */
+    padding: 5px 20px;
+	gap: 20px;
 }
+
+.acao-check {
+    flex: 0 0 auto; /* Não cresce, não encolhe, tamanho automático */
+}
+
+.acao-label {
+    flex: 0 0 30%; /* Não cresce, não encolhe, 40% da largura */
+}
+
+.acao-fiscal {
+    flex: 0 0 40%; /* Não cresce, não encolhe, 40% da largura */
+}
+
+.acao-multiplicador,
+.acao-total {
+    flex: 0 0 30%; /* Não cresce, não encolhe, 20% da largura */
+
+}
+
 
 .form-container-3 {
     background-color: #000; /* fundo preto */

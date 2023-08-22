@@ -59,8 +59,10 @@ urlpatterns = [
     path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
     path('get_pontos/', get_pontos, name='get_pontos'),
     path('lista_empresas_cnae/', views.EmpresasCnaeListView.as_view(), name='lista_empresas_cnae'),
+    path('lista_empresas_endereco/', views.EmpresasEnderecoListView.as_view(), name='lista_empresas_endereco'),
     path('editar_empresa_cnae/<int:id>/', views.editar_empresa_cnae, name='editar_empresa_cnae'),
     path('empresas-cnae-pdf/', views.empresas_cnae_pdf, name='empresas_cnae_pdf'),
+    path('empresas-endereco-pdf/', views.empresas_endereco_pdf, name='empresas_endereco_pdf'),
 
     path('empresas/', EmpresasView.as_view(), name='empresas'),
     path('listar_risco_um/', listar_risco_um, name='listar_risco_um'),

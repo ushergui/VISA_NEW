@@ -1,7 +1,7 @@
 {% extends 'basy.html' %}
 
 {% load static %}
-
+{% load custom_filters %}
 {% load crispy_forms_tags %}
 {% load zip %}
 {% load form_field %}
@@ -15,23 +15,29 @@
     <label>Protocolo: <strong>{{ protocolo_empresa }}</strong></label><br>
     <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label><br>
     {% if inspecao %}
-    <label>Inspeção <strong>{{ inspecao }}</strong></label>
+    <label>Inspeção: <strong>Sim</strong></label>
     {% else %}
     <label>Não há inspeção neste protocolo</label>
     {% endif%}
     <!-- Exibindo o campo inspecao -->
     
     {% for acao, multiplicador in acoes|zip_lists:multiplicadores %}
-    <div class="acao-row">
+<div class="acao-row">
+    <div class="acao-check">
         <input type="checkbox" class="form-check-input" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
-        <label for="acao-{{ acao.id }}" class="form-check-label">{{ acao }}</label>
-        <label for="{{ multiplicador }}" class="form-label">Multiplicador</label>
-        <input type="number" class="multiplicador-field" id="multiplicador-{{ acao.id }}" name="multiplicador-{{ acao.id }}" value="{{ multiplicador }}">
-        <label for="totalmultiplicado">Total</label>
-        <input type="number" class="totalmultiplicado" id="totalmultiplicado-{{ acao.id }}">
-
     </div>
+    <label class="acao-label" for="acao-{{ acao.id }}" class="form-check-label">{{ acao }}</label>
+    <div class="acao-multiplicador">
+        <label for="{{ multiplicador }}" class="form-label">Multiplicador: </label>
+        <input type="number" class="multiplicador-field" id="multiplicador-{{ acao.id }}" name="multiplicador-{{ acao.id }}" value="{{ multiplicador }}">
+    </div>
+    <div class="acao-total">
+        <label for="totalmultiplicado">Total: </label>
+        <input type="number" class="totalmultiplicado" id="totalmultiplicado-{{ acao.id }}">
+    </div>
+</div>
 {% endfor %}
+
 
 <input type="hidden" name="inspecao" value="{{ inspecao.id|default_if_none:'' }}">
 <input type="hidden" name="protocolo" value="{{ protocolo_empresa.id }}">
@@ -42,22 +48,27 @@
     <!-- Exibindo o resto dos campos -->
     <p>{{ form.tempo_gasto|as_crispy_field }}</p>
     <p>{{ form.mes_produtividade|as_crispy_field }}</p>
-
     <p>{{ form.data_saida_fiscal|as_crispy_field }}</p>
 
     {% for fiscal in fiscais %}
-    <div class="fiscal-row">
-        
+    <div class="acao-row">
+        <div class="acao-check">
         <input type="checkbox" name="fiscal" value="{{ fiscal.id }}" id="id_fiscal_{{ fiscal.id }}">
-
-
-        <label>{{ fiscal.nome_fiscal }}:</label>
+        </div>
+        
+        <label>{{ fiscal.primeiro_nome|capitalize_name }}:</label>
+        <div class="acao-fiscal">
         <input type="date" name="data_fiscal_auxiliar-{{ fiscal.id }}" id="id_data_fiscal_auxiliar-{{ fiscal.id }}">
-
+        </div>  
 
     </div>
 {% endfor %}
-    
+{% if form.inspecao.errors %}
+<br>
+<div class="alert alert-danger" role="alert">
+    {{ form.inspecao.errors }}
+</div>
+{% endif %}
     <br>
 
     <button type="submit" class="btn btn-primary center-button">
@@ -166,6 +177,8 @@ $(document).ready(function() {
     $('#id_data_saida_fiscal').mask("00/00/0000");
     $('#id_mes_produtividade').mask("00/00/0000");
     $('#id_encerramento_protocolo').mask("00/00/0000");
+
+
     $('#id_inspecao').select2();
 });
 

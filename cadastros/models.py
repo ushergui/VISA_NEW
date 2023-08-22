@@ -437,7 +437,9 @@ class Infracao(models.Model):
         ("13", "Não defendeu e limpou (razoável)"),
         ("14", "Defendeu e limpou (razoável)"),
         ("15", "Não defendeu e limpou (razoável) via Edital"),
-        ("16", "Defendeu e indicou possuidor")
+        ("16", "Defendeu e indicou possuidor"),
+        ("17", "Defendeu e queimou"),
+        ("18", "Duplicidade")
 
     )
     situacao = models.CharField(blank=True, null=True, max_length=25, choices=SITUACAO_CHOICES, verbose_name="Situação")

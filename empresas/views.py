@@ -380,62 +380,49 @@ def criar_produtividade(request, protocolo_id):
     if request.method == 'POST':
         form = ProdutividadeForm(request.POST)
         if form.is_valid():
-            produtividade = form.save(commit=False)
-            produtividade.fiscal_responsavel = protocolo_empresa.fiscal_responsavel
-            produtividade.inspecao = protocolo_empresa.inspecao
-            produtividade.protocolo = protocolo_empresa
-            produtividade.save() 
+            # Verifique se uma produtividade com a mesma inspeção já existe.
+            inspecao = protocolo_empresa.inspecao
+            if Produtividade.objects.filter(inspecao=inspecao).exists():
+                # Se existir, adicione uma mensagem de erro ao formulário.
+                form.add_error('inspecao', 'Uma produtividade para essa inspeção já existe.')
+            else:
+                produtividade = form.save(commit=False)
+                produtividade.fiscal_responsavel = protocolo_empresa.fiscal_responsavel
+                produtividade.inspecao = protocolo_empresa.inspecao
+                produtividade.protocolo = protocolo_empresa
+                produtividade.save() 
 
-            for acao in acoes:
-                multiplicador = form.cleaned_data.get(f'multiplicador-{acao.id}')
-                if multiplicador is not None:
-                    AcaoProdutividadeRel.objects.update_or_create(
-                        acao=acao,
-                        produtividade=produtividade,
-                        defaults={'multiplicador': multiplicador},
-                    )
-            form.save_m2m()
-            fiscais_auxiliares = []
-            fiscais_ids = request.POST.getlist('fiscal')
-            for fiscal_id in fiscais_ids:
-                try:
-                    fiscal = Fiscal.objects.get(id=fiscal_id)
-                except Fiscal.DoesNotExist:
-                    print(f"Fiscal with ID {fiscal_id} does not exist")
-                    continue
-                data_fiscal_auxiliar_str = request.POST.get(f'data_fiscal_auxiliar-{fiscal.id}')
-                if data_fiscal_auxiliar_str:
+                for acao in acoes:
+                    multiplicador = form.cleaned_data.get(f'multiplicador-{acao.id}')
+                    if multiplicador is not None:
+                        AcaoProdutividadeRel.objects.update_or_create(
+                            acao=acao,
+                            produtividade=produtividade,
+                            defaults={'multiplicador': multiplicador},
+                        )
+                form.save_m2m()
+                fiscais_auxiliares = []
+                fiscais_ids = request.POST.getlist('fiscal')
+                for fiscal_id in fiscais_ids:
                     try:
-                        data_fiscal_auxiliar = datetime.strptime(data_fiscal_auxiliar_str, "%Y-%m-%d").date()
-                    except ValueError:
-                        print(f"Invalid date string {data_fiscal_auxiliar_str} for fiscal ID {fiscal_id}")
+                        fiscal = Fiscal.objects.get(id=fiscal_id)
+                    except Fiscal.DoesNotExist:
                         continue
-                    fiscal_aux_rel, created = FiscalAuxiliarRel.objects.update_or_create(
-                        fiscal_auxiliar=fiscal,
-                        produtividade=produtividade,
-                        defaults={'data_fiscal_auxiliar': data_fiscal_auxiliar},
-                    )
-                    if created:
-                        print(f"Created new FiscalAuxiliarRel: {fiscal_aux_rel}")
-                    else:
-                        print(f"Updated FiscalAuxiliarRel: {fiscal_aux_rel}")
-                    print("No exceptions after creating FiscalAuxiliarRel")  # Adiciona essa linha 
-                    try:
-                        saved_fiscal_aux_rel = FiscalAuxiliarRel.objects.get(
+                    data_fiscal_auxiliar_str = request.POST.get(f'data_fiscal_auxiliar-{fiscal.id}')
+                    if data_fiscal_auxiliar_str:
+                        try:
+                            data_fiscal_auxiliar = datetime.strptime(data_fiscal_auxiliar_str, "%Y-%m-%d").date()
+                        except ValueError:
+                            continue
+                        FiscalAuxiliarRel.objects.update_or_create(
                             fiscal_auxiliar=fiscal,
                             produtividade=produtividade,
+                            defaults={'data_fiscal_auxiliar': data_fiscal_auxiliar},
                         )
-                        print(f"Successfully retrieved FiscalAuxiliarRel from DB: {saved_fiscal_aux_rel}")
-                    except FiscalAuxiliarRel.DoesNotExist:
-                        print("Failed to retrieve FiscalAuxiliarRel from DB")
                        
                     fiscais_auxiliares.append(fiscal)
 
-            
-
-            return redirect('listar_produtividade')
-        else:
-            print(form.errors)  # Mostra erros do formulário no console
+                return redirect('listar_produtividade')
     else:
         form = ProdutividadeForm(initial={'protocolo': protocolo_empresa, 'fiscal_responsavel': protocolo_empresa.fiscal_responsavel})
 
@@ -529,6 +516,79 @@ class EmpresasCnaeListView(ListView):
             context['total_registros'] = empresas.count()
 
         return context
+    
+class EmpresasEnderecoListView(ListView):
+    model = Empresas
+    template_name = 'empresas/lista_empresas_endereco.html'
+    context_object_name = 'empresas'
+    
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query:
+            empresas = Empresas.objects.filter(
+                Q(logradouro_empresa__nome_logradouro__icontains=query) |
+                Q(numero_empresa__icontains=query) |
+                Q(logradouro_empresa__bairro__nome_bairro__icontains=query) |
+                Q(cnae_principal__codigo_cnae__icontains=query) |
+                Q(cnae_principal__descricao_cnae__icontains=query)
+            ).distinct()
+
+            return empresas.order_by('razao')
+        else:
+            return Empresas.objects.none()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q')
+
+        if query:
+            empresas = Empresas.objects.filter(
+                Q(logradouro_empresa__nome_logradouro__icontains=query) |
+                Q(numero_empresa__icontains=query) |
+                Q(logradouro_empresa__bairro__nome_bairro__icontains=query) |
+                Q(cnae_principal__codigo_cnae__icontains=query) |
+                Q(cnae_principal__descricao_cnae__icontains=query)
+            ).distinct()
+
+            context['total_registros'] = empresas.count()
+
+        return context
+
+
+def empresas_endereco_pdf(request):
+    # Recupera o parâmetro da URL
+    query = request.GET.get('q')
+    # Inicia a query como vazia
+    empresas = Empresas.objects.none()
+
+    if query:
+        # Faz a consulta caso a query tenha sido preenchida
+        empresas = Empresas.objects.filter(
+            Q(logradouro_empresa__nome_logradouro__icontains=query) |
+            Q(numero_empresa__icontains=query) |
+            Q(logradouro_empresa__bairro__nome_bairro__icontains=query) 
+        ).distinct().order_by(
+            'cnae_principal__descricao_cnae', 
+            'logradouro_empresa__bairro__nome_bairro', 
+            'logradouro_empresa__nome_logradouro', 
+            'numero_empresa'
+        )
+
+    context = {
+        'empresas': empresas,
+        'total_registros': empresas.count(),
+    }
+    
+    # Aqui o código renderiza o HTML e cria o PDF
+    html_template = get_template('empresas/empresas_endereco_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=empresas_endereco_pdf.html'
+    return response
+
+
 
 def empresas_cnae_pdf(request):
     # Recupera o parâmetro da URL
