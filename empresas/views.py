@@ -372,23 +372,28 @@ def listar_produtividade(request):
 
 
 from datetime import datetime
+from django.core.exceptions import ObjectDoesNotExist
+
 def criar_produtividade(request, protocolo_id):
     protocolo_empresa = get_object_or_404(ProtocoloEmpresa, pk=protocolo_id)
     acoes = AcaoProdutividade.objects.all()
     fiscais = Fiscal.objects.all()
+    inspecao = None
+
+    try:
+        inspecao = protocolo_empresa.inspecao
+    except ObjectDoesNotExist:
+        pass
     
     if request.method == 'POST':
         form = ProdutividadeForm(request.POST)
         if form.is_valid():
-            # Verifique se uma produtividade com a mesma inspeção já existe.
-            inspecao = protocolo_empresa.inspecao
-            if Produtividade.objects.filter(inspecao=inspecao).exists():
-                # Se existir, adicione uma mensagem de erro ao formulário.
+            if inspecao and Produtividade.objects.filter(inspecao=inspecao).exists():
                 form.add_error('inspecao', 'Uma produtividade para essa inspeção já existe.')
             else:
                 produtividade = form.save(commit=False)
                 produtividade.fiscal_responsavel = protocolo_empresa.fiscal_responsavel
-                produtividade.inspecao = protocolo_empresa.inspecao
+                produtividade.inspecao = inspecao
                 produtividade.protocolo = protocolo_empresa
                 produtividade.save() 
 
@@ -426,15 +431,13 @@ def criar_produtividade(request, protocolo_id):
     else:
         form = ProdutividadeForm(initial={'protocolo': protocolo_empresa, 'fiscal_responsavel': protocolo_empresa.fiscal_responsavel})
 
-    # Inicializar multiplicadores com valores padrões
     multiplicadores = [None for _ in range(acoes.count())]
-
     context = {
         'form': form,
         'protocolo_empresa': protocolo_empresa,
         'acoes': acoes,
         'multiplicadores': multiplicadores,
-        'inspecao': protocolo_empresa.inspecao,
+        'inspecao': inspecao,
         'protocolo_empresa': protocolo_empresa,
         'fiscal_responsavel': protocolo_empresa.fiscal_responsavel,
         'titulo': 'Lançamento da produtividade', 
@@ -444,7 +447,49 @@ def criar_produtividade(request, protocolo_id):
 
     return render(request, 'empresas/form-produtividade.html', context)
 
+def editar_produtividade(request, id):
+    produtividade = get_object_or_404(Produtividade, id=id)
+    fiscais = Fiscal.objects.all()
 
+    # Otimização: usar a consulta direta para obter ações relacionadas
+    todas_acoes = AcaoProdutividade.objects.all()
+    acao_rels = AcaoProdutividadeRel.objects.filter(produtividade=produtividade)
+    acao_ids = [acao_rel.acao.id for acao_rel in acao_rels]
+    mapa_acao_multiplicador = {acao_rel.acao.id: acao_rel.multiplicador for acao_rel in acao_rels}
+
+    if request.method == 'POST':
+        form = ProdutividadeFormEdit(request.POST, instance=produtividade)
+        if form.is_valid():
+            form.save()
+
+            # Atualizar o método POST para lidar com o campo ações
+            acoes_ids = request.POST.getlist('acao')
+            produtividade.acoes.set(acoes_ids)
+
+            # Loop otimizado usando a consulta direta
+            for acao_rel in acao_rels:
+                multiplicador = request.POST.get('multiplicador_{}'.format(acao_rel.id))
+                if multiplicador:
+                    acao_rel.multiplicador = multiplicador
+                    acao_rel.save()
+
+            fiscais_auxiliares_ids = request.POST.getlist('fiscal_auxiliar')
+            produtividade.fiscais_auxiliar.set(fiscais_auxiliares_ids)
+            produtividade.save()
+
+    else:
+        form = ProdutividadeFormEdit(instance=produtividade)
+
+    return render(request, 'empresas/form-produtividade-editar.html', {
+        'form': form,
+        'fiscais': fiscais,
+        'acao_rels': acao_rels,  # Passando a consulta otimizada para o template
+        'protocolo_empresa': produtividade.protocolo,
+        'todas_acoes': todas_acoes,
+        'mapa_acao_multiplicador': mapa_acao_multiplicador,
+        'acao_ids': acao_ids,
+        'fiscal_responsavel': produtividade.fiscal_responsavel
+    })
 
 def get_pontos(request):
     acao_id = request.GET.get('acao_id', None)
@@ -456,27 +501,6 @@ def get_pontos(request):
         except AcaoProdutividade.DoesNotExist:
             pass
     return JsonResponse({'pontos': str(pontos)})
-
-
-def editar_produtividade(request, id):
-    produtividade = get_object_or_404(Produtividade, id=id)
-
-    if request.method == 'POST':
-        form = ProdutividadeFormEdit(request.POST, instance=produtividade, protocolo=produtividade.protocolo, fiscal_responsavel=produtividade.fiscal_responsavel)
-        if form.is_valid():
-            form.save()
-            return redirect('listar_produtividade')
-    else:
-        form = ProdutividadeFormEdit(instance=produtividade, protocolo=produtividade.protocolo, fiscal_responsavel=produtividade.fiscal_responsavel)
-
-    context = {
-        'form': form,
-        'produtividade': produtividade,
-        # outros contextos necessários
-    }
-
-    return render(request, 'empresas/form-produtividade-editar.html', context)
-
 
 def excluir_produtividade(request, id):
     produtividade = get_object_or_404(Produtividade, id=id)

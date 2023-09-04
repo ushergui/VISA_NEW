@@ -12,19 +12,21 @@
 <table class="table table-striped" id="tabela-listar">
 	<thead>
 	<tr>
-        <th>Código</th>
-        <th>Descrição</th>
-        <th>Risco</th>
-        <th>Ações</th>
+        <th class="text-center">Código</th>
+        <th class="text-center">Descrição</th>
+        <th class="text-center">Risco</th>
+        <th class="text-center">Alimento</th>
+        <th class="text-center">Ações</th>
 
     </tr>
 	</thead>
 	<tbody>
     {% for cnae in cnaes %}
     <tr>
-    <td>{{ cnae.codigo_cnae }}</td>
+    <td class="text-center">{{ cnae.codigo_cnae }}</td>
 	<td>{{ cnae.descricao_cnae }}</td>
-	<td>{{ cnae.risco_cnae }}</td>
+	<td class="text-center">{{ cnae.risco_cnae }}</td>
+	<td class="text-center">{% if cnae.alimentos == True %}<i class="fas fa-thumbs-up" style="color:green;"></i>{% else %}<i class="fas fa-thumbs-down" style="color:red;"></i>{% endif %}</td>
     <td style="text-align: center">
             <a href="{% url 'editar_cnae' cnae.id %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a>
             <a href="{% url 'excluir_cnae' cnae.id %}" class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px;">Deletar</a>

@@ -23,9 +23,10 @@
 	
 
     <h3 id="valorConvertido1"></h3>
-    <button type="submit" onclick="return Verificar()" class="btn btn-primary center-button">
-    {{ botao }}   
+    <button type="button" onclick="Verificar().then((canSubmit) => {if (canSubmit) { document.querySelector('form').submit(); }})" class="btn btn-primary center-button">
+        {{ botao }}   
     </button>
+    
 
 </form>
 </div>
@@ -45,6 +46,7 @@
                 // Eu não vejo um campo de observações no seu formulário atual,
                 // então você precisará adicionar um e referenciá-lo aqui.
                 $('#id_observacoes_terreno').text(data.observacoes);
+                $('#id_inscricao_terreno').val(data.inscricao);
             });
         } else {
             // Limpe o campo de observações se nenhuma inspeção for selecionada.
@@ -94,18 +96,57 @@
         $('#id_inspecao').select2();
     });
 
-
     function Verificar() {
-    var limpo = document.getElementById('id_inspecao');
-    var value = limpo.options[limpo.selectedIndex].text;
-	    
-	if (value.includes('LIMPO')){
-    alert("Você não pode gerar um alto de infração para um terreno limpo ou razoável!");
-    return false;
-    }
-	else {
-	}
- }
+    return new Promise((resolve, reject) => {
+        var inspecaoElem = document.getElementById('id_inspecao');
+        var inspecaoId = inspecaoElem.value;
+
+        if (!inspecaoId) {
+            alert("Por favor, selecione uma inspeção.");
+            reject(false);
+            return;
+        }
+
+        // Primeiro, obtenha a inscrição do terreno com base na inspeção selecionada
+        $.get('/ajax/get-terreno-inscricao/', { inspecao_id: inspecaoId }, function(data) {
+            // Aqui você recebe a inscrição do terreno relacionada à inspeção selecionada
+            var inscricao = data.inscricao;
+
+            // Agora faça a chamada AJAX para verificar a infração
+            $.get('/verificar_infracao_existente/', { inscricao: inscricao }, function(data) {
+                if (data.status === 'found') {
+                    var confirmMessage = `Este terreno (${inscricao}) já foi autuado em ${data.data_auto} através do Auto ${data.numero_format_ano}. Deseja gerar uma nova infração?`;
+                    
+                    var userConfirmed = window.confirm(confirmMessage);
+                    
+                    if (!userConfirmed) {
+                        reject(false);
+                        return;
+                    }
+                }
+                resolve(true);
+            });
+        });
+    })
+    .then((canSubmit) => {
+        if (canSubmit) {
+            // Aqui, você pode verificar se o terreno é "LIMPO" ou não.
+            var limpo = document.getElementById('id_inspecao');
+            var value = limpo.options[limpo.selectedIndex].text;
+
+            if (value.includes('LIMPO')) {
+                alert("Você não pode gerar um auto de infração para um terreno limpo ou razoável!");
+                return false;
+            }
+            // Se tudo estiver ok, você pode prosseguir com o envio do formulário.
+            return true;
+        } else {
+            return false;
+        }
+    });
+}
+
+ 
 
 
 </script>

@@ -68,7 +68,14 @@
 				{% else %}
 				{% endif %}
 			</div>
-        
+			{% if paciente.convenio %}
+			<div class="row">
+				<div class="col-lg-12 ">
+					<h4>Convênio</h4>
+					<p>{{ paciente.convenio }} </p>
+				</div>
+			</div>
+			{% else %}{% endif %}
 			{% if paciente.observacoes_paciente %}
 			<div class="row">
 				<div class="col-lg-12 ">
@@ -84,6 +91,14 @@
 				<h2>Prescrição atual <a href="{% url 'prescricao_edit' prescricao.id %}"><i class="fas fa-pencil-alt"></i></a></h2><br>
 				<!-- Verifique se a prescrição existe antes de tentar exibi-la -->
 				{% if prescricao %}
+					{% if prescricao.medico_prescritor %}
+					<p>Tempo de uso: {{ prescricao.medico_prescritor|capitalize_name }}</p>
+					{% else %}
+					{% endif %}
+					{% if prescricao.medico_alta %}
+					<p>Tempo de uso: {{ prescricao.medico_alta|capitalize_name }}</p>
+					{% else %}
+					{% endif %}
 					<p>Equipamento(s): </p>
 					<ul>
 						{% for equipamento in prescricao.equipamento.all %}

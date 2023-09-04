@@ -31,6 +31,7 @@ class Cnae(models.Model):
     observacoes_cnae = models.CharField(max_length=300, null=True, blank=True)
     risco_cnae = models.ForeignKey(Risco, on_delete=models.PROTECT)
     legislacao = models.ManyToManyField(Legislacao, related_name='Legislação')
+    alimentos = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.codigo_cnae} - {self.descricao_cnae} - {self.risco_cnae}'

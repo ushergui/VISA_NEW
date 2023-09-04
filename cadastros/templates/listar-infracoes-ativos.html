@@ -14,7 +14,6 @@
     <thead>	
     <tr>
         <th class="text-center" style="font-size:12px">Auto </th>
-        <th class="text-center" style="font-size:12px">Imprimir</th>
         <th class="text-center" style="font-size:12px">AR</th>
 	<th class="text-center" style="font-size:12px">Fiscal</th>
 	<th class="text-center" style="font-size:12px">Protocolo / Imóvel / Proprietário</th>
@@ -35,12 +34,7 @@
     {% for infracao in object_list %}
     <tr>
 		
-        <td style="font-size:11px"  class="text-center">{{ infracao.numero_format_ano }} </td>
-        <td class="text-center">
-        <a href="{% url 'gerar_auto' pk=infracao.pk %}" >
-        <i class="fa fa-file" aria-hidden="true"></i>
-        </a>
-        </td>
+        <td style="font-size:11px;vertical-align:middle;"  class="text-center"><a href="{% url 'gerar_auto' pk=infracao.pk %}">{{ infracao.numero_format_ano }}</a></td>
 
         <td class="text-center">
         <a href="{% url 'gerar_ar1' pk=infracao.pk %}">
@@ -116,7 +110,7 @@
                 {% endif %}
             </td>
         <td class="text-center">
-		{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
+		{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "5" or infracao.julgamento != NULL and infracao.situacao == "11" or  infracao.julgamento != NULL and infracao.situacao == "14" or  infracao.julgamento != NULL and infracao.situacao == "16" or infracao.julgamento != NULL and infracao.situacao == "17"  %}
         <a href="{% url 'gerar_ar5' pk=infracao.pk %}">
           <i class="fa fa-envelope" aria-hidden="true"></i>
         </a>
@@ -134,7 +128,7 @@
 
         </td>
 	<td class="text-center">
-	{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
+        {% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "5" or infracao.julgamento != NULL and infracao.situacao == "11" or  infracao.julgamento != NULL and infracao.situacao == "14" or  infracao.julgamento != NULL and infracao.situacao == "16" or infracao.julgamento != NULL and infracao.situacao == "17"  %}
 
         <a href="{% url 'cadastrar-AR2' pk=infracao.pk %}">
           <i class="fa fa-plus" aria-hidden="true"></i>

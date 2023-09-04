@@ -28,6 +28,8 @@
         {{ form.numero_oficio|as_crispy_field }}
         {{ form.data_oficio|as_crispy_field }}
         {{ form.destinatario_oficio|as_crispy_field }}
+        {{ form.medico_prescritor|as_crispy_field }}
+        {{ form.medico_alta|as_crispy_field }}
         
 
 
@@ -101,6 +103,19 @@
         $('#id_telefone_paciente2').mask(behavior, options);
 
         $('#id_nome_paciente').on('keyup', function() {
+            var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+            $(this).val(textoSemAcentos);
+        });
+
+        $('#id_medico_prescritor').on('keyup', function() {
+            var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+            $(this).val(textoSemAcentos);
+        });
+        $('#id_medico_alta').on('keyup', function() {
+            var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
+            $(this).val(textoSemAcentos);
+        });
+        $('#id_destinatario_oficio').on('keyup', function() {
             var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
             $(this).val(textoSemAcentos);
         });

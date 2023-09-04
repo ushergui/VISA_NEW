@@ -219,98 +219,10 @@ class ProdutividadeForm(forms.ModelForm):
         # Resto do seu código aqui
         return instance
 
-
-
-'''ESTAVA FUNCIONANDO MEDIO
-class ProdutividadeForm(forms.ModelForm):
-    class Meta:
-        model = Produtividade
-        fields = ('data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscal_auxiliar', 'total')  
-        widgets = {
-            'fiscal_responsavel': forms.Select(attrs={'readonly': 'readonly'}),
-        }
-
-    def __init__(self, *args, inspecao=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'fiscal_responsavel' in self.initial:
-            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
-
-        # Criando dinamicamente os campos de multiplicador
-        for acao in AcaoProdutividade.objects.all():
-            self.fields[f'multiplicador_{acao.id}'] = forms.DecimalField(
-                decimal_places=1,
-                max_digits=3,
-                required=False,
-            )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        
-        # Verificação para cada multiplicador
-        for field in self.fields:
-            if 'multiplicador' in field:
-                multiplicador = cleaned_data.get(field)
-
-                allowed_values = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5]  # Continue a lista conforme necessário
-
-                if multiplicador is not None and multiplicador not in allowed_values:
-                    self.add_error(field, "O valor do multiplicador é inválido.")
-        
-        inspecao = cleaned_data.get("inspecao")
-        
-        if inspecao and Produtividade.objects.filter(inspecao=inspecao).exists():
-            self.add_error('inspecao', "Produtividade com esta Inspeção já existe.")
-        
-        return cleaned_data
-
-    '''
-# SE DER PAU EMBAIXO TA PRONTO
-'''class ProdutividadeForm(forms.ModelForm):
-    class Meta:
-        model = Produtividade
-        fields = ('protocolo', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscal_auxiliar', 'total')
-        widgets = {
-    'protocolo': forms.Select(attrs={'disabled': 'disabled'}),
-    'fiscal_responsavel': forms.Select(attrs={'disabled': 'disabled'}),
-}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'fiscal_responsavel' in self.initial:
-            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        inspecao = cleaned_data.get("inspecao")
-        
-        if Produtividade.objects.filter(inspecao=inspecao).exists():
-            raise forms.ValidationError("Produtividade com esta Inspeção já existe.")
-        
-        return cleaned_data
-        '''
-
 class ProdutividadeFormEdit(forms.ModelForm):
     class Meta:
         model = Produtividade
-        fields = ('total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscais_auxiliar')
-
-    protocolo = forms.CharField(max_length=200, disabled=True, required=False)
-    fiscal_responsavel = forms.CharField(max_length=200, disabled=True, required=False)
-
-    def __init__(self, *args, **kwargs):
-        protocolo = kwargs.pop('protocolo', None)
-        fiscal_responsavel = kwargs.pop('fiscal_responsavel', None)
-        super().__init__(*args, **kwargs)
-
-        if protocolo:
-            self.fields['protocolo'].initial = protocolo
-        if fiscal_responsavel:
-            self.fields['fiscal_responsavel'].initial = fiscal_responsavel
-
-        if 'fiscal_responsavel' in self.initial:
-            self.fields['fiscal_auxiliar'].queryset = Fiscal.objects.exclude(id=self.initial['fiscal_responsavel'].id)
-
-
+        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscais_auxiliar', 'validacao']
 
 class EmpresaCnaeForm(forms.ModelForm):
     cnae = forms.ModelMultipleChoiceField(

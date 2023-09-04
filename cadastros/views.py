@@ -32,6 +32,8 @@ from crispy_forms.layout import Layout
 from datetime import timedelta
 from django.http import QueryDict
 from django.views import View
+from decimal import Decimal
+
 
 
 
@@ -227,20 +229,6 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     template_name = 'form5.html'
     success_url = reverse_lazy('listar-infracoes-ativos')
 
-    def form_valid(self, form):
-        # Obtenha o terreno associado à inspeção selecionada
-        terreno = form.cleaned_data['inspecao'].terreno
-
-        # Obtenha a data do julgamento mais recente para infrações neste terreno
-        ultima_infracao = Infracao.objects.filter(inspecao__terreno=terreno).order_by('-julgamento').first()
-
-        # Se houver uma infração e a data do julgamento for menos de 183 dias atrás e a situação for 3 ou 8, não permita criar uma nova infração
-        if ultima_infracao and ultima_infracao.julgamento and ultima_infracao.numero_format_ano and (datetime.today().date() - ultima_infracao.julgamento).days < 183 and ultima_infracao.situacao in ["3", "8"]:
-            form.add_error(None, f'Este terreno foi multado há menos de seis meses (Data do Julgamento: {ultima_infracao.julgamento.strftime("%d/%m/%Y")}) através do Auto de Infração número {ultima_infracao.numero_format_ano}.')
-            return self.form_invalid(form)
-
-        return super().form_valid(form)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -258,7 +246,32 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
         context['titulo'] = "Cadastro de infração"
         context['botao'] = "Cadastrar"
         return context
+    
+def verificar_infracao_existente(request):
+    inscricao = request.GET.get('inscricao', None)
+    if not inscricao:
+        return JsonResponse({'status': 'fail', 'message': 'Inscrição não fornecida'})
 
+    try:
+        ultima_infracao = Infracao.objects.filter(inspecao__terreno__inscricao=inscricao).latest('data_auto')
+        data = {
+            'status': 'found',
+            'data_auto': ultima_infracao.data_auto.strftime('%d/%m/%Y'),
+            'numero_format_ano': ultima_infracao.numero_format_ano,
+            'julgamento': ultima_infracao.julgamento.strftime('%d/%m/%Y') if ultima_infracao.julgamento else None,
+        }
+        return JsonResponse(data)
+    except Infracao.DoesNotExist:
+        return JsonResponse({'status': 'not_found'})
+
+def get_terreno_inscricao(request):
+    inspecao_id = request.GET.get('inspecao_id')
+    try:
+        inspecao = Inspecao.objects.get(pk=inspecao_id)
+        terreno_inscricao = inspecao.terreno.inscricao
+        return JsonResponse({'inscricao': terreno_inscricao})
+    except Inspecao.DoesNotExist:
+        return JsonResponse({'error': 'Inspeção não encontrada'}, status=404)
         
 class GetTerrenoObservacoes(View):
     def get(self, request, *args, **kwargs):
@@ -1051,3 +1064,32 @@ def vrm_delete(request, pk):
         return redirect('vrm_list')
 
     return render(request, 'form-excluir.html', {'item': vrm})
+
+def dados_multados(request):
+    search_year = request.GET.get('q')
+    infracoes = None
+    total_count = 0
+    total_value = Decimal(0)
+
+    if search_year:
+        # Filtra infrações baseadas no ano inserido no campo de pesquisa e nas situações 3 ou 8
+        infracoes = Infracao.objects.filter(
+            data_auto__year=search_year,
+            situacao__in=["3", "8"]  # isso fará a filtragem para os códigos de situação
+        )
+
+        # Calcula o número total de terrenos multados
+        total_count = infracoes.count()
+
+        # Calcula o valor total das multas
+        for infracao in infracoes:
+            total_value += infracao.get_vrm
+
+    context = {
+        'object_list': infracoes,
+        'total_count': total_count,
+        'total_value': total_value,
+        'search_year': search_year,
+    }
+
+    return render(request, 'dados_multados.html', context)

@@ -93,6 +93,8 @@ class InspecaoUpdateForm(forms.ModelForm):
 
 class InfracaoCreateForm(forms.ModelForm):
     inspecao = forms.ModelChoiceField(queryset=Inspecao.objects.select_related('protocolo', 'terreno').all())
+    inscricao_terreno = forms.CharField(widget=forms.HiddenInput(), required=False)
+
 
     class Meta:
         model = Infracao

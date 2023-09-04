@@ -118,7 +118,7 @@
                 {% endif %}
             </td>
             <td style="vertical-align:middle;width:80px;" class="text-center">
-		{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
+                {% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "5" or infracao.julgamento != NULL and infracao.situacao == "11" or  infracao.julgamento != NULL and infracao.situacao == "14" or  infracao.julgamento != NULL and infracao.situacao == "16" or infracao.julgamento != NULL and infracao.situacao == "17"  %}
         <a href="{% url 'gerar_ar5' pk=infracao.pk %}">
           <i class="fa fa-envelope fa-xs" aria-hidden="true"></i>
         </a>
@@ -136,7 +136,7 @@
 
         </td>
         <td class="text-center" style="vertical-align:middle;">
-	{% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "3" or infracao.julgamento != NULL and infracao.situacao == "4" or  infracao.julgamento != NULL and infracao.situacao == "5"  %}
+            {% if infracao.julgamento != NULL and infracao.situacao == "1" or  infracao.julgamento != NULL and infracao.situacao == "5" or infracao.julgamento != NULL and infracao.situacao == "11" or  infracao.julgamento != NULL and infracao.situacao == "14" or  infracao.julgamento != NULL and infracao.situacao == "16" or infracao.julgamento != NULL and infracao.situacao == "17"  %}
 
         <a href="{% url 'cadastrar-AR2' pk=infracao.pk %}">
           <i class="fa fa-plus" aria-hidden="true"></i>

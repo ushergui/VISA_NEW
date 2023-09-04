@@ -9,3 +9,7 @@ def zip_lists(a, b):
 @register.filter
 def get_field(form, field_name):
     return form.fields[field_name]
+
+@register.filter
+def get_item(queryset, id):
+    return queryset.filter(id=id).first()

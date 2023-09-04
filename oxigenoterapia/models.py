@@ -3,6 +3,7 @@ from cadastros.models import Logradouro
 from ckeditor.fields import RichTextField
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.urls import reverse
 
 class Fisioterapeuta(models.Model):
         nome_fisioterapeuta = models.CharField(max_length=100, null=False, verbose_name="Nome completo")
@@ -50,6 +51,7 @@ class Paciente(models.Model):
     complemento_paciente=models.CharField(max_length=20, verbose_name="Complemento", null=True, blank=True)
     rg_paciente = models.CharField(max_length=20, verbose_name="RG", null=True, blank=True)
     cpf_paciente = models.CharField(max_length=14,null=True, verbose_name="CPF", blank=True) 
+    convenio = models.CharField(max_length=45,null=True, verbose_name="Convênio", blank=True) 
     
     usf_paciente = models.ForeignKey(Usf, on_delete=models.PROTECT, verbose_name="USF")
 
@@ -66,6 +68,9 @@ class Paciente(models.Model):
 
     def __str__(self):
         return self.nome_paciente
+    
+    def get_absolute_url(self):
+        return reverse('detalhes_paciente', kwargs={'paciente_id': self.id})
 
 @receiver(pre_save, sender=Paciente)
 def update_related_status(sender, instance, **kwargs):
@@ -164,6 +169,8 @@ class Prescricao(models.Model):
     numero_oficio = models.CharField(null=True, blank=True, max_length=15, verbose_name="Número do Ofício")
     data_oficio = models.DateField(null=True, blank=True, verbose_name="Data do Ofício")
     destinatario_oficio = models.CharField(null=True, blank=True, max_length=45, verbose_name="Destinatário")
+    medico_prescritor = models.CharField(null=True, blank=True, max_length=150)
+    medico_alta = models.CharField(null=True, blank=True, max_length=150)
     
     def __str__(self):
         data_inicio_uso_formatada = self.data_inicio_uso.strftime('%d/%m/%Y')

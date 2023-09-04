@@ -13,7 +13,7 @@ from .views import EstadoDelete, CidadeDelete, BairroDelete, LogradouroDelete, \
 from .views import EstadoList, CidadeList, BairroList, LogradouroList, \
     ProprietarioList, TerrenoList, ProtocoloList, FiscalList, InspecaoList, InfracaoList, InformacoesList, ProdutividadeList, GerenciarList, ProdutividadeList2, InfracaoListFilterAtivos, MultadosList
 
-from .views import gerar_relatorio, gerar_ar1, gerar_ar2, gerar_auto, gerar_ar3, gerar_ar4, gerar_ar5, gerar_ar6, gerar_ar7, gerar_manifestacao, gerar_julgamento, ProtocoloDetalhes
+from .views import gerar_relatorio, gerar_ar1, gerar_ar2, gerar_auto, gerar_ar3, gerar_ar4, gerar_ar5, gerar_ar6, gerar_ar7, gerar_manifestacao, gerar_julgamento, ProtocoloDetalhes, verificar_infracao_existente
 
 from . import views
 
@@ -63,7 +63,8 @@ urlpatterns = [
     path('deletar/inspecao/<int:pk>/', InspecaoDelete.as_view(), name="deletar-inspecao"),
     path('deletar/infracao/<int:pk>/', InfracaoDelete.as_view(), name="deletar-infracao"),
 
-
+    path('verificar_infracao_existente/', verificar_infracao_existente, name='verificar_infracao_existente'),
+    path('ajax/get-terreno-inscricao/', views.get_terreno_inscricao, name='get_terreno_inscricao'),
 
     # Para listar
     #path('listar-produtividade/', ProdutividadeList.as_view(), name="listar-produtividade"),
@@ -87,6 +88,7 @@ urlpatterns = [
     path('imprimir-infracoes/', InfracaoPrintList.as_view(), name="imprimir-infracoes"),
     path('calcular_prazo_defesa/', views.calcular_prazo_defesa, name='calcular_prazo_defesa'),
     path('calcular_prazo_manifesto/', views.calcular_prazo_manifesto, name='calcular_prazo_manifesto'),
+    path('dados_multados/', views.dados_multados, name='dados_multados'),
 
 
     # Para gerar

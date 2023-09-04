@@ -98,7 +98,7 @@ class CidForm(forms.ModelForm):
 class PrescricaoForm(forms.ModelForm):
     class Meta:
         model = Prescricao
-        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros', 'status', 'numero_oficio', 'data_oficio','destinatario_oficio']
+        fields = ['paciente', 'equipamento', 'data_inicio_uso', 'tempo_de_uso', 'cid', 'litros', 'parametros', 'status', 'numero_oficio', 'data_oficio','destinatario_oficio','medico_prescritor','medico_alta']
 
 class ModoDeUsoForm(forms.ModelForm):
     class Meta:
