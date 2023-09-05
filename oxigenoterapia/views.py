@@ -798,7 +798,6 @@ def relatorio_pacientes_ativos_ventilacao_pdf(request):
     response['Content-Disposition'] = 'inline; filename=relatorio_pacientes_ativos_ventilacao.pdf'
     return response
 
-#FUNCIONANDO
 def relatorio_para_visita(request):
     fisioterapeuta_id = request.GET.get('fisioterapeuta', None)
     
