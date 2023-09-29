@@ -53,3 +53,8 @@ def month_lower(date):
     return 'Data não disponível'
 
 register.filter('capitalize_name', capitalize_name)
+
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    return dictionary.get(key)

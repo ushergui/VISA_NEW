@@ -827,7 +827,12 @@ def relatorio_para_visita(request):
     modos_uso_por_paciente = defaultdict(list)
     for modo_uso in modos_uso:
         modos_uso_por_paciente[modo_uso.paciente].append(modo_uso)
-    
+    data_atendimento_recente = ModoDeUso.objects.filter(paciente__status='ATIVO').annotate(
+        data_atendimento_recente=Max('atendimentos__data_atendimento')
+    ).values('paciente__id', 'data_atendimento_recente')
+
+    data_atendimento_dict = {item['paciente__id']: item['data_atendimento_recente'] for item in data_atendimento_recente}
+
     context = {
         'modos_uso_por_paciente': dict(modos_uso_por_paciente),
         'modos_uso': modos_uso,
@@ -836,6 +841,7 @@ def relatorio_para_visita(request):
         'fisioterapeuta_pesquisa': fisioterapeuta_id,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
+        'data_atendimento_dict': data_atendimento_dict,
     }
 
     return render(request, 'oxigenoterapia/relatorio_para_visita.html', context)
@@ -871,6 +877,11 @@ def relatorio_para_visita_pdf(request):
     modos_uso_por_paciente = defaultdict(list)
     for modo_uso in modos_uso:
         modos_uso_por_paciente[modo_uso.paciente].append(modo_uso)
+    data_atendimento_recente = ModoDeUso.objects.filter(paciente__status='ATIVO').annotate(
+        data_atendimento_recente=Max('atendimentos__data_atendimento')
+    ).values('paciente__id', 'data_atendimento_recente')
+
+    data_atendimento_dict = {item['paciente__id']: item['data_atendimento_recente'] for item in data_atendimento_recente}
     
     context = {
         'modos_uso_por_paciente': dict(modos_uso_por_paciente),
@@ -880,6 +891,7 @@ def relatorio_para_visita_pdf(request):
         'fisioterapeuta_pesquisa': fisioterapeuta_id,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
+        'data_atendimento_dict': data_atendimento_dict,
     }
  # Aqui o código renderiza o HTML e cria o PDF
     html_template = get_template('oxigenoterapia/relatorio_para_visita_pdf.html').render(context)

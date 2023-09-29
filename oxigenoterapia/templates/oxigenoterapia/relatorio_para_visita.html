@@ -49,6 +49,7 @@ Pesquisar    </button>
                     <th>Modo de Uso</th>
                     <th>Litros</th>
                     <th>Parâmetros</th>
+                    <th>Última visita</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,6 +76,12 @@ Pesquisar    </button>
                         <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
                         <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
                     {% endwith %}
+                    <td>
+                        {% if paciente.id in data_atendimento_dict %}
+                        {{ data_atendimento_dict|get_item:paciente.id|date:"d/m/Y" }}
+
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

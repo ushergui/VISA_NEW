@@ -61,8 +61,62 @@
                 <th>Telefone 2</th>
                 <th>Endereço</th>
                 <th>USF</th>
-				<th>Fisioterapeuta</th>
+                <th>Fisioterapeuta</th>
                 <th>CID</th>
+                <th>Equipamento(s)</th>
+                <th>Modo de Uso</th>
+                <th>Litros</th>
+                <th>Parâmetros</th>
+                <th>Última visita</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente, modos_uso in modos_uso_por_paciente.items %}
+            <tr>
+                <td>{{ paciente.prontuario_paciente }}</td>
+                <td>{{ paciente.nome_paciente|capitalize_name }}</td>
+                <td>{% if paciente.contato_1 %}{{ paciente.contato_1|capitalize_name }}{% endif %} {% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
+                <td>{% if paciente.contato_2 %}{{ paciente.contato_2|capitalize_name }}{% endif %} {% if paciente.telefone_paciente2 %}{{ paciente.telefone_paciente2 }}{% endif %}</td>
+                <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
+                <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                {% with modos_uso|last as modo %}
+                    <td>{{ modo.cid.codigo_doenca }}</td>
+                    <td>
+                        {% for equip in modo.equipamento.all %}
+                            {{ equip.nome_equipamento }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Nenhum
+                        {% endfor %}
+                    </td>
+					<td>{% if modo.tempo_de_uso %}{{ modo.tempo_de_uso }}{% else %}{% endif %}</td>
+                    <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
+                    <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
+                {% endwith %}
+                <td>
+                    {% if paciente.id in data_atendimento_dict %}
+                    {{ data_atendimento_dict|get_item:paciente.id|date:"d/m/Y" }}
+
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% elif equipamento_pesquisa == "OXIGENOTERAPIA" %}
+    <table class="table table-striped" style="font-size: 10px;">
+        <thead>
+            <tr>
+                <th>Prontuário</th>
+                <th>Paciente</th>
+                <th>Telefone 1</th>
+                <th>Telefone 2</th>
+                <th>Endereço</th>
+                <th>USF</th>
+                <th>Fisioterapeuta</th>
+                <th>CID</th>
+                
                 <th>Equipamento(s)</th>
                 <th>Modo de Uso</th>
                 <th>Litros</th>
@@ -97,52 +151,6 @@
             {% endfor %}
         </tbody>
         </table>
-    {% elif equipamento_pesquisa == "OXIGENOTERAPIA" %}
-    <table class="table table-striped" style="font-size: 10px;">
-        <thead>
-            <tr>
-                <th>Prontuário</th>
-                <th>Paciente</th>
-                <th>Telefone 1</th>
-                <th>Telefone 2</th>
-                <th>Endereço</th>
-                <th>USF</th>
-                <th>CID</th>
-                <th>Fisioterapeuta</th>
-                <th>Equipamento(s)</th>
-                <th>Modo de Uso</th>
-                <th>Litros</th>
-                <th>Parâmetros</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for paciente, modos_uso in modos_uso_por_paciente.items %}
-            <tr>
-                <td>{{ paciente.prontuario_paciente }}</td>
-                <td>{{ paciente.nome_paciente|capitalize_name }}</td>
-                <td>{% if paciente.contato_1 %}{{ paciente.contato_1|capitalize_name }}{% endif %} {% if paciente.telefone_paciente1 %}{{ paciente.telefone_paciente1 }}{% endif %}</td>
-                <td>{% if paciente.contato_2 %}{{ paciente.contato_2|capitalize_name }}{% endif %} {% if paciente.telefone_paciente2 %}{{ paciente.telefone_paciente2 }}{% endif %}</td>
-                <td>{{ paciente.logradouro_paciente.tipo|capitalize_name }} {{ paciente.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ paciente.numero_paciente }} {% if paciente.complemento_paciente %} {{ paciente.complemento_paciente|capitalize_name }} {% endif %}- {{ paciente.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
-                <td>{{ paciente.usf_paciente.nome_fantasia_usf|capitalize_name }}</td>
-                <td>{{ paciente.usf_paciente.nome_fisioterapeuta.primeiro_nome_fisioterapeuta|capitalize_name }}</td>
-                {% with modos_uso|last as modo %}
-                    <td>{{ modo.cid.codigo_doenca }}</td>
-                    <td>
-                        {% for equip in modo.equipamento.all %}
-                            {{ equip.nome_equipamento }}
-                            {% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            Nenhum
-                        {% endfor %}
-                    </td>
-                    <td>{{ modo.tempo_de_uso }}</td>
-                    <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
-                    <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
-                {% endwith %}
-            </tr>
-            {% endfor %}
-        </tbody>
-        </table>
     {% else %}
     <table class="table table-striped" style="font-size: 10px;">
         <thead>
@@ -153,8 +161,9 @@
                 <th>Telefone 2</th>
                 <th>Endereço</th>
                 <th>USF</th>
-                <th>CID</th>
                 <th>Fisioterapeuta</th>
+                <th>CID</th>
+                
                 <th>Equipamento(s)</th>
                 <th>Modo de Uso</th>
                 <th>Litros</th>
@@ -181,7 +190,7 @@
                             Nenhum
                         {% endfor %}
                     </td>
-                    <td>{{ modo.tempo_de_uso }}</td>
+                    <td>{% if modo.tempo_de_uso %}{{ modo.tempo_de_uso }}{% else %}{% endif %}</td>
                     <td>{% if modo.litros %}{{ modo.litros }}{% else %}{% endif %}</td>
                     <td>{% if modo.parametros %}{{ modo.parametros }}{% else %}{% endif %}</td>
                 {% endwith %}
