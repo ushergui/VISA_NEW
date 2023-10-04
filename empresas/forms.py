@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, FiscalAuxiliarRel
 from cadastros.models import Logradouro, Fiscal, Cidade, Bairro
 from django.core.exceptions import ValidationError
 import re
@@ -190,39 +190,30 @@ class AcaoProdutividadeForm(forms.ModelForm):
         model = AcaoProdutividade
         fields = ['codigo_produtividade', 'acao', 'pontos']
 
-#FUNCIONANDO
 class ProdutividadeForm(forms.ModelForm):
     class Meta:
         model = Produtividade
-        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscais_auxiliar', 'validacao']
-
+        fields = ['acoes', 'total', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_auxiliar', 'validacao']
+        widgets = {
+            'inspecao': forms.HiddenInput(),  # Escondendo o campo inspecao porque você vai amarrá-lo a um ID específico
+        }
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.inspecao:
-            self.fields['inspecao'].initial = self.instance.inspecao
-            self.fields['inspecao'].disabled = True
-        else:
-            self.fields['inspecao'].disabled = True
-        # Adicionando campos de multiplicador para cada ação
-        for acao in AcaoProdutividade.objects.all():
-            self.fields[f'multiplicador-{acao.id}'] = forms.DecimalField(max_digits=3, decimal_places=1, required=False)
+        super().__init__(*args, **kwargs)  # Este é o passo crucial
+        self.fields['acoes'] = forms.ModelMultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple, queryset=AcaoProdutividade.objects.all())
+        self.fields['fiscal_auxiliar'] = forms.ModelMultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple, queryset=Fiscal.objects.all())
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if 'inspecao' in self.cleaned_data:
-            try:
-                instance.inspecao = Inspecao.objects.get(id=self.cleaned_data['inspecao'])
-            except (Inspecao.DoesNotExist, ValueError):
-                instance.inspecao = None
-        if commit:
-            instance.save()
-        # Resto do seu código aqui
-        return instance
 
-class ProdutividadeFormEdit(forms.ModelForm):
+class ProdutividadeAcaoForm(forms.ModelForm):
     class Meta:
-        model = Produtividade
-        fields = ['protocolo', 'acoes', 'total', 'data_saida_fiscal', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_responsavel', 'fiscais_auxiliar', 'validacao']
+        model = AcaoProdutividadeRel
+        fields = ['acao_produtividade', 'multiplicador']
+
+class ProdutividadeFiscalAuxiliarForm(forms.ModelForm):
+    class Meta:
+        model = FiscalAuxiliarRel
+        fields = ['fiscal', 'data_fiscal_auxiliar']
 
 class EmpresaCnaeForm(forms.ModelForm):
     cnae = forms.ModelMultipleChoiceField(

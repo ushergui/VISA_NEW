@@ -1,0 +1,51 @@
+{% extends 'basy.html' %}
+{% load custom_filters %}
+{% block conteudo %}
+<style>
+    #tabela-listar td, #tabela-listar th {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+<h3>Vigirisco 2023</h3>
+<div class="table responsive">
+    <table class="table table-striped" id="tabela-listar">
+        <thead>
+            <tr>
+                <th>Razão</th>
+                <th>Inspeção</th>
+                <th>CNAE Principal</th>
+                <th>Alvará</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for empresa in empresas %}
+    {% if empresa.protocolos_2023 %}
+        <tr>
+            <td><a href="{% url 'detalhe_empresa' empresa.id %}">{{ empresa.razao|capitalize_name }}</td>
+                <td>
+                {% for protocolo in empresa.protocolos_2023 %}
+                    {{ protocolo.inspecao.data_inspecao|date:"d/m/Y" }}<br>
+                {% endfor %}
+            </td>
+            <td>{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>
+            <td>{% if empresa.alvara %}{{ empresa.alvara|date:"d/m/Y" }}{% else %}{% endif %}</td>
+            
+            
+        </tr>
+    {% endif %}
+{% empty %}
+    <tr>
+        <td colspan="6">A tabela está vazia.</td>
+    </tr>
+{% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="text-center mt-4">
+    <a href="{% url 'listar_vigiriscos_2023_pdf' %}" target="_blank" class="btn btn-primary">
+        <i class="fas fa-file-pdf"></i> Gerar PDF
+    </a>
+    </div>
+{% endblock %}

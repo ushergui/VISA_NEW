@@ -111,6 +111,11 @@ table tr {
     margin: auto;
 }
 
+.table-container2 {
+    width: 40%;
+    margin: auto;
+}
+
 .center-button {
     display: block;
     margin-left: auto;

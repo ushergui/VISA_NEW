@@ -1,17 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, FiscalAuxiliarRel
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, AcaoProdutividadeForm, ProdutividadeForm, ProdutividadeFormEdit, EmpresasObservacoesForm, EmpresaCnaeForm
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, FiscalAuxiliarRel, AcaoProdutividadeRel
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, ProdutividadeFiscalAuxiliarForm, AcaoProdutividadeForm
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
-from datetime import date
-from django.db.models import Max, Subquery, OuterRef, Prefetch
+from datetime import date, datetime
+from django.db.models import Max, Subquery, OuterRef, Prefetch, Case, When, Value, CharField
 from cadastros.models import Fiscal
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.template.loader import get_template
 from weasyprint import HTML, CSS
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import formset_factory
+from django.db.models.functions import Concat
+
 
 
 
@@ -370,126 +374,39 @@ def listar_produtividade(request):
     produtividades = Produtividade.objects.all()
     return render(request, 'empresas/listar_produtividade.html', {'produtividades': produtividades})
 
-
-from datetime import datetime
-from django.core.exceptions import ObjectDoesNotExist
-
-def criar_produtividade(request, protocolo_id):
-    protocolo_empresa = get_object_or_404(ProtocoloEmpresa, pk=protocolo_id)
-    acoes = AcaoProdutividade.objects.all()
-    fiscais = Fiscal.objects.all()
-    inspecao = None
-
-    try:
-        inspecao = protocolo_empresa.inspecao
-    except ObjectDoesNotExist:
-        pass
+def CreateProdutividade(request, inspecao_id):
+    inspecao = Inspecao.objects.get(id=inspecao_id)
+    ProdutividadeAcaoFormSet = formset_factory(ProdutividadeAcaoForm, extra=1)
+    ProdutividadeFiscalAuxiliarFormSet = formset_factory(ProdutividadeFiscalAuxiliarForm, extra=1)
     
     if request.method == 'POST':
         form = ProdutividadeForm(request.POST)
-        if form.is_valid():
-            if inspecao and Produtividade.objects.filter(inspecao=inspecao).exists():
-                form.add_error('inspecao', 'Uma produtividade para essa inspeção já existe.')
-            else:
-                produtividade = form.save(commit=False)
-                produtividade.fiscal_responsavel = protocolo_empresa.fiscal_responsavel
-                produtividade.inspecao = inspecao
-                produtividade.protocolo = protocolo_empresa
-                produtividade.save() 
-
-                for acao in acoes:
-                    multiplicador = form.cleaned_data.get(f'multiplicador-{acao.id}')
-                    if multiplicador is not None:
-                        AcaoProdutividadeRel.objects.update_or_create(
-                            acao=acao,
-                            produtividade=produtividade,
-                            defaults={'multiplicador': multiplicador},
-                        )
-                form.save_m2m()
-                fiscais_auxiliares = []
-                fiscais_ids = request.POST.getlist('fiscal')
-                for fiscal_id in fiscais_ids:
-                    try:
-                        fiscal = Fiscal.objects.get(id=fiscal_id)
-                    except Fiscal.DoesNotExist:
-                        continue
-                    data_fiscal_auxiliar_str = request.POST.get(f'data_fiscal_auxiliar-{fiscal.id}')
-                    if data_fiscal_auxiliar_str:
-                        try:
-                            data_fiscal_auxiliar = datetime.strptime(data_fiscal_auxiliar_str, "%Y-%m-%d").date()
-                        except ValueError:
-                            continue
-                        FiscalAuxiliarRel.objects.update_or_create(
-                            fiscal_auxiliar=fiscal,
-                            produtividade=produtividade,
-                            defaults={'data_fiscal_auxiliar': data_fiscal_auxiliar},
-                        )
-                       
-                    fiscais_auxiliares.append(fiscal)
-
-                return redirect('listar_produtividade')
-    else:
-        form = ProdutividadeForm(initial={'protocolo': protocolo_empresa, 'fiscal_responsavel': protocolo_empresa.fiscal_responsavel})
-
-    multiplicadores = [None for _ in range(acoes.count())]
-    context = {
-        'form': form,
-        'protocolo_empresa': protocolo_empresa,
-        'acoes': acoes,
-        'multiplicadores': multiplicadores,
-        'inspecao': inspecao,
-        'protocolo_empresa': protocolo_empresa,
-        'fiscal_responsavel': protocolo_empresa.fiscal_responsavel,
-        'titulo': 'Lançamento da produtividade', 
-        'botao': 'Salvar',
-        'fiscais': fiscais,
-    }
-
-    return render(request, 'empresas/form-produtividade.html', context)
-
-def editar_produtividade(request, id):
-    produtividade = get_object_or_404(Produtividade, id=id)
-    fiscais = Fiscal.objects.all()
-
-    # Otimização: usar a consulta direta para obter ações relacionadas
-    todas_acoes = AcaoProdutividade.objects.all()
-    acao_rels = AcaoProdutividadeRel.objects.filter(produtividade=produtividade)
-    acao_ids = [acao_rel.acao.id for acao_rel in acao_rels]
-    mapa_acao_multiplicador = {acao_rel.acao.id: acao_rel.multiplicador for acao_rel in acao_rels}
-
-    if request.method == 'POST':
-        form = ProdutividadeFormEdit(request.POST, instance=produtividade)
-        if form.is_valid():
-            form.save()
-
-            # Atualizar o método POST para lidar com o campo ações
-            acoes_ids = request.POST.getlist('acao')
-            produtividade.acoes.set(acoes_ids)
-
-            # Loop otimizado usando a consulta direta
-            for acao_rel in acao_rels:
-                multiplicador = request.POST.get('multiplicador_{}'.format(acao_rel.id))
-                if multiplicador:
-                    acao_rel.multiplicador = multiplicador
-                    acao_rel.save()
-
-            fiscais_auxiliares_ids = request.POST.getlist('fiscal_auxiliar')
-            produtividade.fiscais_auxiliar.set(fiscais_auxiliares_ids)
+        acao_formset = ProdutividadeAcaoFormSet(request.POST, prefix='acoes')
+        fiscal_formset = ProdutividadeFiscalAuxiliarFormSet(request.POST, prefix='fiscais')
+        
+        if form.is_valid() and acao_formset.is_valid() and fiscal_formset.is_valid():
+            produtividade = form.save(commit=False)
+            produtividade.inspecao = inspecao
             produtividade.save()
+            
+            for acao_form in acao_formset:
+                prod_acao = acao_form.save(commit=False)
+                prod_acao.produtividade = produtividade
+                prod_acao.save()
+                
+            for fiscal_form in fiscal_formset:
+                prod_fiscal = fiscal_form.save(commit=False)
+                prod_fiscal.produtividade = produtividade
+                prod_fiscal.save()
 
+            return redirect('empresas/listar_produtividade.html')
+            
     else:
-        form = ProdutividadeFormEdit(instance=produtividade)
-
-    return render(request, 'empresas/form-produtividade-editar.html', {
-        'form': form,
-        'fiscais': fiscais,
-        'acao_rels': acao_rels,  # Passando a consulta otimizada para o template
-        'protocolo_empresa': produtividade.protocolo,
-        'todas_acoes': todas_acoes,
-        'mapa_acao_multiplicador': mapa_acao_multiplicador,
-        'acao_ids': acao_ids,
-        'fiscal_responsavel': produtividade.fiscal_responsavel
-    })
+        form = ProdutividadeForm(initial={'inspecao': inspecao})
+        acao_formset = ProdutividadeAcaoFormSet(prefix='acoes')
+        fiscal_formset = ProdutividadeFiscalAuxiliarFormSet(prefix='fiscais')
+        
+    return render(request, 'empresas/form-produtividade.html', {'form': form, 'acao_formset': acao_formset, 'fiscal_formset': fiscal_formset})
 
 def get_pontos(request):
     acao_id = request.GET.get('acao_id', None)
@@ -501,6 +418,10 @@ def get_pontos(request):
         except AcaoProdutividade.DoesNotExist:
             pass
     return JsonResponse({'pontos': str(pontos)})
+
+def listar_produtividade(request):
+    produtividades = Produtividade.objects.all()
+    return render(request, 'empresas/listar_produtividade.html', {'produtividades': produtividades})
 
 def excluir_produtividade(request, id):
     produtividade = get_object_or_404(Produtividade, id=id)
@@ -692,10 +613,32 @@ def listar_risco_um(request):
         Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
         cnae_principal__risco_cnae__valor_risco=3
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     return render(request, 'empresas/listar_riscos_um.html', {'empresas': empresas})
+
 
 
 def listar_risco_um_pdf(request):
@@ -709,8 +652,29 @@ def listar_risco_um_pdf(request):
         Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
         cnae_principal__risco_cnae__valor_risco=3
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     context = {
         'empresas': empresas,
@@ -732,11 +696,32 @@ def listar_risco_dois(request):
     ).values('inspecao__data_inspecao')[:1]
 
     empresas = Empresas.objects.filter(
-        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        Q(status_funcionamento='ATIVA'),
         cnae_principal__risco_cnae__valor_risco=4
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     return render(request, 'empresas/listar_riscos_dois.html', {'empresas': empresas})
 
@@ -749,11 +734,32 @@ def listar_risco_dois_pdf(request):
     ).values('inspecao__data_inspecao')[:1]
 
     empresas = Empresas.objects.filter(
-        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        Q(status_funcionamento='ATIVA'),
         cnae_principal__risco_cnae__valor_risco=4
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     context = {
         'empresas': empresas,
@@ -776,11 +782,32 @@ def listar_risco_tres(request):
     ).values('inspecao__data_inspecao')[:1]
 
     empresas = Empresas.objects.filter(
-        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        Q(status_funcionamento='ATIVA'),
         cnae_principal__risco_cnae__valor_risco=5
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     return render(request, 'empresas/listar_riscos_tres.html', {'empresas': empresas})
 
@@ -793,11 +820,32 @@ def listar_risco_tres_pdf(request):
     ).values('inspecao__data_inspecao')[:1]
 
     empresas = Empresas.objects.filter(
-        Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),
+        Q(status_funcionamento='ATIVA'),
         cnae_principal__risco_cnae__valor_risco=5
     ).annotate(
-        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery)
-    )
+        inspecao_mais_recente=Subquery(ultimo_protocolo_subquery),
+        status_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+        ),
+        numero_protocolo=Subquery(
+            ProtocoloEmpresa.objects.filter(
+                empresa=OuterRef('pk')
+            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+         ),
+         primeiro_nome_fiscal=Subquery(
+             ProtocoloEmpresa.objects.filter(
+             empresa=OuterRef('pk')
+         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ),
+     ).annotate(
+         protocolo_aberto_fiscal=Case(
+         When(status_protocolo=4, then=Value('')),
+         default=Concat('numero_protocolo', Value(' - '), 'primeiro_nome_fiscal'),
+         output_field=CharField()
+         )
+     ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     context = {
         'empresas': empresas,
@@ -810,3 +858,35 @@ def listar_risco_tres_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename=empresas_cnae_pdf.html'
     return response
+
+
+def listar_vigiriscos_2023(request):
+    inspecoes_2023 = Inspecao.objects.filter(data_inspecao__year=2023)
+    protocolos_com_inspecoes_2023 = ProtocoloEmpresa.objects.filter(
+        inspecao__in=inspecoes_2023
+    )
+    empresas = Empresas.objects.prefetch_related(
+        Prefetch('protocoloempresa_set', queryset=protocolos_com_inspecoes_2023, to_attr='protocolos_2023')
+    ).order_by('razao')
+    context = {'empresas': empresas}
+    return render(request, 'empresas/listar_vigiriscos_2023.html', context)
+
+
+def listar_vigiriscos_2023_pdf(request):
+    inspecoes_2023 = Inspecao.objects.filter(data_inspecao__year=2023)
+    protocolos_com_inspecoes_2023 = ProtocoloEmpresa.objects.filter(
+        inspecao__in=inspecoes_2023
+    )
+    empresas = Empresas.objects.prefetch_related(
+        Prefetch('protocoloempresa_set', queryset=protocolos_com_inspecoes_2023, to_attr='protocolos_2023')
+    ).order_by('razao')
+    context = {'empresas': empresas}
+    html_template = get_template('empresas/listar_vigiriscos_2023_pdf.html').render(context)
+    html = HTML(string=html_template)
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=vigiriscos_2023_pdf.html'
+    return response
+
+

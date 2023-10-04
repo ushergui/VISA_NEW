@@ -505,22 +505,29 @@ def consulta_atendimentos(request):
     total_obitos_periodo = Paciente.objects.filter(status="ÓBITO", data_obito__range=[data_inicial, data_final]).count()
     total_altas_periodo = Paciente.objects.filter(status="ALTA", data_alta__range=[data_inicial, data_final]).count()
     
-    if nome_fisioterapeuta:
-        atendimentos = atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
+    detalhes_atendimentos = Atendimento.objects.filter(
+    data_atendimento__range=[data_inicial, data_final]
+    ).values(
+    'data_atendimento',
+    'prescricao__paciente__nome_paciente',
+    'fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta'
+    ).order_by('data_atendimento', 'prescricao__paciente__nome_paciente') 
 
+    if nome_fisioterapeuta:
+        detalhes_atendimentos = detalhes_atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
+   
     ids_atendimentos_interesse = atendimentos.values_list('id', flat=True)
 
     modos_de_uso = ModoDeUso.objects.filter(atendimentos__id__in=ids_atendimentos_interesse)
-
-    atendimentos_por_finalidade = modos_de_uso.values(
-        finalidade=F('equipamento__finalidade_equipamento__finalidade')
-    ).annotate(total=Count('paciente', distinct=True))
 
     # Inicialmente, crie um conjunto vazio para armazenar os IDs dos pacientes atendidos.
     pacientes_atendidos = set()
 
     # Filtre todos os atendimentos no período desejado.
     atendimentos_no_periodo = Atendimento.objects.filter(data_atendimento__range=[data_inicial, data_final])
+
+    if nome_fisioterapeuta:
+        atendimentos_no_periodo = atendimentos_no_periodo.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
 
     # Obtenha os IDs de pacientes únicos desse filtro.
     ids_pacientes_unicos = atendimentos_no_periodo.values_list('prescricao__paciente__id', flat=True).distinct()
@@ -529,7 +536,7 @@ def consulta_atendimentos(request):
     pacientes_atendidos.update(ids_pacientes_unicos)
 
     # O total de atendimentos agora será o tamanho deste conjunto.
-    total_atendimentos = len(pacientes_atendidos)
+    total_atendimentos = atendimentos_no_periodo.count()
 
     inicio_contagem = date(2013, 1, 1)
     total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).count()
@@ -548,8 +555,8 @@ def consulta_atendimentos(request):
         'mes_pesquisa': mes,
         'fisioterapeuta_pesquisa': nome_fisioterapeuta,
         'total_atendimentos': total_atendimentos,
-        'atendimentos_por_finalidade': atendimentos_por_finalidade,
         'total_obitos_periodo': total_obitos_periodo,
+        'detalhes_atendimentos': detalhes_atendimentos,
         'total_altas_periodo': total_altas_periodo,
         'total_ativos_periodo': total_ativos_periodo,
         'total_ativos': total_ativos,
@@ -570,22 +577,29 @@ def consulta_atendimentos_pdf(request):
     total_obitos_periodo = Paciente.objects.filter(status="ÓBITO", data_obito__range=[data_inicial, data_final]).count()
     total_altas_periodo = Paciente.objects.filter(status="ALTA", data_alta__range=[data_inicial, data_final]).count()
     
-    if nome_fisioterapeuta:
-        atendimentos = atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
+    detalhes_atendimentos = Atendimento.objects.filter(
+    data_atendimento__range=[data_inicial, data_final]
+    ).values(
+    'data_atendimento',
+    'prescricao__paciente__nome_paciente',
+    'fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta'
+    ).order_by('data_atendimento', 'prescricao__paciente__nome_paciente') 
 
+    if nome_fisioterapeuta:
+        detalhes_atendimentos = detalhes_atendimentos.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
+   
     ids_atendimentos_interesse = atendimentos.values_list('id', flat=True)
 
     modos_de_uso = ModoDeUso.objects.filter(atendimentos__id__in=ids_atendimentos_interesse)
-
-    atendimentos_por_finalidade = modos_de_uso.values(
-        finalidade=F('equipamento__finalidade_equipamento__finalidade')
-    ).annotate(total=Count('paciente', distinct=True))
 
     # Inicialmente, crie um conjunto vazio para armazenar os IDs dos pacientes atendidos.
     pacientes_atendidos = set()
 
     # Filtre todos os atendimentos no período desejado.
     atendimentos_no_periodo = Atendimento.objects.filter(data_atendimento__range=[data_inicial, data_final])
+
+    if nome_fisioterapeuta:
+        atendimentos_no_periodo = atendimentos_no_periodo.filter(fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta=nome_fisioterapeuta)
 
     # Obtenha os IDs de pacientes únicos desse filtro.
     ids_pacientes_unicos = atendimentos_no_periodo.values_list('prescricao__paciente__id', flat=True).distinct()
@@ -594,7 +608,7 @@ def consulta_atendimentos_pdf(request):
     pacientes_atendidos.update(ids_pacientes_unicos)
 
     # O total de atendimentos agora será o tamanho deste conjunto.
-    total_atendimentos = len(pacientes_atendidos)
+    total_atendimentos = atendimentos_no_periodo.count()
 
     inicio_contagem = date(2013, 1, 1)
     total_ativos_periodo = ModoDeUso.objects.filter(data_inicio_uso__range=[inicio_contagem, data_final]).count()
@@ -613,8 +627,8 @@ def consulta_atendimentos_pdf(request):
         'mes_pesquisa': mes,
         'fisioterapeuta_pesquisa': nome_fisioterapeuta,
         'total_atendimentos': total_atendimentos,
-        'atendimentos_por_finalidade': atendimentos_por_finalidade,
         'total_obitos_periodo': total_obitos_periodo,
+        'detalhes_atendimentos': detalhes_atendimentos,
         'total_altas_periodo': total_altas_periodo,
         'total_ativos_periodo': total_ativos_periodo,
         'total_ativos': total_ativos,
@@ -817,6 +831,9 @@ def relatorio_para_visita(request):
     # Aplicar filtros se eles foram fornecidos
     if fisioterapeuta_id:
         modos_uso = modos_uso.filter(paciente__usf_paciente__nome_fisioterapeuta__id=fisioterapeuta_id)
+        fisioterapeuta_nome = Fisioterapeuta.objects.get(id=fisioterapeuta_id).nome_fisioterapeuta
+    else:
+        fisioterapeuta_nome = None
 
     if equipamento:
         modos_uso = modos_uso.filter(equipamento__finalidade_equipamento__agrupamento=equipamento)
@@ -839,6 +856,7 @@ def relatorio_para_visita(request):
         'fisioterapeutas': fisioterapeutas,
         'equipamentos': equipamentos,
         'fisioterapeuta_pesquisa': fisioterapeuta_id,
+        'fisioterapeuta_nome': fisioterapeuta_nome,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
         'data_atendimento_dict': data_atendimento_dict,
@@ -867,6 +885,9 @@ def relatorio_para_visita_pdf(request):
     # Aplicar filtros se eles foram fornecidos
     if fisioterapeuta_id:
         modos_uso = modos_uso.filter(paciente__usf_paciente__nome_fisioterapeuta__id=fisioterapeuta_id)
+        fisioterapeuta_nome = Fisioterapeuta.objects.get(id=fisioterapeuta_id).primeiro_nome_fisioterapeuta
+    else:
+        fisioterapeuta_nome = None
 
     if equipamento:
         modos_uso = modos_uso.filter(equipamento__finalidade_equipamento__agrupamento=equipamento)
@@ -882,13 +903,14 @@ def relatorio_para_visita_pdf(request):
     ).values('paciente__id', 'data_atendimento_recente')
 
     data_atendimento_dict = {item['paciente__id']: item['data_atendimento_recente'] for item in data_atendimento_recente}
-    
+
     context = {
         'modos_uso_por_paciente': dict(modos_uso_por_paciente),
         'modos_uso': modos_uso,
         'fisioterapeutas': fisioterapeutas,
         'equipamentos': equipamentos,
         'fisioterapeuta_pesquisa': fisioterapeuta_id,
+        'fisioterapeuta_nome': fisioterapeuta_nome,
         'equipamento_pesquisa': equipamento,
         'busca_submetida': busca_submetida,  # Adicionando a variável no contexto
         'data_atendimento_dict': data_atendimento_dict,

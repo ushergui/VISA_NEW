@@ -166,39 +166,29 @@ class AcaoProdutividade(models.Model):
 
     def __str__(self):
         return f"{self.codigo_produtividade} - {self.acao}"
-
+    
 class AcaoProdutividadeRel(models.Model):
-    acao = models.ForeignKey(AcaoProdutividade, on_delete=models.CASCADE)
-    produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE) 
-    multiplicador = models.DecimalField(max_digits=3, decimal_places=1, verbose_name="Multiplicador")
-
-    def __str__(self):
-        return f"{self.acao} (multiplicador: {self.multiplicador})"
+    produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE)
+    acao_produtividade = models.ForeignKey(AcaoProdutividade, on_delete=models.CASCADE)
+    multiplicador = models.DecimalField(max_digits=5, decimal_places=1)
 
 class FiscalAuxiliarRel(models.Model):
-    fiscal_auxiliar = models.ForeignKey(Fiscal, on_delete=models.CASCADE)
     produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE)
-    data_fiscal_auxiliar = models.DateField(null=False, blank=False)
+    fiscal = models.ForeignKey(Fiscal, on_delete=models.CASCADE)
+    data_fiscal_auxiliar = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
 
 class Produtividade(models.Model):
-    protocolo = models.ForeignKey(ProtocoloEmpresa, on_delete=models.PROTECT)
-    acoes = models.ManyToManyField(AcaoProdutividade, through=AcaoProdutividadeRel, verbose_name="Ações de Produtividade")
     total = models.DecimalField(max_digits=5, decimal_places=1, verbose_name="Total de Pontos", null=True, blank=True)
-    data_saida_fiscal = models.DateField(null=False, blank=False, verbose_name="Data de Saída do Fiscal")
     tempo_gasto = models.DecimalField(max_digits=2, decimal_places=1, verbose_name="Tempo gasto")
     mes_produtividade = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
     inspecao = models.OneToOneField(Inspecao, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Inspeção")
-    fiscal_responsavel = models.ForeignKey(Fiscal, on_delete=models.PROTECT, blank=True, null=True)
-    fiscais_auxiliar = models.ManyToManyField(Fiscal, through=FiscalAuxiliarRel, related_name='fiscais_auxiliares', blank=True)
+    validacao = models.BooleanField(default=False)
+    acoes = models.ManyToManyField(AcaoProdutividade, through=AcaoProdutividadeRel)
+    fiscal_auxiliar = models.ManyToManyField(Fiscal, through=FiscalAuxiliarRel, related_name="Fiscal_auxiliar")
     validacao = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
-        if self.protocolo and not self.fiscal_responsavel:
-            self.fiscal_responsavel = self.protocolo.fiscal_responsavel
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f"Produtividade do protocolo {self.protocolo.numero_protocolo}"
+        return f"Produtividade da inspecao {self.inspecao}"
     
 
 

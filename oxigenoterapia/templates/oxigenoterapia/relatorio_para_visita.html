@@ -9,7 +9,7 @@
     <div class="form-group">
         <label for="q3" class="mr-2">Fisioterapeuta</label>
         <select name="fisioterapeuta" id="q3" class="form-control-sm mr-4">
-            <option value="">--Escolha um fisioterapeuta--</option>
+            
             {% for fisioterapeuta in fisioterapeutas %}
             <option value="{{ fisioterapeuta.id }}" {% if fisioterapeuta_pesquisa == fisioterapeuta.id %} selected {% endif %}>{{ fisioterapeuta.primeiro_nome_fisioterapeuta }}</option>
             {% endfor %}

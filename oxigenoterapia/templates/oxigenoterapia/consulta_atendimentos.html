@@ -35,29 +35,14 @@
     <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
         <thead>
             <tr>
-                <th style="text-align: center">TIPO DE EQUIPAMENTO</th>
-                <th style="text-align: center">ATENDIMENTOS NO PERÍODO</th>
+                <th style="text-align: center">TOTAL GERAL DE ATENDIMENTOS</th>
+                <th style="text-align: center">{{ total_atendimentos }}</th>
             </tr>
         </thead>
-        <tbody>
-            {% for atendimento in atendimentos_por_finalidade %}
-                <tr>
-                    <td style="text-align: center">{{ atendimento.finalidade }}</td>
-                    <td style="text-align: center">{{ atendimento.total }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2" style="text-align: center">Nenhum atendimento registrado para este período.</td>
-                </tr>
-            {% endfor %}
-            <tr>
-                <td style="text-align: center">TOTAL GERAL DE ATENDIMENTOS</td>
-                <td style="text-align: center">{{ total_atendimentos }}</td>
-            </tr>
-        </tbody>
+
     </table>
 </div>
-<div class="table-container table-responsive" style="margin-top: 20px;">
+<div class="table-container table-responsive">
     <table class="table table-striped" id="tabela-pacientes" style="font-size: 11px;">
         <thead>
             <tr>
@@ -87,7 +72,29 @@
         </tbody>
     </table>
 </div>
+
+
+<div class="table-container2 table-responsive">
+    <table class="table table-striped" id="tabela-detalhes" style="font-size: 11px;">
+        <thead>
+            <tr>
+                <th style="text-align: center">Data do Atendimento</th>
+                <th style="text-align: center">Nome do Paciente</th>
+                <th style="text-align: center">Fisioterapeuta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalhe in detalhes_atendimentos %}
+                <tr>
+                    <td style="text-align: center">{{ detalhe.data_atendimento|date:"d/m/Y" }}</td>
+                    <td style="text-align: center">{{ detalhe.prescricao__paciente__nome_paciente|capitalize_name }}</td>
+                    <td style="text-align: center">{{ detalhe.fisioterapeuta_atendimento__primeiro_nome_fisioterapeuta|capitalize_name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+
 <div class="text-center mt-4">
     <a href="{% url 'consulta_atendimentos_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
         <i class="fas fa-file-pdf"></i> Gerar PDF

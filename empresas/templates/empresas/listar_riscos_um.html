@@ -1,5 +1,5 @@
 {% extends 'basy.html' %}
-
+{% load custom_filters %}
 {% block conteudo %}
 <style>
     #tabela-listar td, #tabela-listar th {
@@ -18,14 +18,13 @@
             <th>CNAE Principal</th>
             <th>Inspeção</th>
             <th>Meta</th>
-            <th>Risco</th>
-            <th>Ação</th>
+            <th>Protocolo aberto - Fiscal</th>
         </tr>
     </thead>
     <tbody>
         {% for empresa in empresas %}
         <tr>
-            <td>{{ empresa.razao }}</td>
+            <td><a href="{% url 'detalhe_empresa' empresa.id %}">{{ empresa.razao|capitalize_name }}</td>
             <td>{% if empresa.mei == False %} Não {% else %}Sim {% endif %}</td>
             <td>{% if empresa.alvara %}{{ empresa.alvara|date:"d/m/Y" }}{% else %}{% endif %}</td>
             <td>{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>
@@ -48,8 +47,14 @@
                 {% endif %}
             </td>
             
-            <td>{{ empresa.risco_empresa }}</td>
-            <td><a class="btn btn-primary" title="Detalhe" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a></td>
+            <td>
+                <a href="{% url 'detalhe_empresa' empresa.id %}">
+                {% if empresa.status_protocolo != 4 %}
+                    {{ empresa.protocolo_aberto_fiscal|capitalize_name }}
+                {% endif %}
+                </a>
+            </td>
+            
         </tr>
     {% empty %}
         <tr>

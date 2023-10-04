@@ -9,44 +9,12 @@
 {% block conteudo %}
 <div class="form-container-3">
     <h3 class="text-center"> {{ titulo }}</h3>
-<hr>
-<form method="post">
-    {% csrf_token %}
-    <label>Protocolo: <strong>{{ protocolo_empresa }}</strong></label><br>
-    <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label><br>
-        {% if inspecao %}
-        <label>Inspeção: <strong>Sim</strong></label>
-    {% else %}
-    <label>Não há inspeção neste protocolo</label>
-    {% endif%}
-    <br>
-    
-
-    {% for acao in todas_acoes %}
-    <input type="checkbox" name="acao" value="{{ acao.id }}" {% if acao.id in mapa_acao_multiplicador.keys %}checked{% endif %}>
-    <label>{{ acao.acao }}</label>
-    <label for="multiplicador">Multiplicador:</label>
-    <input type="number" name="multiplicador_{{ acao.id }}" value="{{ mapa_acao_multiplicador.acao.id|default:'' }}">
-
-    <br>
-    {% endfor %}
-    <p>{{ form.total|as_crispy_field }}</p>
-    <p>{{ form.tempo_gasto|as_crispy_field }}</p>
-    <p>{{ form.mes_produtividade|as_crispy_field }}</p>
-    <p>{{ form.data_saida_fiscal|as_crispy_field }}</p>
-    <label>Fiscais Auxiliares:</label><br>
-    {% for fiscal in fiscais %}
-    <input type="checkbox" name="fiscal_auxiliar" value="{{ fiscal.id }}" {% if fiscal in produtividade.fiscais_auxiliar.all %}checked{% endif %}>
-    <label>{{ fiscal.nome_fiscal }}</label><br>
-    {% endfor %}
-    
-    <br>
-    <button type="submit" class="btn btn-primary center-button">
-        Salvar
-    </button>
-</form>
-
-
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit">Salvar</button>
+      </form>
 </div>
 {% endblock %}
 
@@ -56,7 +24,7 @@
     
 
     $(document).ready(function() {
-    $('.form-check-input').change(function() {
+        $(".form-check-input:checked").each(function() {
         var acaoId = $(this).val();
         var multiplicadorField = $('#multiplicador-' + acaoId);
         var totalmultiplicadoField = $('#totalmultiplicado-' + acaoId);

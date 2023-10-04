@@ -24,6 +24,8 @@ urlpatterns = [
     path('empresas/excluir/<int:id>/', views.excluir_empresa, name='excluir_empresa'),
     path('empresa/<int:empresa_id>/', views.detalhe_empresa, name='detalhe_empresa'),
 
+    path('create_produtividade/<int:inspecao_id>/', views.CreateProdutividade, name='create_produtividade'),
+    
 
     path('risco/listar/', views.listar_risco, name='listar_risco'),
     path('risco/cadastrar/', views.cadastrar_risco, name='cadastrar_risco'),
@@ -50,13 +52,11 @@ urlpatterns = [
 
     path('acao-produtividade/', views.listar_acao_produtividade, name='listar_acao_produtividade'),
     path('acao-produtividade/novo', views.criar_acao_produtividade, name='criar_acao_produtividade'),
-    path('acao-produtividade/editar/<int:id>/', views.editar_acao_produtividade, name='editar_acao_produtividade'),
     path('acao-produtividade/excluir/<int:id>/', views.excluir_acao_produtividade, name='excluir_acao_produtividade'),
-
+    path('acao-produtividade/editar/<int:id>/', views.editar_acao_produtividade, name='editar_acao_produtividade'),
     path('produtividade/', views.listar_produtividade, name='listar_produtividade'),
-    path('produtividade/novo/<int:protocolo_id>/', views.criar_produtividade, name='criar_produtividade'),
-    path('produtividade/editar/<int:id>/', views.editar_produtividade, name='editar_produtividade'),
-    path('produtividade/excluir/<int:id>/', views.excluir_produtividade, name='excluir_produtividade'),
+
+
     path('get_pontos/', get_pontos, name='get_pontos'),
     path('lista_empresas_cnae/', views.EmpresasCnaeListView.as_view(), name='lista_empresas_cnae'),
     path('lista_empresas_endereco/', views.EmpresasEnderecoListView.as_view(), name='lista_empresas_endereco'),
@@ -71,5 +71,7 @@ urlpatterns = [
     path('listar_risco_dois_pdf/', listar_risco_dois_pdf, name='listar_risco_dois_pdf'),
     path('listar_risco_tres/', listar_risco_tres, name='listar_risco_tres'),
     path('listar_risco_tres_pdf/', listar_risco_tres_pdf, name='listar_risco_tres_pdf'),
+    path('listar_vigiriscos_2023/', views.listar_vigiriscos_2023, name='listar_vigiriscos_2023'),
+    path('listar_vigiriscos_2023_pdf/', views.listar_vigiriscos_2023_pdf, name='listar_vigiriscos_2023_pdf'),
 
 ]

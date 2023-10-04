@@ -10,70 +10,18 @@
 <div class="form-container-3">
     <h3 class="text-center"> {{ titulo }}</h3>
 <hr>
-<form method="POST">
+<form method="post">
     {% csrf_token %}
-    <label>Protocolo: <strong>{{ protocolo_empresa }}</strong></label><br>
-    <label>Fiscal responsável: <strong>{{ fiscal_responsavel }}</strong></label><br>
-    {% if inspecao %}
-    <label>Inspeção: <strong>Sim</strong></label>
-    {% else %}
-    <label>Não há inspeção neste protocolo</label>
-    {% endif%}
-    <!-- Exibindo o campo inspecao -->
-    
-    {% for acao, multiplicador in acoes|zip_lists:multiplicadores %}
-<div class="acao-row">
-    <div class="acao-check">
-        <input type="checkbox" class="form-check-input" id="acao-{{ acao.id }}" name="acoes" value="{{ acao.id }}" {% if acao.id in produtividade_acoes_ids %}checked{% endif %}>
-    </div>
-    <label class="acao-label" for="acao-{{ acao.id }}" class="form-check-label">{{ acao }}</label>
-    <div class="acao-multiplicador">
-        <label for="{{ multiplicador }}" class="form-label">Multiplicador: </label>
-        <input type="number" class="multiplicador-field" id="multiplicador-{{ acao.id }}" name="multiplicador-{{ acao.id }}" value="{{ multiplicador }}">
-    </div>
-    <div class="acao-total">
-        <label for="totalmultiplicado">Total: </label>
-        <input type="number" class="totalmultiplicado" id="totalmultiplicado-{{ acao.id }}">
-    </div>
-</div>
+    {{ form|crispy }}
+    {% for acao_form in acao_formset %}
+    {{ acao_form|crispy }}
 {% endfor %}
 
-
-<input type="hidden" name="inspecao" value="{{ inspecao.id|default_if_none:'' }}">
-<input type="hidden" name="protocolo" value="{{ protocolo_empresa.id }}">
-
-   
-    <p>{{ form.total|as_crispy_field }}</p>
-    <p>{{ form.tempo_gasto|as_crispy_field }}</p>
-    <p>{{ form.mes_produtividade|as_crispy_field }}</p>
-    <p>{{ form.data_saida_fiscal|as_crispy_field }}</p>
-
-    {% for fiscal in fiscais %}
-    <div class="acao-row">
-        <div class="acao-check">
-        <input type="checkbox" name="fiscal" value="{{ fiscal.id }}" id="id_fiscal_{{ fiscal.id }}">
-        </div>
-        
-        <label>{{ fiscal.primeiro_nome|capitalize_name }}:</label>
-        <div class="acao-fiscal">
-        <input type="date" name="data_fiscal_auxiliar-{{ fiscal.id }}" id="id_data_fiscal_auxiliar-{{ fiscal.id }}">
-        </div>  
-
-    </div>
+{% for fiscal_form in fiscal_formset %}
+    {{ fiscal_form|crispy }}
 {% endfor %}
-{% if form.inspecao.errors %}
-<br>
-<div class="alert alert-danger" role="alert">
-    {{ form.inspecao.errors }}
-</div>
-{% endif %}
-    <br>
-
-    <button type="submit" class="btn btn-primary center-button">
-        {{ botao }}
-    </button>
-
-</form>
+    <button type="submit">Salvar</button>
+  </form>
 
 </div>
 {% endblock %}
