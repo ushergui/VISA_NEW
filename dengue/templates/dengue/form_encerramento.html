@@ -98,12 +98,6 @@
     });
 
 
-    $(document).ready(function() {
-        $('#id_observacoes').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
-        $(this).val(textoSemAcentos);
-        });
-    });
 
     $(document).ready(function() {
         $('#id_responsavel_legal').on('keyup', function() {

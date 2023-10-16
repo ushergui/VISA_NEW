@@ -72,7 +72,9 @@ Personalização da Barra de menu pra ficar igual do site
 
 .navbar a.nav-link{
     color: white !important;
+    white-space: nowrap;
 }
+
 
 .navbar .nav-item{
     padding: 3px 5px;
@@ -98,3 +100,4 @@ Largura máxima das tabelas para não ficar mal formatada
 table td{
     max-width: 500px;
 }
+

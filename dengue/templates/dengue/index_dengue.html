@@ -11,44 +11,9 @@
 <br>
 
 <div class="row">
-  <div class="col-6">
-    <h4>Agendados por dia</h4>
-    <form class="form-inline" action="{% url 'agendados' %}" method="get">
-      <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" id="agendados" placeholder="Digite a data do agendamento" size="58">
-      </div>
-      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-    </form>
-
-    <br>
-    <h4>Total de notificações das últimas 4 semanas</h4>
-    <form class="form-inline" action="{% url 'listar_notificacoes_gerais' %}" method="get">
-      <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
-      </div>
-      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-    </form>
-    <br>
-      <h4>Agendamentos motorista</h4>
-<form class="form-inline" action="{% url 'motorista' %}" method="get">
-  <div class="form-group mx-sm-1 mb-2">
-    <input class="form-control-sm" type="text" id="motorista" name="q" placeholder="Digite a data do agendamento" size="58">
-  </div>
-  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-</form>
-  </div>
 
   <div class="col-6">
-    <h4>Positivos das últimas 4 semanas</h4>
-    <form class="form-inline" action="{% url 'listar_notificacoes' %}" method="get">
-      <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
-      </div>
-      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-    </form>
 
-    <br>
-	
     <h4>Notificações por bairro nas últimas 4 semanas</h4>
     <form class="form-inline" action="{% url 'total_bairros' %}" method="get">
       <div class="form-group mx-sm-1 mb-2">
@@ -97,16 +62,7 @@
     </div>
     <button type="submit" class="btn btn-primary btn-sm">Pesquisar</button>
 </form>
-<br>
-<h4>Positivos por bairro nas últimas 4 semanas</h4>
-    <form class="form-inline" action="{% url 'total_bairros_positivos' %}" method="get">
-      <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
-      </div>
-      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-    </form>
 
-      <br>
 {% endblock %}
 
 {% block scripts %}

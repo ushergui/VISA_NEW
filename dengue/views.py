@@ -93,29 +93,43 @@ def total_bairros(request):
 
     return render(request, 'dengue/total_por_bairros.html', context)
     
-def total_bairros_positivos(request):
-    search_query = request.GET.get('q')
-    if search_query:
+def positivos_bairros(request):
+    semana = request.GET.get('semana')
+    ano = request.GET.get('ano')
+    
+    notificacoes = None
+    pesquisa_realizada = False  # Inicializa a variável como False
+    if semana and ano:
+        pesquisa_realizada = True
         try:
-            semana_atual = int(search_query)
-            ultimas_4_semanas = [semana_atual - i for i in range(4)]
+            semana = int(semana)
+            ano = int(ano)
             notificacoes = Notificacao.objects.filter(
-                semana_epidemiologica__in=ultimas_4_semanas,
+                semana_epidemiologica__semana=semana,
+                semana_epidemiologica__ano=ano,
                 resultado__in=["Positivo NS1", "Positivo sorologia", "Isolamento viral positivo"]
             ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
-    else:
-        notificacoes = Notificacao.objects.filter(
-            resultado__in=["Positivo NS1", "Positivo sorologia", "Isolamento viral positivo"]
-        ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
 
+    semana_menos_1 = semana - 1 if semana else None
+    semana_menos_2 = semana - 2 if semana else None
+    semana_menos_3 = semana - 3 if semana else None
+    
     context = {
         'notificacoes': notificacoes,
-        'termo_pesquisa': search_query
+        'termo_pesquisa': semana,
+        'ano_pesquisa': ano,
+        'semana': semana,
+        'semana_menos_1': semana_menos_1,
+        'semana_menos_2': semana_menos_2,
+        'semana_menos_3': semana_menos_3,
+        'pesquisa_realizada': pesquisa_realizada,
+        'ano': ano,
     }
 
-    return render(request, 'dengue/total_por_bairros.html', context)
+    return render(request, 'dengue/positivos_bairros.html', context)
+
 
 def criar_notificacao(request):
     if request.method == 'POST':
@@ -315,8 +329,9 @@ def api_semanas(request):
 
 def motorista(request):
     termo_pesquisa = request.GET.get('q', None)
-    agendamentos = []
+    agendamentos = None  # Altere para None
 
+    desconhecidos = None  # Adicione esta linha
     if termo_pesquisa:
         try:
             data_formatada = datetime.strptime(termo_pesquisa, '%d/%m/%Y').date()
@@ -330,13 +345,20 @@ def motorista(request):
         except ValueError:
             # Você pode definir uma mensagem de erro para exibir no template, se desejar.
             pass
+        desconhecidos = (
+            Notificacao.objects
+            .filter(data_agendamento=data_formatada, usf__isnull=True)
+            
+        )
 
     context = {
         'termo_pesquisa': termo_pesquisa,
         'agendamentos': agendamentos,
+        'desconhecidos': desconhecidos,
     }
 
     return render(request, 'dengue/motorista.html', context)
+
 
 
 def agendados(request):
@@ -350,7 +372,7 @@ def agendados(request):
             notificacoes = Notificacao.objects.none()
             messages.error(request, "O valor informado tem um formato de data inválido. Deve ser no formato DD/MM/YYYY.")
     else:
-        notificacoes = Notificacao.objects.all()
+        notificacoes = Notificacao.objects.none()
 
     context = {
         'notificacoes': notificacoes,
@@ -362,6 +384,15 @@ def agendados(request):
 
 def aguardando_resultados(request):
     notificacoes = Notificacao.objects.filter(resultado='Aguardando resultado')
+    return render(request, 'dengue/aguardando_resultados.html', {'notificacoes': notificacoes})
+
+def aguardando_ou_nao_agendado(request):
+    notificacoes = Notificacao.objects.filter(
+        Q(resultado='Aguardando resultado') | 
+        Q(resultado='Aguardando agendamento') |
+        Q(resultado='Aguardando coleta') |
+        Q(resultado='Não agendado')
+    )
     return render(request, 'dengue/aguardando_resultados.html', {'notificacoes': notificacoes})
 
 def pesquisar_notificacoes(request):
@@ -405,3 +436,153 @@ def encerrar_notificacao(request, pk):
     return render(request, 'dengue/form_encerramento.html', {'form': form})
 
 
+def notificacoes_recentes(request):
+    erro_msg = None
+    tabela_notificacoes = []
+
+    if request.method == 'GET' and 'semana' in request.GET and 'ano' in request.GET:
+        semana = request.GET.get('semana')
+        ano = request.GET.get('ano')
+
+        if semana and ano:
+            semanas_pesquisa = [int(semana) - i for i in range(4) if int(semana) - i > 0]
+            tabela_notificacoes = Notificacao.objects.filter(
+                semana_epidemiologica__semana__in=semanas_pesquisa,
+                semana_epidemiologica__ano=ano
+            ).order_by('nome')
+
+            if not tabela_notificacoes:
+                erro_msg = "Nenhuma notificação encontrada no período"
+        else:
+            erro_msg = "Ambos os campos, semana e ano, são obrigatórios."
+
+    return render(request, 'dengue/notificacoes_recentes.html', {
+        'tabela_notificacoes': tabela_notificacoes,
+        'erro_msg': erro_msg
+    })
+
+def chikungunya(request):
+    erro_msg = None
+    tabela_notificacoes = None  # Inicialmente definido como None
+
+    if request.method == 'GET':
+        semana = request.GET.get('semana')
+        ano = request.GET.get('ano')
+
+        if semana and ano:
+            semanas_pesquisa = [int(semana) - i for i in range(4) if int(semana) - i > 0]
+            tabela_notificacoes = Notificacao.objects.filter(
+                semana_epidemiologica__semana__in=semanas_pesquisa,
+                semana_epidemiologica__ano=ano,
+                classificacao='Chikungunya'
+            ).order_by('nome')
+
+            if not tabela_notificacoes:
+                erro_msg = "Nenhuma notificação encontrada no período"
+
+        elif semana and not ano:
+            erro_msg = "É necessário digitar um ano."
+
+        elif ano and not semana:
+            tabela_notificacoes = Notificacao.objects.filter(
+                semana_epidemiologica__ano=ano,
+                classificacao='Chikungunya'
+            ).order_by('nome')
+
+            if not tabela_notificacoes:
+                erro_msg = "Nenhuma notificação encontrada no período"
+
+        elif not semana and not ano and request.GET:
+            erro_msg = "É necessário digitar pelo menos o ano."
+
+    return render(request, 'dengue/chikungunya.html', {
+        'tabela_notificacoes': tabela_notificacoes,
+        'erro_msg': erro_msg
+    })
+
+def internados(request):
+    erro_msg = None
+    tabela_notificacoes = None
+
+    formulario_enviado = 'semana' in request.GET or 'ano' in request.GET  # Aqui é onde detectamos se o formulário foi enviado
+
+    if request.method == 'GET':
+        semana = request.GET.get('semana')
+        ano = request.GET.get('ano')
+
+        # Base para todas as queries
+        base_query = Notificacao.objects.exclude(internacao__isnull=True).order_by('nome')
+
+        if semana and ano:
+            semanas_pesquisa = [int(semana) - i for i in range(4) if int(semana) - i > 0]
+            tabela_notificacoes = base_query.filter(
+                semana_epidemiologica__semana__in=semanas_pesquisa,
+                semana_epidemiologica__ano=ano,
+            )
+        elif semana and not ano:
+            erro_msg = "É necessário digitar um ano."
+        elif ano and not semana:
+            tabela_notificacoes = base_query.filter(
+                semana_epidemiologica__ano=ano,
+            )
+        elif not semana and not ano and formulario_enviado:
+            erro_msg = "É necessário digitar pelo menos o ano."
+
+        if tabela_notificacoes and not tabela_notificacoes.exists():
+            erro_msg = "Nenhuma notificação encontrada no período"
+
+    return render(request, 'dengue/internados.html', {
+        'tabela_notificacoes': tabela_notificacoes,
+        'erro_msg': erro_msg,
+        'formulario_enviado': formulario_enviado
+    })
+
+
+def positivos_recentes(request):
+    erro_msg = None
+    tabela_notificacoes = []
+    total_notificacoes = 0
+    formulario_submetido = False
+    
+    if request.method == 'GET':
+        semana = request.GET.get('semana')
+        ano = request.GET.get('ano')
+        print(semana, ano)
+        
+        if semana is not None or ano is not None:
+            formulario_submetido = True
+
+        if semana and ano:
+            try:
+                semana = int(semana)
+                ano = int(ano)
+            except ValueError:
+                erro_msg = "Os campos semana e ano devem ser numéricos."
+                return render(request, 'dengue/positivos_recentes.html', {'erro_msg': erro_msg})
+            
+            # Validação de semana e ano
+            if semana < 1 or semana > 52:
+                erro_msg = "A semana deve estar entre 1 e 52."
+            elif ano < 2022:  # Supondo que 2022 é o ano mínimo permitido
+                erro_msg = "O ano não pode ser menor que 2022."
+            
+            if erro_msg is None:
+                semanas_pesquisa = [semana - i for i in range(4) if semana - i > 0]
+                tabela_notificacoes = Notificacao.objects.filter(
+                    semana_epidemiologica__semana__in=semanas_pesquisa,
+                    semana_epidemiologica__ano=ano,
+                    resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']
+                ).order_by('nome')
+                total_notificacoes = tabela_notificacoes.count()
+                if total_notificacoes == 0:
+                        erro_msg = "Nenhuma notificação encontrada no período especificado."
+        elif formulario_submetido:
+            erro_msg = "Ambos os campos, semana e ano, são obrigatórios."
+    
+    return render(request, 'dengue/positivos_recentes.html', {
+    'tabela_notificacoes': tabela_notificacoes,
+    'erro_msg': erro_msg,
+    'total_notificacoes': total_notificacoes if erro_msg is None else 0,
+    'semana': semana,
+    'ano' : ano,
+})

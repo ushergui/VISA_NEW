@@ -3,65 +3,55 @@
 {% load custom_filters %}
 {% block conteudo %}
 
-<h4>Agendados no dia</h4>
-{% if messages %}
-  <div class="alert alert-danger">
-    {% for message in messages %}
-      {{ message }}
-    {% endfor %}
-  </div>
+<h4>Casos de Chikungunya</h4>
+{% if erro_msg %}
+    <div class="alert alert-danger">
+        {{ erro_msg }}
+    </div>
 {% endif %}
-<form class="form-inline" action="{% url 'agendados' %}" method="get">
+<form class="form-inline" action="{% url 'chikungunya' %}" method="get">
   <div class="form-group">
-    <label class="mr-2">Digite a data de agendamento</label>
-    <input class="form-control-sm" type="text" name="q" id="agendados" placeholder="Digite a data do agendamento" required pattern="\d{2}/\d{2}/\d{4}" title="Deve estar no formato DD/MM/YYYY" size="58">
-
+    <label class="mr-2">Semana</label>
+    <input type="number" name="semana" placeholder="Exemplo 8" class="form-control-sm">
 </div>
 &#160;&#160;&#160;&#160;&#160;&#160;
-
+<div class="form-group">
+  <label class="mr-2">Ano</label>
+  <input type="number" name="ano" placeholder="2023" class="form-control-sm">
+</div>
+&#160;&#160;&#160;&#160;
 <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
   Pesquisar</button>
 </form><br>
 
-{% if notificacoes %}
+{% if tabela_notificacoes != None %}
 <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
         <thead>
             <tr>
               <th style="vertical-align: middle; width: 120px; text-align: center" >Nome</th>
-              <th style="vertical-align: middle; width: 60px; text-align: center">Telefone</th>
-              <th style="vertical-align: middle; width: 200px; text-align: center" >Endereço</th>
-              <th style="vertical-align: middle; width: 50px; text-align: center">USF</th>
-              <th style="vertical-align: middle; width: 50px; text-align: center">Recebimento</th>
-              <th style="vertical-align: middle; width: 7px; text-align: center">Unidade notificadora</th>
+              <th style="vertical-align: middle; width: 180px; text-align: center">Endereço</th>
+              <th style="vertical-align: middle; width: 7px; text-align: center">Notificadora</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Notificação</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Início de sintomas</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Limite coleta</th>
-              <th style="vertical-align: middle; width: 50px; text-align: center">Semana epidemiológica</th>
+              <th style="vertical-align: middle; width: 50px; text-align: center">Semana</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">SINAN</th>
               <th style="vertical-align: middle; width: 70px; text-align: center">Resultado</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Internação</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Óbito</th>
               <th style="vertical-align: middle; width: 50px; text-align: center">Agendamento</th>
+              <th style="vertical-align: middle; width: 50px; text-align: center">Classificação</th>
+              <th style="vertical-align: middle; width: 50px; text-align: center">Evolução</th>
+              <th style="vertical-align: middle; width: 50px; text-align: center">Critério</th>
               <th style="vertical-align: middle; width: 130px; text-align: center">Observações</th>
               <th style="vertical-align: middle; width: 60px; text-align: center" >Ações</th>
             </tr>
         </thead>
         <tbody>
-          {% for notificacao in notificacoes %}
+            {% for notificacao in tabela_notificacoes %}
                 <tr>
                   <td style="vertical-align: middle;">{{ notificacao.nome|capitalize_name }}</td>
-                  {% if notificacao.telefone is not none %}
-                  <td style="vertical-align: middle;">{{ notificacao.telefone }}</td>
-                  {% else %}
-                  <td style="vertical-align: middle;"></td>
-                  {% endif %}
                   <td style="vertical-align: middle;">{{ notificacao.logradouro_paciente.tipo|capitalize_name }} {{ notificacao.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ notificacao.numero_paciente }} - {{ notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
-                  {% if notificacao.usf is not none %}
-                  <td style="text-align: center; vertical-align: middle;">{{ notificacao.usf }}</td>
-                  {% else %}
-                  <td style="vertical-align: middle;"></td>
-                  {% endif %}
-                  <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_recebimento|date:"d/m/Y" }}</td>
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.notificadora }}</td>
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
@@ -72,6 +62,21 @@
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.internacao|date:"d/m/Y" }}</td>
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.obito|date:"d/m/Y" }}</td>
                   <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_agendamento|date:"d/m/Y" }}</td>
+                  {% if notificacao.classificacao is not none %}
+                  <td style="text-align: center; vertical-align: middle;">{{ notificacao.classificacao }}</td>
+                  {% else %}
+                  <td style="vertical-align: middle;"></td>
+                  {% endif %}
+                  {% if notificacao.evolucao is not none %}
+                  <td style="text-align: center; vertical-align: middle;">{{ notificacao.evolucao }}</td>
+                  {% else %}
+                  <td style="vertical-align: middle;"></td>
+                  {% endif %}
+                  {% if notificacao.motivo_encerramento is not none %}
+                  <td style="text-align: center; vertical-align: middle;">{{ notificacao.motivo_encerramento }}</td>
+                  {% else %}
+                  <td style="vertical-align: middle;"></td>
+                  {% endif %}
                   {% if notificacao.observacoes is not none %}
                   <td style="vertical-align: middle;">{{ notificacao.observacoes }}</td>
                   {% else %}

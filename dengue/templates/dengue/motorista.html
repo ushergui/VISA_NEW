@@ -1,5 +1,7 @@
 {% extends 'bases.html' %}
 {% block extra_css %}
+{% load static %}
+{% load custom_filters %}
 <style>
     .custom-table tr td, .custom-table tr th {
         height: 25px; /* Ajuste esse valor conforme a altura desejada */
@@ -8,9 +10,7 @@
     h3 {
         margin-top: -25px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
     }
-    h4 {
-        margin-top: 30px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
-    }
+
     .small-table {
         width: auto; /* Ajusta a largura da tabela para se ajustar ao conteúdo */
         margin: 0 auto; /* Centraliza a tabela na página */
@@ -20,9 +20,19 @@
 
 {% block conteudo %}
 
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a></h3></div>
+{% if termo_pesquisa %}
+
 <div align="center"><h3>USF com pacientes agendados na data {{ termo_pesquisa }}</h3></div>
-<br><br>
+<br>
+{% endif %}
+<h4>Agendamentos motorista</h4>
+<form class="form-inline" action="{% url 'motorista' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-sm" type="text" id="motorista" name="q" placeholder="Digite a data do agendamento" size="58">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+{% if agendamentos %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -36,7 +46,7 @@
     <tbody>
         {% for agendamento in agendamentos %}
             <tr>
-                <td>{{ agendamento.usf }}</td>
+                <td>{{ agendamento.usf|default:"Desconhecido" }}</td>
                 <td>{{ agendamento.total_agendamentos }}</td>
             </tr>
         {% endfor %}
@@ -46,4 +56,47 @@
 
     </div>
 </div>
+<br>
+{% if desconhecidos %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h4 style="text-align:center;">Agendamentos com USF Desconhecido</h4>
+            <table class="table table-striped custom-table small-table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Data da Notificação</th>
+            <th>Data de Início dos Sintomas</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for desconhecido in desconhecidos %}
+            <tr>
+                <td>{{ desconhecido.nome|capitalize_name }}</td>
+                <td>{{ desconhecido.data_notificacao|date:"d/m/Y" }}</td>
+                <td>{{ desconhecido.data_inicio_sintomas|date:"d/m/Y" }}</td>
+                <td><a href="{% url 'editar_notificacao' desconhecido.pk %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}
+{% block scripts %}
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+        $('#motorista').mask("00/00/0000");
+        $('#agendados').mask("00/00/0000");
+});
+</script>
 {% endblock %}

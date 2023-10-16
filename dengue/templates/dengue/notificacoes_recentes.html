@@ -3,27 +3,28 @@
 {% load custom_filters %}
 {% block conteudo %}
 
-<h4>Agendados no dia</h4>
-{% if messages %}
-  <div class="alert alert-danger">
-    {% for message in messages %}
-      {{ message }}
-    {% endfor %}
-  </div>
+<h4>Total de notificações das últimas 4 semanas</h4>
+{% if erro_msg %}
+    <div class="alert alert-danger">
+        {{ erro_msg }}
+    </div>
 {% endif %}
-<form class="form-inline" action="{% url 'agendados' %}" method="get">
+<form class="form-inline" action="{% url 'notificacoes_recentes' %}" method="get">
   <div class="form-group">
-    <label class="mr-2">Digite a data de agendamento</label>
-    <input class="form-control-sm" type="text" name="q" id="agendados" placeholder="Digite a data do agendamento" required pattern="\d{2}/\d{2}/\d{4}" title="Deve estar no formato DD/MM/YYYY" size="58">
-
+    <label class="mr-2">Semana epidemiológica (em número)</label>
+    <input type="number" name="semana" placeholder="Exemplo 8" class="form-control-sm">
 </div>
 &#160;&#160;&#160;&#160;&#160;&#160;
-
+<div class="form-group">
+  <label class="mr-2">Ano</label>
+  <input type="number" name="ano" placeholder="2023" class="form-control-sm">
+</div>
+&#160;&#160;&#160;&#160;
 <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
   Pesquisar</button>
 </form><br>
 
-{% if notificacoes %}
+{% if tabela_notificacoes %}
 <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
         <thead>
             <tr>
@@ -47,7 +48,7 @@
             </tr>
         </thead>
         <tbody>
-          {% for notificacao in notificacoes %}
+            {% for notificacao in tabela_notificacoes %}
                 <tr>
                   <td style="vertical-align: middle;">{{ notificacao.nome|capitalize_name }}</td>
                   {% if notificacao.telefone is not none %}

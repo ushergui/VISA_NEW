@@ -601,7 +601,6 @@ class EmpresasView(TemplateView):
 
         return context
     
-
 def listar_risco_um(request):
     ultimo_protocolo_subquery = ProtocoloEmpresa.objects.filter(
         empresa=OuterRef('pk')
@@ -638,7 +637,6 @@ def listar_risco_um(request):
      ).order_by('cnae_principal__descricao_cnae', 'razao')
 
     return render(request, 'empresas/listar_riscos_um.html', {'empresas': empresas})
-
 
 
 def listar_risco_um_pdf(request):
@@ -888,5 +886,3 @@ def listar_vigiriscos_2023_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename=vigiriscos_2023_pdf.html'
     return response
-
-

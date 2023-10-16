@@ -3,23 +3,50 @@
 {% load static %}
 <style>
     .chart-container {
-        height: 700px;
-        width: {% if termo_pesquisa and ano_pesquisa %}20{% else %}80{% endif %}%;
+        height: 600px;
+        width: 850px;
     }
+    table tr {
+    height: 50%;  /* ou você pode usar um valor em px, como '25px' */
+}
 </style>
 {% endblock %}
 {% block conteudo %}
-{% if termo_pesquisa %}
-    <div align="center"><h3>Você pesquisou pela semana: {{ termo_pesquisa }}, mostrando dados desta semana e das 3 anteriores.</h3></div>
+{% if notificacoes %}
+  <div class="text-center mt-3">
+    <h4>
+        Semanas {{ semana_menos_3 }}, {{ semana_menos_2 }}, {{ semana_menos_1 }} e {{ semana }} do ano de {{ ano }} - Total de {{ total_notificacoes }} notificações
+    </h4>
+    
+  </div>
+  {% else %}
+  <h4>Notificações positivas por bairro nas últimas 4 semanas</h4>
 {% endif %}
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
 
-<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
-
-<div class="container-fluid">
+{% if erro_msg %}
+    <div class="alert alert-danger">
+        {{ erro_msg }}
+    </div>
+{% endif %}
+<form class="form-inline" action="{% url 'positivos_bairros' %}" method="get">
+  <div class="form-group">
+    <label class="mr-2">Semana epidemiológica (em número)</label>
+    <input type="number" name="semana" placeholder="Exemplo 8" class="form-control-sm">
+</div>
+&#160;&#160;&#160;&#160;&#160;&#160;
+<div class="form-group">
+  <label class="mr-2">Ano</label>
+  <input type="number" name="ano" placeholder="2023" class="form-control-sm">
+</div>
+&#160;&#160;&#160;&#160;
+<button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
+  Pesquisar</button>
+</form><br>
+{% if notificacoes %}
+<div>
     <div class="row">
         <div class="col-md-4">
-            <div class="table-responsive">
+            <div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -28,11 +55,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for notificacao in notificacoes|slice:":110" %}
-                        <tr>
-                            <td>{{ notificacao.logradouro_paciente__bairro__nome_bairro }}</td>
-                            <td>{{ notificacao.quantidade }}</td>
+                        {% for notificacao in notificacoes|slice:":20" %}
+                        <tr style="height: 25px !important">
+                            <td style="height: 25px !important">{{ notificacao.logradouro_paciente__bairro__nome_bairro }}</td>
+                            <td style="height: 25px !important">{{ notificacao.quantidade }}</td>
                         </tr>
+                        
                         {% endfor %}
                     </tbody>
                 </table>
@@ -45,6 +73,11 @@
         </div>
     </div>
 </div>
+{% elif pesquisa_realizada %}
+    <div class="alert alert-danger">
+        Não há dados para o período pesquisado.
+    </div>
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/chart.js' %}"></script>

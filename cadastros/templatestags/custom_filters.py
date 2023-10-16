@@ -58,3 +58,9 @@ register.filter('capitalize_name', capitalize_name)
 @register.filter(name='get_item')
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+@register.filter(name='subtract')
+def subtract(value, arg):
+    return value - arg
+
+

@@ -153,6 +153,7 @@ $(document).ready(function() {
         $('#id_internacao').mask("00/00/0000");
         $('#id_data_agendamento').mask("00/00/0000");
         $('#id_obito').mask("00/00/0000");
+        $('#id_data_encerramento').mask("00/00/0000");
         $('#id_usf').select2();
         $('#id_semana_epidemiologica').select2();
         $('#id_logradouro_paciente').select2();
@@ -180,12 +181,6 @@ $(document).ready(function() {
     });
 
 
-    $(document).ready(function() {
-        $('#id_observacoes').on('keyup', function() {
-        var textoSemAcentos = $(this).val().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/gi, '');
-        $(this).val(textoSemAcentos);
-        });
-    });
 
     $(document).ready(function() {
         $('#id_responsavel_legal').on('keyup', function() {
