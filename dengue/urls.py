@@ -7,6 +7,7 @@ urlpatterns = [
     path('notificacoes_recentes/', views.notificacoes_recentes, name='notificacoes_recentes'),
     path('chikungunya/', views.chikungunya, name='chikungunya'),
     path('internados/', views.internados, name='internados'),
+    path('obitos/', views.obitos, name='obitos'),
     path('positivos_recentes/', views.positivos_recentes, name='positivos_recentes'),
     path('total_bairros/', views.total_bairros, name='total_bairros'),
     path('positivos_bairros/', views.positivos_bairros, name='positivos_bairros'),
@@ -26,7 +27,9 @@ urlpatterns = [
     path('agendados/', views.agendados, name='agendados'),
     path('aguardando_resultados/', views.aguardando_resultados, name='aguardando_resultados'),
     path('aguardando_ou_nao_agendado/', views.aguardando_ou_nao_agendado, name='aguardando_ou_nao_agendado'),
+    path('casos_abertos/', views.casos_abertos, name='casos_abertos'),
     path('pesquisar_notificacoes/', views.pesquisar_notificacoes, name='pesquisar_notificacoes'),
     path('listar_casos_abertos/', views.listar_casos_abertos, name='listar_casos_abertos'),
     path('encerrar_notificacao/<int:pk>/', views.encerrar_notificacao, name='encerrar_notificacao'),
+    path('notificacao/<int:id_notificacao>/', views.detalhes_notificacao, name='detalhes_notificacao'),
 ]

@@ -3,15 +3,16 @@
 {% load custom_filters %}
 {% block conteudo %}
 
-<h4>Total de notificações das últimas 4 semanas</h4>
-{% if erro_msg %}
+<h4>Pacientes Óbitos</h4>
+{% if erro_msg and formulario_enviado %}  <!-- Adicionada a condição "and formulario_enviado" -->
     <div class="alert alert-danger">
         {{ erro_msg }}
     </div>
 {% endif %}
-<form class="form-inline" action="{% url 'notificacoes_recentes' %}" method="get">
+
+<form class="form-inline" action="{% url 'obitos' %}" method="get">
   <div class="form-group">
-    <label class="mr-2">Semana epidemiológica (em número)</label>
+    <label class="mr-2">Semana</label>
     <input type="number" name="semana" placeholder="Exemplo 8" class="form-control-sm">
 </div>
 &#160;&#160;&#160;&#160;&#160;&#160;
@@ -24,7 +25,7 @@
   Pesquisar</button>
 </form><br>
 
-{% if tabela_notificacoes %}
+{% if tabela_notificacoes != None %}
 <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
         <thead>
           <tr>
@@ -78,10 +79,10 @@
               <td style="vertical-align: middle;"></td>
               {% endif %}
               <td style="vertical-align: middle; text-align: center">
-              <a href="{% url 'editar_notificacao' notificacao.pk %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a>
-              <a href="{% url 'deletar_notificacao' notificacao.pk %}" class="btn btn-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir?');" style="font-size: 11px; padding: 1px 4px;">Deletar</a>
-              <a href="{% url 'detalhes_notificacao' notificacao.pk %}" class="btn btn-success" title="Detalhes" style="font-size: 11px; padding: 1px 4px;">Detalhes</a>
-              </td>
+                <a href="{% url 'editar_notificacao' notificacao.pk %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a>
+                <a href="{% url 'deletar_notificacao' notificacao.pk %}" class="btn btn-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir?');" style="font-size: 11px; padding: 1px 4px;">Deletar</a>
+                <a href="{% url 'detalhes_notificacao' notificacao.pk %}" class="btn btn-success" title="Detalhes" style="font-size: 11px; padding: 1px 4px;">Detalhes</a>
+                </td>
           </tr>
             {% endfor %}
         </tbody>

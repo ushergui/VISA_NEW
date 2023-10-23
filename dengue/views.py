@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from cadastros.models import Logradouro
 from django.http import JsonResponse
 from datetime import datetime
+from django.urls import reverse
 
 def check_duplicate(request):
     nome = request.GET.get("nome")
@@ -151,7 +152,7 @@ def editar_notificacao(request, pk):
         form = NotificacaoForm(request.POST, instance=notificacao)
         if form.is_valid():
             form.save()
-            return redirect('index_dengue') # Substitua 'listar_notificacoes' pelo nome da URL da lista de notificações, se necessário.
+            return redirect(reverse('detalhes_notificacao', args=[pk])) # redireciona para a página de detalhes
     else:
         form = NotificacaoForm(instance=notificacao)
 
@@ -239,61 +240,73 @@ def semana_epidemiologica(request):
 
     return render(request, 'dengue/semana_epidemiologica.html', {'notificacoes': notificacoes, 'termo_pesquisa': search_query, 'ano_pesquisa': search_year})
 
-
 def boletim_resumo_totais(request):
-    search_query = request.GET.get('q')
-    search_year = request.GET.get('year')
-    notificacoes = Notificacao.objects.all()
+    erro_msg = None  # Inicializando a variável aqui
+    if request.method == "POST":
+        data_inicial = request.POST.get("data_inicial")
+        data_final = request.POST.get("data_final")
+        
+        if not data_inicial or not data_final:
+            erro_msg = "Deve digitar ambas as datas"
+            
+        else:
+            try:
+                data_inicial = datetime.strptime(data_inicial, '%d/%m/%Y').date()
+                data_final = datetime.strptime(data_final, '%d/%m/%Y').date()
+                
+                if data_inicial > data_final:
+                    erro_msg = "A data inicial não pode ser superior a data final"
 
-    if search_year:
-        try:
-            year = int(search_year)
-            notificacoes = notificacoes.filter(semana_epidemiologica__ano=year)
-        except ValueError:
-            notificacoes = Notificacao.objects.none()
+            except ValueError:
+                erro_msg = "Digite as datas completas"
 
-    if search_query:
-        try:
-            semana_atual = int(search_query)
-            ultimas_4_semanas = [semana_atual - i for i in range(4)]
-            notificacoes = notificacoes.filter(
-                semana_epidemiologica__semana__in=ultimas_4_semanas
-            )
-        except ValueError:
-            notificacoes = Notificacao.objects.none()
+        # Filtra as notificações pela data
+        queryset = Notificacao.objects.filter(data_notificacao__range=[data_inicial, data_final])
 
-    resultado_agrupado = notificacoes.values('semana_epidemiologica').annotate(
-        casos_positivos=Count('pk', filter=Q(
-            resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo'])),
-        casos_negativos=Count('pk', filter=Q(
-            resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])),
-        aguardando=Count('pk', filter=Q(
-            resultado__in=['Aguardando coleta', 'Aguardando agendamento', 'Aguardando resultado'])),
-        faltas_recusa=Count('pk', filter=Q(resultado__in=['Faltou', 'Recusou'])),
-        total_internacao=Count('pk', filter=Q(internacao__isnull=False)),
-        total_obito=Count('pk', filter=Q(obito__isnull=False)),
-    ).order_by('semana_epidemiologica')
+        total_notificacoes = queryset.count()
+        
+        if total_notificacoes == 0:
+            erro_msg = "Não há resultados para o período"
 
-    total_casos_positivos = sum(item['casos_positivos'] for item in resultado_agrupado)
-    total_casos_negativos = sum(item['casos_negativos'] for item in resultado_agrupado)
-    total_aguardando = sum(item['aguardando'] for item in resultado_agrupado)
-    total_faltas_recusa = sum(item['faltas_recusa'] for item in resultado_agrupado)
-    total_internacao = sum(item['total_internacao'] for item in resultado_agrupado)
-    total_obito = sum(item['total_obito'] for item in resultado_agrupado)
-    total_notificacoes = notificacoes.count()
+        total_casos_positivos = queryset.filter(
+            Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave']) |
+            Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo'])
+        ).count()
 
-    context = {
-        'termo_pesquisa': search_query,
-        'total_casos_positivos': total_casos_positivos,
-        'total_casos_negativos': total_casos_negativos,
-        'total_aguardando': total_aguardando,
-        'total_faltas_recusa': total_faltas_recusa,
-        'total_internacao': total_internacao,
-        'total_obito': total_obito,
-        'total_notificacoes': total_notificacoes,
-    }
+        total_casos_negativos = queryset.filter(
+            Q(classificacao__in=['Descartado', 'Chikungunya']) |
+            Q(classificacao__isnull=True, resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])
+        ).count()
 
-    return render(request, 'dengue/boletim_resumo_totais.html', context)
+        total_aguardando = queryset.filter(
+            Q(classificacao__isnull=True,resultado__in=['Aguardando agendamento', 'Aguardando coleta', 'Aguardando resultado'])
+        ).count()
+
+        total_faltas_recusa = queryset.filter(
+            Q(classificacao__isnull=True, resultado__in=['Faltou', 'Recusou', 'Inconclusivo', 'Não agendado'])
+        ).count()
+
+        total_obito = queryset.filter(obito__range=[data_inicial, data_final]).count()
+        total_internacao = queryset.filter(internacao__range=[data_inicial, data_final]).count()
+
+        context = {
+            'total_notificacoes': total_notificacoes,
+            'total_casos_positivos': total_casos_positivos,
+            'total_casos_negativos': total_casos_negativos,
+            'total_aguardando': total_aguardando,
+            'total_faltas_recusa': total_faltas_recusa,
+            'total_obito': total_obito,
+            'total_internacao': total_internacao,
+            'data_inicial': data_inicial,  
+            'data_final': data_final,  
+            'erro_msg': erro_msg,
+        }
+
+        return render(request, 'dengue/boletim_resumo_totais.html', context)
+
+    return render(request, 'dengue/boletim_resumo_totais.html')
+
+
 
 
 def listar_semanas(request):
@@ -392,8 +405,21 @@ def aguardando_ou_nao_agendado(request):
         Q(resultado='Aguardando agendamento') |
         Q(resultado='Aguardando coleta') |
         Q(resultado='Não agendado')
-    )
-    return render(request, 'dengue/aguardando_resultados.html', {'notificacoes': notificacoes})
+    ).order_by('nome')
+    return render(request, 'dengue/aguardando_ou_nao_agendado.html', {'notificacoes': notificacoes})
+
+def casos_abertos(request):
+    notificacoes = Notificacao.objects.filter(
+        classificacao=None
+    ).order_by('resultado', 'nome')  # Ordena primeiro por 'resultado' e depois por 'nome'
+    
+    # Contando o número total de notificações
+    total_notificacoes = notificacoes.count()
+
+    return render(request, 'dengue/casos_abertos.html', {
+        'notificacoes': notificacoes,
+        'total_notificacoes': total_notificacoes  # passando o total como um contexto adicional
+    })
 
 def pesquisar_notificacoes(request):
     termo_buscas = request.GET.get('q')
@@ -430,7 +456,7 @@ def encerrar_notificacao(request, pk):
         form = EncerrarNotificacaoForm(request.POST, instance=notificacao)
         if form.is_valid():
             form.save()
-            return redirect('listar_casos_abertos')  # Redireciona para a página de listagem após o encerramento
+            return redirect('casos_abertos')  # Redireciona para a página de listagem após o encerramento
     else:
         form = EncerrarNotificacaoForm(instance=notificacao)
     return render(request, 'dengue/form_encerramento.html', {'form': form})
@@ -537,6 +563,42 @@ def internados(request):
         'formulario_enviado': formulario_enviado
     })
 
+def obitos(request):
+    erro_msg = None
+    tabela_notificacoes = None
+
+    formulario_enviado = 'semana' in request.GET or 'ano' in request.GET  # Aqui é onde detectamos se o formulário foi enviado
+
+    if request.method == 'GET':
+        semana = request.GET.get('semana')
+        ano = request.GET.get('ano')
+
+        # Base para todas as queries
+        base_query = Notificacao.objects.exclude(obito__isnull=True).order_by('nome')
+
+        if semana and ano:
+            semanas_pesquisa = [int(semana) - i for i in range(4) if int(semana) - i > 0]
+            tabela_notificacoes = base_query.filter(
+                semana_epidemiologica__semana__in=semanas_pesquisa,
+                semana_epidemiologica__ano=ano,
+            )
+        elif semana and not ano:
+            erro_msg = "É necessário digitar um ano."
+        elif ano and not semana:
+            tabela_notificacoes = base_query.filter(
+                semana_epidemiologica__ano=ano,
+            )
+        elif not semana and not ano and formulario_enviado:
+            erro_msg = "É necessário digitar pelo menos o ano."
+
+        if tabela_notificacoes and not tabela_notificacoes.exists():
+            erro_msg = "Nenhuma notificação encontrada no período"
+
+    return render(request, 'dengue/obitos.html', {
+        'tabela_notificacoes': tabela_notificacoes,
+        'erro_msg': erro_msg,
+        'formulario_enviado': formulario_enviado
+    })
 
 def positivos_recentes(request):
     erro_msg = None
@@ -586,3 +648,7 @@ def positivos_recentes(request):
     'semana': semana,
     'ano' : ano,
 })
+
+def detalhes_notificacao(request, id_notificacao):
+    notificacao = get_object_or_404(Notificacao, id=id_notificacao)
+    return render(request, 'dengue/detalhes_notificacao.html', {'notificacao': notificacao})

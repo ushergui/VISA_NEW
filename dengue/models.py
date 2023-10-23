@@ -43,6 +43,7 @@ class Notificacao(models.Model):
     usf = models.CharField(null=True, blank=True, max_length=35, verbose_name="USF", choices=USF_CHOICES)
     data_recebimento = models.DateField(null=False)
     NOTIFICADORA_CHOICES = (
+        ("Ambulatório de Infectologia", "Ambulatório de Infectologia"),
         ("USF Alvorada", "USF Alvorada"),
         ("Ampara", "Ampara"),
         ("USF Asilo", "USF Asilo"),
@@ -56,6 +57,7 @@ class Notificacao(models.Model):
         ("EAP Rural", "EAP Rural"),
         ("USF Estação", "USF Estação"),
         ("Farmácia Ana Terra", "Farmácia Ana Terra"),
+        ("Gedor Silveira", "Gedor Silveira"),
         ("USF Guardinha", "USF Guardinha"),
         ("USF João XXIII", "USF João XXIII"),
         ("Laboratório Athena", "Laboratório Athena"),
@@ -99,6 +101,7 @@ class Notificacao(models.Model):
         ("Isolamento viral positivo", "Isolamento viral positivo"),
         ("Isolamento viral negativo", "Isolamento viral negativo"),
         ("Não agendado", "Não agendado"),
+        ("Inconclusivo", "Inconclusivo"),
     )
     resultado = models.CharField(null=False, max_length=40 ,choices=RESULTADO_CHOICES)
     internacao = models.DateField(null=True, verbose_name="Internação", blank=True)

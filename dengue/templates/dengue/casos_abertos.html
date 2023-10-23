@@ -7,11 +7,8 @@
     }
 </style>
 
-<h3 align="center">Aguardando (agendamento, coleta e resultado) ou não agendado</h3>
+<h3 align="center">Casos abertos - {{ total_notificacoes }}</h3>
 
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
-
-<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
 
     <div class="table responsive">
 <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">

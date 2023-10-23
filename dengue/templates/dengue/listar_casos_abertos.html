@@ -25,45 +25,62 @@
 <div class="table responsive">
 <table class="table table-striped" id="tabela-listar">
     <thead>
-    <tr>
-        <th style="text-align:center">Nome</th>
-        <th style="text-align:center">Notificação</th>
-        <th style="text-align:center">Início de sintomas</th>
-        <th style="text-align:center">Sem. Epid.</th>
-        <th style="text-align:center">SINAN</th>
-        <th style="text-align:center">Resultado</th>
-        <th style="text-align:center">Internação</th>
-        <th style="text-align:center">Óbito</th>
-        <th style="text-align:center">Agendamento</th>
-        <th style="text-align:center">Observações</th>
-        <th style="text-align:center">Encerrar</th>
-    </tr>
+        <tr>
+
+            <th style="vertical-align: middle;text-align: center">Nome</th>
+            <th style="vertical-align: middle; text-align: center">Notificação</th>
+            <th style="vertical-align: middle; text-align: center">Início de sintomas</th>
+            <th style="vertical-align: middle; text-align: center">Semana epidemiológica</th>
+            <th style="vertical-align: middle; text-align: center">SINAN</th>
+            <th style="vertical-align: middle; text-align: center">Resultado</th>
+            <th style="vertical-align: middle; text-align: center">Internação</th>
+            <th style="vertical-align: middle; text-align: center">Óbito</th>
+            <th style="vertical-align: middle; text-align: center">Agendamento</th>
+            <th style="vertical-align: middle; text-align: center">Classificação</th>
+            <th style="vertical-align: middle; text-align: center">Evolução</th>
+            <th style="vertical-align: middle; text-align: center">Critério</th>
+            <th style="vertical-align: middle; text-align: center">Observações</th>
+            <th style="vertical-align: middle; text-align: center" >Ações</th>
+        </tr>
     </thead>
     <tbody>
         {% for notificacao in notificacoes %}
-    <tr>
-        <td>{{ notificacao.nome|capitalize_name }}</td>
-        <td style="text-align:center">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
-        <td style="text-align:center">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
-        <td style="text-align:center">{{ notificacao.semana_epidemiologica }}</td>
-        <td style="text-align:center">{{ notificacao.sinan }}</td>
-        <td>{{ notificacao.resultado }}</td>
-        <td style="text-align:center">{{ notificacao.internacao|date:"d/m/Y" }}</td>
-        <td style="text-align:center">{{ notificacao.obito|date:"d/m/Y" }}</td>
-        <td style="text-align:center">{{ notificacao.data_agendamento|date:"d/m/Y" }}</td>
-        {% if notificacao.observacoes is not none %}
-            <td style="vertical-align: middle;">{{ notificacao.observacoes }}</td>
-        {% else %}
+        <tr>
+            <td style="vertical-align: middle;">{{ notificacao.nome|capitalize_name }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.semana_epidemiologica }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.sinan }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.resultado }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.internacao|date:"d/m/Y" }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.obito|date:"d/m/Y" }}</td>
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_agendamento|date:"d/m/Y" }}</td>
+            {% if notificacao.classificacao is not none %}
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.classificacao }}</td>
+            {% else %}
             <td style="vertical-align: middle;"></td>
-        {% endif %}
-        
-        <td style="text-align:center; width: 170px">
-            <a class="btn btn-primary" title="Encerrar notificação" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'encerrar_notificacao' notificacao.pk %}">
-                <i class="fa fa-sign-out" aria-hidden="true"></i>
-            </a>
-        </td>
-        
-    </tr>
+            {% endif %}
+            {% if notificacao.evolucao is not none %}
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.evolucao }}</td>
+            {% else %}
+            <td style="vertical-align: middle;"></td>
+            {% endif %}
+            {% if notificacao.motivo_encerramento is not none %}
+            <td style="text-align: center; vertical-align: middle;">{{ notificacao.motivo_encerramento }}</td>
+            {% else %}
+            <td style="vertical-align: middle;"></td>
+            {% endif %}
+            {% if notificacao.observacoes is not none %}
+            <td style="vertical-align: middle;">{{ notificacao.observacoes }}</td>
+            {% else %}
+            <td style="vertical-align: middle;"></td>
+            {% endif %}
+            <td style="vertical-align: middle; text-align: center">
+                <a href="{% url 'encerrar_notificacao' notificacao.pk %}" class="btn btn-success" title="Encerrar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Encerrar</a>
+                <a href="{% url 'detalhes_notificacao' notificacao.pk %}" class="btn btn-info" title="Detalhes" style="font-size: 11px; padding: 1px 4px;">Detalhes</a>
+                <a href="{% url 'editar_notificacao' notificacao.pk %}" class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center">Editar</a>
+            </td>
+        </tr>
     {% empty %}
         <tr>
             <td colspan="11">Nenhum campo registrado.</td>

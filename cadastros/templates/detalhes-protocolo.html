@@ -55,7 +55,10 @@
     <tbody>
       {% for infracao in infracoes %}
         <tr>
-          <td>{{ infracao.numero_format_ano }}</td>
+          <td><a href="{% url 'listar-infracoes' %}?q={{ infracao.numero_format_ano }}">
+            {{ infracao.numero_format_ano }}
+          </a>
+          </td>
           <td>{{ infracao.inspecao.fiscal }}</td>
         </tr>
       {% endfor %}

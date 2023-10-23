@@ -1,0 +1,243 @@
+{% extends 'bases.html' %}
+{% load custom_filters %}
+{% block conteudo %}
+
+<div class="notificacao-container">
+    <h3>Detalhes da notificação 
+        <a href="{% url 'editar_notificacao' notificacao.pk %}" >
+        <i class="fa fa-pencil" aria-hidden="true"></i>
+        </a>
+        <a href="{% url 'encerrar_notificacao' notificacao.pk %}" >
+        <i class="fa fa-check" aria-hidden="true"></i>
+    </a> 
+    
+    </h3>
+<div class="row">
+    <div class="col-lg-3 ">
+        <h4>Nome</h4>
+        <p >{{ notificacao.nome|capitalize_name }}</p>
+    </div>
+    <div class="col-lg-1">
+        <h4>Telefone:</h4>
+        <p>
+            {% if notificacao.telefone %}
+                {{ notificacao.telefone }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-5 ">
+        <h4>Endereço:</h4>
+        <p>
+            {% if notificacao.logradouro_paciente %}
+                {{ notificacao.logradouro_paciente.tipo|capitalize_name }} {{ notificacao.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ notificacao.numero_paciente }} - {{ notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-3 ">
+        <h4>USF</h4>
+        <p >{% if notificacao.usf %}
+            {{ notificacao.usf }}
+        {% else %}
+            ********
+        {% endif %}</p>
+    </div>
+</div>
+<br>
+<div class="row">
+    
+    <div class="col-lg-3 ">
+        <h4>Notificadora</h4>
+        <p>
+            {% if notificacao.notificadora %}
+                {{ notificacao.notificadora }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Data recebimento</h4>
+        <p>
+            {% if notificacao.data_recebimento %}
+            {{ notificacao.data_recebimento|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Data notificação</h4>
+        <p>
+            {% if notificacao.data_notificacao %}
+            {{ notificacao.data_notificacao|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Início Sintomas</h4>
+        <p>
+            {% if notificacao.data_inicio_sintomas %}
+            {{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Limite Coleta</h4>
+        <p>
+            {% if notificacao.data_limite_coleta %}
+            {{ notificacao.data_limite_coleta|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+</div>
+<br>
+<div class="row">
+    
+    <div class="col-lg-3 ">
+        <h4>Semana epidemiológica</h4>
+        <p>
+            {% if notificacao.semana_epidemiologica %}
+                {{ notificacao.semana_epidemiologica }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>SINAN</h4>
+        <p>
+            {% if notificacao.sinan %}
+            {{ notificacao.sinan }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Resultado</h4>
+        <p>
+            {% if notificacao.resultado %}
+            {{ notificacao.resultado     }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Internação</h4>
+        <p>
+            {% if notificacao.internacao %}
+            {{ notificacao.internacao|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-1 ">
+        <h4>Óbito</h4>
+        <p>
+            {% if notificacao.obito %}
+            {{ notificacao.obito|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    {% if notificacao.obito %}
+    <div class="col-lg-2 ">
+        <h4>Status Óbito</h4>
+        <p>            
+            {{ notificacao.status_obito }}
+            
+        </p>
+    </div>
+    {% else %}
+    {% endif %}
+
+</div>
+<br>
+<div class="row">
+    
+    <div class="col-lg-3 ">
+        <h4>Observações</h4>
+        <p>
+            {% if notificacao.observações %}
+                {{ notificacao.observacoes }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Data agendamento</h4>
+        <p>
+            {% if notificacao.data_agendamento %}
+            {{ notificacao.data_agendamento|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Classificação</h4>
+        <p>
+            {% if notificacao.classificacao %}
+            {{ notificacao.classificacao     }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-2 ">
+        <h4>Critério confirmação/descarte</h4>
+        <p>
+            {% if notificacao.classificacao %}
+            {{ notificacao.classificacao }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-lg-1 ">
+        <h4>Encerramento</h4>
+        <p>
+            {% if notificacao.encerramento %}
+            {{ notificacao.encerramento|date:"d/m/Y" }}
+            {% else %}
+                ********
+            {% endif %}
+        </p>
+    </div>
+    
+   
+    <div class="col-lg-2 ">
+        <h4>Evolução do caso</h4>
+        <p>            
+            {% if notificacao.evolucao %}
+            {{ notificacao.evolucao}}
+            {% else %}
+            ********
+            {% endif %}
+        </p>
+    </div>
+    
+    
+</div>
+</div>
+</div>
+
+
+
+
+
+{% endblock %}
