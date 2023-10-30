@@ -1,5 +1,6 @@
 {% extends 'basy.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block conteudo %}
 <h3>Lista de Inspeções</h3>
@@ -7,25 +8,25 @@
 <table class="table table-striped" id="tabela-listar">
 	<thead>
     <tr>
-		<th>Protocolo</th>
-		<th>Empresa</th>
-        <th>Data inspeção</th>
-        <th>Data relatório</th>
-        <th>Ações</th>
+		<th style="text-align:center">Protocolo</th>
+		<th style="text-align:center">Empresa</th>
+        <th style="text-align:center">Data inspeção</th>
+        <th style="text-align:center">Data relatório</th>
+        <th style="text-align:center">Ações</th>
         <!-- E assim por diante para todos os campos que você quer mostrar -->
     </tr>
 	</thead>
       <tbody>
     {% for inspecao in inspecoes %}
     <tr>
-        <td>{{ inspecao.protocolo.numero_protocolo }}</td>
-        <td>{{ inspecao.protocolo.empresa }}</td>
-		<td>{% if inspecao.data_inspecao %}{{ inspecao.data_inspecao|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
-		<td>{% if inspecao.data_relatorio %}{{ inspecao.data_relatorio|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
+        <td style="font-size:13px; text-align: center;">{{ inspecao.protocolo.numero_protocolo }}</td>
+        <td>{{ inspecao.protocolo.empresa.razao|capitalize_name }}</td>
+		<td style="font-size:13px; text-align: center;">{% if inspecao.data_inspecao %}{{ inspecao.data_inspecao|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
+		<td style="font-size:13px; text-align: center;">{% if inspecao.data_relatorio %}{{ inspecao.data_relatorio|date:"d/m/Y" }}{% else %}*******{% endif %}</td>
         <!-- E assim por diante para todos os campos que você quer mostrar -->
-        <td>
-            <a href="{% url 'alterar_inspecao' inspecao.id %}">Editar</a>
-            <a href="{% url 'excluir_inspecao' inspecao.id %}">Excluir</a>
+        <td style="text-align:center;">
+            <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center"href="{% url 'alterar_inspecao' inspecao.id %}">Editar</a>
+            <a class="btn btn-danger" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center"href="{% url 'excluir_inspecao' inspecao.id %}">Excluir</a>
             <a class="btn btn-primary" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'create_produtividade' inspecao.id %}">Criar Produtividade</a>
         </td>
     </tr>

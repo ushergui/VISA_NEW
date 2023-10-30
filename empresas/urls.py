@@ -74,4 +74,6 @@ urlpatterns = [
     path('listar_vigiriscos_2023/', views.listar_vigiriscos_2023, name='listar_vigiriscos_2023'),
     path('listar_vigiriscos_2023_pdf/', views.listar_vigiriscos_2023_pdf, name='listar_vigiriscos_2023_pdf'),
 
+    path('fechamento/', views.fechamento, name='fechamento'),
+
 ]

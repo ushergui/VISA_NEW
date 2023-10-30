@@ -11,7 +11,16 @@
       <button type="submit" class="btn btn-primary">Buscar</button>
     </div>
 </form>
-
+<br>
+<h3>Pesquisa protocolos</h3>
+<form method="get" action="{% url 'listar_protocolos' %}">
+    <div class="form-group">
+      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise por parte do protocolo" size="58" class="form-control-sm">
+      <button type="submit" class="btn btn-success">Buscar</button>
+    </div>
+</form>
+<br>
+<h3 style="text-align:center">Metas 2023</h3>
 <div style="width: 70%; margin: 0 auto;">
   <table class="table table-bordered text-center" style="width: 100%;">
       <thead>

@@ -8,21 +8,21 @@
     <table class="table" id="tabela-listar">
       <thead>
         <tr>
-          <th>Número</th>
-          <th>Empresa</th>
-          <th>Motivo</th>
-          <th>Observações</th>
-          <th>Status do Protocolo</th>
-          <th>Ações</th>
+          <th style="text-align:center">Número</th>
+          <th style="text-align:center">Empresa</th>
+          <th style="text-align:center">Motivo</th>
+          <th style="text-align:center">Observações</th>
+          <th style="text-align:center">Status do Protocolo</th>
+          <th style="text-align:center">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for protocolo in protocolos %}
           <tr>
-		    <td>{% if protocolo.numero_protocolo %}{{ protocolo.numero_protocolo }}{% else %}*******{% endif %}</td>
+            <td style="text-align:center;">{% if protocolo.numero_protocolo %}{{ protocolo.numero_protocolo }}{% else %}*******{% endif %}</td>
 		    <td>{% if protocolo.empresa %}{{ protocolo.empresa.razao|capitalize_name }}{% else %}*******{% endif %}</td>
 			
-			<td>
+        <td style="text-align:center;">
 			{% if protocolo.motivo == "1"%}
 				Alvará Sanitário Inicial
 				{% elif protocolo.motivo == "2"%}
@@ -70,8 +70,8 @@
 			
 			
 			
-		    <td>{% if protocolo.observacoes_protocolo %}{{ protocolo.observacoes_protocolo }}{% else %}*******{% endif %}</td>
-		    <td>{% if protocolo.status_protocolo == "1"%}
+      <td style="text-align:center;">{% if protocolo.observacoes_protocolo %}{{ protocolo.observacoes_protocolo }}{% else %}*******{% endif %}</td>
+      <td style="text-align:center;">{% if protocolo.status_protocolo == "1"%}
 				Aguardando escolha/entrega de fiscal (Administrativo)
 				{% elif protocolo.status_protocolo == "2"%}
 				Aguardando realização de inspeção/ emissão de relatório (Fiscal)
@@ -82,7 +82,7 @@
 				{% else %}
 				Indefinido
 				{% endif %}</td>
-            <td>
+        <td style="text-align:center;">
               <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_protocolo' protocolo.id %}">Editar</a>
               <a class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px;" href="{% url 'excluir_protocolo' protocolo.id %}">Excluir</a>
               

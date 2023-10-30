@@ -1,5 +1,7 @@
 {% extends 'basy.html' %}
 {% load static %}
+{% load custom_filters %}
+
 
 
 
@@ -24,15 +26,13 @@
     <tbody>
     {% for empresa in empresas %}
     <tr>
-        <td>{{ empresa.razao }}</td>
-        <td>{% if empresa.cnpj %}{{ empresa.cnpj }}{% else %}{% endif %}</td>
-        <td>
+        <td style="font-size:13px;">{{ empresa.razao|capitalize_name }}</td>
+        <td style="font-size:13px; text-align: center;">{% if empresa.cnpj %}{{ empresa.cnpj }}{% else %}{% endif %}</td>
+        <td style="font-size:13px;">
         {% if empresa.nome_fantasia %}
-        {{ empresa.nome_fantasia }}{% else %}********{% endif %}</td>
-        <td>{% for cnae in empresa.cnae.all %}
-                        {{ cnae.codigo_cnae }} - {{ cnae.descricao_cnae }}{% if not forloop.last %}; {% endif %}
-                        {% endfor %}</td>
-        <td>{{ empresa.responsavel_legal }}</td>
+        {{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
+        <td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae|capitalize_name }}</td>
+        <td style="font-size:13px;">{{ empresa.responsavel_legal|capitalize_name }}</td>
         <td style="text-align:center; width: 170px">
             <a class="btn btn-primary" title="Detalhe" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a>
             <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_empresa' empresa.id %}">Editar</a>

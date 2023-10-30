@@ -15,6 +15,8 @@ from weasyprint import HTML, CSS
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory
 from django.db.models.functions import Concat
+from django.db.models import Count
+from django.contrib import messages
 
 
 
@@ -249,9 +251,15 @@ def excluir_legislacao(request, id):
     return render(request, 'empresas/form-excluir.html', {'legislacao': legislacao})
 
 def listar_protocolos(request):
-    protocolos = ProtocoloEmpresa.objects.all()
-    return render(request, 'empresas/listar_protocolos.html', {'protocolos': protocolos})
+    termo_pesquisa = request.GET.get('termo_pesquisa', '')
 
+    # Filtrando os objetos com base no termo de pesquisa.
+    if termo_pesquisa:
+        protocolos = ProtocoloEmpresa.objects.filter(numero_protocolo__icontains=termo_pesquisa)
+    else:
+        protocolos = ProtocoloEmpresa.objects.all()
+
+    return render(request, 'empresas/listar_protocolos.html', {'protocolos': protocolos, 'termo_pesquisa': termo_pesquisa})
 
 
 def novo_protocolo(request):
@@ -886,3 +894,91 @@ def listar_vigiriscos_2023_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename=vigiriscos_2023_pdf.html'
     return response
+
+def fechamento(request):
+    mostrar_resultados = False
+    if request.method == "POST":
+        data_inicial_str = request.POST.get('data_inicial')
+        data_final_str = request.POST.get('data_final')
+        
+        if not data_inicial_str or not data_final_str:
+            messages.error(request, 'Ambos os campos de data são obrigatórios.')
+            return render(request, 'empresas/fechamento.html')
+
+        data_inicial = datetime.strptime(data_inicial_str, '%d/%m/%Y').date()
+        data_final = datetime.strptime(data_final_str, '%d/%m/%Y').date()
+
+        # Item 1
+        inspecoes_realizadas = Inspecao.objects.filter(data_inspecao__range=[data_inicial, data_final]).count()
+
+        # Item 2
+        inspecoes_realizadas_alimentos = Inspecao.objects.filter(
+            data_inspecao__range=[data_inicial, data_final],
+            protocolo__empresa__cnae_principal__alimentos=True
+        ).count()
+
+        # Item 3
+        abertura_denuncias = ProtocoloEmpresa.objects.filter(
+            motivo='5',
+            entrada_protocolo__range=[data_inicial, data_final]
+        ).count()
+
+        # Item 4
+        atendimento_denuncias = ProtocoloEmpresa.objects.filter(
+            motivo='5',
+            encerramento_protocolo__range=[data_inicial, data_final]
+        ).count()
+
+        # Item 5
+        cadastro_empresas = ProtocoloEmpresa.objects.filter(
+            motivo='1',
+            entrada_protocolo__range=[data_inicial, data_final]
+        ).count()
+
+        # Item 6
+        empresas_encerradas = ProtocoloEmpresa.objects.filter(
+            encerramento_protocolo__range=[data_inicial, data_final],
+            empresa__status_funcionamento="BAIXADA"
+        ).count()
+
+        # Item 7
+        licenciamento_empresas = ProtocoloEmpresa.objects.filter(
+            encerramento_protocolo__range=[data_inicial, data_final],
+            motivo__in=['1', '2', '8', '9'],
+            empresa__alvara__gt=datetime.now().date()
+        ).count()
+
+        # Item 8
+        licenciamento_empresas_alimentos = ProtocoloEmpresa.objects.filter(
+            encerramento_protocolo__range=[data_inicial, data_final],
+            motivo__in=['1', '2', '8', '9'],
+            empresa__alvara__gt=datetime.now().date(),
+            empresa__cnae_principal__alimentos=True
+        ).count()
+
+        cadastro_empresas_alimentos = ProtocoloEmpresa.objects.filter(
+            motivo='1',
+            entrada_protocolo__range=[data_inicial, data_final],
+            empresa__cnae_principal__alimentos=True
+        ).count()
+        mostrar_resultados = True
+
+        context = {
+            'inspecoes_realizadas': inspecoes_realizadas,
+            'inspecoes_realizadas_alimentos': inspecoes_realizadas_alimentos,
+            'abertura_denuncias': abertura_denuncias,
+            'atendimento_denuncias': atendimento_denuncias,
+            'cadastro_empresas': cadastro_empresas,
+            'cadastro_empresas_alimentos': cadastro_empresas_alimentos,
+            'data_inicial_str': data_inicial,
+            'data_final_str': data_final,
+            'empresas_encerradas': empresas_encerradas,
+            'licenciamento_empresas': licenciamento_empresas,
+            'licenciamento_empresas_alimentos': licenciamento_empresas_alimentos,
+            'mostrar_resultados': mostrar_resultados,
+        }
+
+        return render(request, 'empresas/fechamento.html', context)
+
+    return render(request, 'empresas/fechamento.html')
+

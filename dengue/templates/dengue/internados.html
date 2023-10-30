@@ -3,7 +3,17 @@
 {% load custom_filters %}
 {% block conteudo %}
 
-<h4>Pacientes internados</h4>
+<h4>
+    Pacientes internados
+    {% if contador > 0 %}
+        - Total ({{ contador }})
+        {% if semana_pesquisada and ano_pesquisado %}
+            na semana {{ semana_pesquisada }} e 3 semanas anteriores do ano {{ ano_pesquisado }}
+        {% elif ano_pesquisado %}
+            no ano {{ ano_pesquisado }}
+        {% endif %}
+    {% endif %}
+</h4>
 {% if erro_msg and formulario_enviado %}  <!-- Adicionada a condição "and formulario_enviado" -->
     <div class="alert alert-danger">
         {{ erro_msg }}

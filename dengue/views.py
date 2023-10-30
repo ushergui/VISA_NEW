@@ -529,14 +529,20 @@ def chikungunya(request):
 def internados(request):
     erro_msg = None
     tabela_notificacoes = None
+    contador = 0  # Adicionado para contar o número de registros
+    semana_pesquisada = None  # Adicionado para guardar a semana pesquisada
+    ano_pesquisado = None  # Adicionado para guardar o ano pesquisado
 
-    formulario_enviado = 'semana' in request.GET or 'ano' in request.GET  # Aqui é onde detectamos se o formulário foi enviado
+    formulario_enviado = 'semana' in request.GET or 'ano' in request.GET
 
     if request.method == 'GET':
         semana = request.GET.get('semana')
         ano = request.GET.get('ano')
 
-        # Base para todas as queries
+        # Guardar os valores para usar no template
+        semana_pesquisada = semana
+        ano_pesquisado = ano
+
         base_query = Notificacao.objects.exclude(internacao__isnull=True).order_by('nome')
 
         if semana and ano:
@@ -554,14 +560,19 @@ def internados(request):
         elif not semana and not ano and formulario_enviado:
             erro_msg = "É necessário digitar pelo menos o ano."
 
-        if tabela_notificacoes and not tabela_notificacoes.exists():
-            erro_msg = "Nenhuma notificação encontrada no período"
+        # Contar o número de registros se existirem
+        if tabela_notificacoes:
+            contador = tabela_notificacoes.count()
 
     return render(request, 'dengue/internados.html', {
         'tabela_notificacoes': tabela_notificacoes,
         'erro_msg': erro_msg,
-        'formulario_enviado': formulario_enviado
+        'formulario_enviado': formulario_enviado,
+        'contador': contador,  # Adicionado para usar no template
+        'semana_pesquisada': semana_pesquisada,  # Adicionado para usar no template
+        'ano_pesquisado': ano_pesquisado  # Adicionado para usar no template
     })
+
 
 def obitos(request):
     erro_msg = None

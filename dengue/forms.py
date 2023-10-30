@@ -68,6 +68,9 @@ class EncerrarNotificacaoForm(forms.ModelForm):
         model = Notificacao
         fields = [
             'nome',
+            'logradouro_paciente',
+            'numero_paciente',
+            'usf',
             'data_notificacao',
             'data_inicio_sintomas',
             'semana_epidemiologica',

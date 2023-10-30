@@ -1,0 +1,139 @@
+{% extends 'basy.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+<style>
+    .custom-table {
+        width: 65%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .custom-table th {
+        width: 65%;
+    }
+</style>
+{% if messages %}
+    {% for message in messages %}
+        <p>{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<div align="center">
+    <h3>
+        {% if mostrar_resultados %}
+            Fechamento procedimentos BPA - período {{ data_inicial_str|date:'d/m/Y' }} a {{ data_final_str|date:'d/m/Y' }}
+        {% else %}
+            Fechamento procedimentos BPA
+        {% endif %}
+    </h3>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="data_inicial">Data Inicial:</label>
+    <input type="text" id="data_inicial" name="data_inicial" class="form-control-sm mr-4" value="{{ data_inicial|date:'d/m/Y' }}" required>
+    <label for="data_final">Data Final:</label>
+    <input type="text" id="data_final" name="data_final" class="form-control-sm mr-4" value="{{ data_final|date:'d/m/Y' }}" required>
+    <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+<br>
+
+{% if mostrar_resultados %}
+    <table class="table table-striped custom-table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Procedimento</th>
+                <th>Quantidade</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if inspecoes_realizadas %}
+            <tr>
+                <td>01.02.01.017-0
+                </td>
+                <td>Inspeção dos estabelecimentos sujeitos à vigilância sanitária
+                </td>
+                <td>{{ inspecoes_realizadas }}</td>
+            </tr>
+        {% endif %}
+        {% if inspecoes_realizadas_alimentos %}
+            <tr>
+                <td>01.02.01.046-3
+                </td>
+                <td>Inspeção sanitária de estabelecimentos de serviços de alimentação
+                </td>
+                <td>{{ inspecoes_realizadas_alimentos }}</td>
+            </tr>
+        {% endif %}
+        {% if abertura_denuncias %}
+            <tr>
+                <td>01.02.01.023-4
+                </td>
+                <td>Recebimento de denúncias/reclamações
+                </td>
+                <td>{{ abertura_denuncias }}</td>
+            </tr>
+        {% endif %}
+        {% if atendimento_denuncias %}
+            <tr>
+                <td>01.02.01.024-2
+                </td>
+                <td>Atendimento a denúncias/reclamações
+                </td>
+                <td>{{ atendimento_denuncias }}</td>
+            </tr>
+        {% endif %}
+        {% if cadastro_empresas %}
+            <tr>
+                <td>01.02.01.007-2</td>
+                <td>Cadastro de estabelecimentos sujeitos à vigilância sanitária</td>
+                <td>{{ cadastro_empresas }}</td>
+            </tr>
+        {% endif %}
+        {% if cadastro_empresas_alimentos %}
+            <tr>
+                <td>01.02.01.045-5</td>
+                <td>Cadastro de estabelecimentos de serviços de alimentação</td>
+                <td>{{ cadastro_empresas_alimentos }}</td>
+            </tr>
+        {% endif %}
+        {% if empresas_encerradas %}
+            <tr>
+                <td>01.02.01.016-1</td>
+                <td>Exclusão de cadastro de estabelecimentos sujeitos à vigilância sanitária com atividades encerradas</td>
+                <td>{{ empresas_encerradas }}</td>
+            </tr>
+        {% endif %}
+        {% if licenciamento_empresas %}
+            <tr>
+                <td>01.02.01.018-8</td>
+                <td>Licenciamento dos estabelecimentos sujeitos à vigilância sanitária</td>
+                <td>{{ licenciamento_empresas }}</td>
+            </tr>
+        {% endif %}
+        {% if licenciamento_empresas_alimentos %}
+            <tr>
+                <td>01.02.01.047-1</td>
+                <td>Licenciamento sanitário de estabelecimentos de serviços de alimentação</td>
+                <td>{{ licenciamento_empresas_alimentos }}</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        $('#data_inicial').mask("00/00/0000");
+        $('#data_final').mask("00/00/0000");
+    });
+</script>
+{% endblock %}
