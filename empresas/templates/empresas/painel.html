@@ -1,0 +1,76 @@
+{% extends 'basy.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block conteudo %}
+<style>
+    .custom-table {
+        width: 65%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .custom-table th {
+        width: 65%;
+    }
+</style>
+<h3 style="text-align: center">
+    Totais ativos por CNAE
+</h3>
+
+<br>
+<table class="table table-striped custom-table">
+ <thead>
+     <tr>
+         <th>Risco</th>
+         <th>Total</th>
+     </tr>
+ </thead>
+ <tbody>
+    <tr>
+        <td>Nível de risco III - Alto risco</td>
+        <td>{{ total_geral_risco_5 }}</td>
+    </tr>
+     
+     <tr>
+         <td>Nível de risco II - Médio risco</td>
+         <td>{{ total_geral_risco_4 }}</td>
+     </tr>
+
+     <tr>
+        <td>Nível de risco I - Baixo risco</td>
+        <td>{{ total_geral_risco_3 }}</td>
+    </tr>
+     
+ </tbody>
+</table>
+
+<br>
+<table class="table table-striped custom-table">
+        <thead>
+            <tr>
+                <th>Cnae</th>
+                <th>Risco</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dado in dados %}
+                <tr>
+                    <td>{{ dado.cnae.codigo_cnae }} - {{ dado.cnae.descricao_cnae }}</td>
+                    <td>{{ dado.risco }}</td>
+                    <td>
+                        {% if dado.total_risco_3 %}
+                        {{ dado.total_risco_3 }}<br>
+                        {% elif dado.total_risco_4 %}
+                        {{ dado.total_risco_4 }}<br>
+                        {% elif dado.total_risco_5 %}
+                        {{ dado.total_risco_5 }}<br>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+</table>
+{% endblock %}

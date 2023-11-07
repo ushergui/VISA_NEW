@@ -30,6 +30,7 @@
             <th style="font-size:14px" class="text-center">Endereço</th>
             <th style="font-size:14px" class="text-center">Nº</th>
             <th style="font-size:14px" class="text-center">Bairro</th>
+            <th style="font-size:14px" class="text-center">Telefone</th>
             <th style="font-size:14px" class="text-center">Alvará</th>
             <th style="font-size:14px" class="text-center">CNAE</th>
         </tr>
@@ -43,6 +44,7 @@
             <td style="font-size:13px; text-align:left;">{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}</td>
             <td style="font-size:13px; text-align:left;">{{ empresa.numero_empresa }}{% if empresa.complemento_empresa %}, {{ empresa.complemento_empresa }}{% else %}{% endif %} </td>    
             <td style="font-size:13px; text-align:left;">{{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</td>
+            <td style="font-size:13px; text-align:left;">{% if empresa.telefone1%}{{ empresa.telefone1 }}{% else %}********{% endif %}</td>
     
             <td style="font-size:13px" class="text-center">{% if empresa.mei == True %}MEI{% else %}
                 {{ empresa.alvara|date:"d/m/Y" }}{% endif %}</td>

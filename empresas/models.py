@@ -29,6 +29,71 @@ class Cnae(models.Model):
     codigo_cnae = models.CharField(max_length=9, null=False, blank=False)
     descricao_cnae = models.CharField(max_length=250, null=False, blank=False)
     observacoes_cnae = models.CharField(max_length=300, null=True, blank=True)
+    CNAE_POPULAR_CHOICES = (
+        ("Academia", "Academia"),
+        ("Açougue", "Açougue"),
+        ("Acupuntura", "Acupuntura"),
+        ("Albergue/alojamento/pensão", "Albergue/alojamento/pensão"),
+        ("Ambulância", "Ambulância"),
+        ("Ambulante", "Ambulante"),
+        ("APAE", "APAE"),
+        ("Atividade de ensino", "Atividade de ensino"),
+        ("Atividade de assistência social", "Atividade de assistência social"),
+        ("Bufê", "Bufê"),
+        ("Cabeleireiro/manicure/pedicure", "Cabeleireiro/manicure/pedicure"),
+        ("Cantina", "Cantina"),
+        ("CAPS", "CAPS"),
+        ("Clínica de vacinação", "Clínica de vacinação"),
+        ("Comércio/transp. de produto para saúde/saneante/cosmético", "Comércio/transp. de produto para saúde/saneante/cosmético"),
+        ("Comércio atacadista de alimentos", "Comércio atacadista de alimentos"),
+        ("Comércio varejista de alimentos", "Comércio varejista de alimentos"),
+        ("Comunidade terapêutica", "Comunidade terapêutica"),
+        ("Creche", "Creche"),
+        ("Dedetização", "Dedetização"),
+        ("Dentista", "Dentista"),
+        ("Diagnóstico por imagem", "Diagnóstico por imagem"),
+        ("Distribuidora/transportadora de alimentos", "Distribuidora/transportadora de alimentos"),
+        ("Drogaria", "Drogaria"),
+        ("Endoscopia", "Endoscopia"),
+        ("Estética", "Estética"),
+        ("Farmácia", "Farmácia"),
+        ("Fisioterapia", "Fisioterapia"),
+        ("Fonoaudiólogo", "Fonoaudiólogo"),
+        ("Funerária", "Funerária"),
+        ("Hospital", "Hospital"),
+        ("Hotel", "Hotel"),
+        ("ILPI", "ILPI"),
+        ("Indústria de alimento", "Indústria de alimento"),
+        ("Indústria de produto para saúde/saneante/cosmético", "Indústria de produto para saúde/saneante/cosmético"),
+        ("Laboratórios", "Laboratórios"),
+        ("Lanchonete", "Lanchonete"),
+        ("Lavanderia", "Lavanderia"),
+        ("Litotripsia", "Litotripsia"),
+        ("Medico", "Medico"),
+        ("Mercado/supermercado", "Mercado/supermercado"),
+        ("Motel", "Motel"),
+        ("Nutricionista", "Nutricionista"),
+        ("Orfanato", "Orfanato"),
+        ("Ótica", "Ótica"),
+        ("Outras atividades", "Outras atividades"),
+        ("Padaria", "Padaria"),
+        ("Peixaria", "Peixaria"),
+        ("Perfumaria", "Perfumaria"),
+        ("Podologia", "Podologia"),
+        ("Práticas integrativas e complementares", "Práticas integrativas e complementares"),
+        ("Presídio", "Presídio"),
+        ("Prótese dentária", "Prótese dentária"),
+        ("Psicólogo", "Psicólogo"),
+        ("Restaurante", "Restaurante"),
+        ("Saneantes", "Saneantes"),
+        ("Tatuador", "Tatuador"),
+        ("Terapeuta ocupacional", "Terapeuta ocupacional"),
+        ("Urgência e emergência", "Urgência e emergência"),
+        ("Veterinário", "Veterinário"),
+
+
+    )
+    cnae_popular = models.CharField(max_length=100, null=True, blank=True, choices=CNAE_POPULAR_CHOICES)
     risco_cnae = models.ForeignKey(Risco, on_delete=models.PROTECT)
     legislacao = models.ManyToManyField(Legislacao, related_name='Legislação')
     alimentos = models.BooleanField(default=False)
@@ -65,13 +130,6 @@ class Empresas(models.Model):
         ("DISPENSADA", "DISPENSADA"),
     )
     status_funcionamento = models.CharField(max_length=20, null=False, blank=False, choices=STATUS_CHOICES)
-    #STATUSS_CHOICES = (
-     #   ("Estabelecimento recebeu fiscalização no ano e recebeu orientações, necessitando de adequações", "Estabelecimento recebeu fiscalização no ano e recebeu orientações, necessitando de adequações"),
-     #   ("Estabelecimento recebeu fiscalização no ano e recebeu orientações, atendendo plenamente as regras de boas práticas.", "Estabelecimento recebeu fiscalização no ano e recebeu orientações, atendendo plenamente as regras de boas práticas."),
-      #  ("Estabelecimento não recebeu fiscalização no ano.", "Estabelecimento não recebeu fiscalização no ano."),
-   # )
-    
-   # situacao_pdvisa = models.CharField(max_length=150, null=True, blank=True, choices=STATUSS_CHOICES)
 
     def __str__(self):
         return self.razao
@@ -172,11 +230,6 @@ class AcaoProdutividadeRel(models.Model):
     acao_produtividade = models.ForeignKey(AcaoProdutividade, on_delete=models.CASCADE)
     multiplicador = models.DecimalField(max_digits=5, decimal_places=1)
 
-class FiscalAuxiliarRel(models.Model):
-    produtividade = models.ForeignKey('Produtividade', on_delete=models.CASCADE)
-    fiscal = models.ForeignKey(Fiscal, on_delete=models.CASCADE)
-    data_fiscal_auxiliar = models.DateField(null=False, blank=False, verbose_name="Mês de Produtividade")
-
 class Produtividade(models.Model):
     total = models.DecimalField(max_digits=5, decimal_places=1, verbose_name="Total de Pontos", null=True, blank=True)
     tempo_gasto = models.DecimalField(max_digits=2, decimal_places=1, verbose_name="Tempo gasto")
@@ -184,14 +237,6 @@ class Produtividade(models.Model):
     inspecao = models.OneToOneField(Inspecao, on_delete=models.PROTECT, null=True, blank=True, verbose_name="Inspeção")
     validacao = models.BooleanField(default=False)
     acoes = models.ManyToManyField(AcaoProdutividade, through=AcaoProdutividadeRel)
-    fiscal_auxiliar = models.ManyToManyField(Fiscal, through=FiscalAuxiliarRel, related_name="Fiscal_auxiliar")
-    validacao = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Produtividade da inspecao {self.inspecao}"
-    
-
-
-
-
-

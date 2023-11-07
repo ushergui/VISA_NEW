@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, FiscalAuxiliarRel, AcaoProdutividadeRel
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, ProdutividadeFiscalAuxiliarForm, AcaoProdutividadeForm
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, AcaoProdutividadeForm
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
 from datetime import date, datetime
-from django.db.models import Max, Subquery, OuterRef, Prefetch, Case, When, Value, CharField
+from django.db.models import Max, Subquery, OuterRef, Prefetch, Case, When, Value, CharField,Sum
 from cadastros.models import Fiscal
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.template.loader import get_template
@@ -17,10 +17,6 @@ from django.forms import formset_factory
 from django.db.models.functions import Concat
 from django.db.models import Count
 from django.contrib import messages
-
-
-
-
 
 # Contabilidade
 def listar_contabilidades(request):
@@ -982,3 +978,52 @@ def fechamento(request):
 
     return render(request, 'empresas/fechamento.html')
 
+def painel(request):
+    # Calcula os totais gerais para cada risco
+    total_geral_risco_3 = Empresas.objects.filter(
+        status_funcionamento__in=['ATIVA', 'DISPENSADA'],
+        cnae_principal__risco_cnae__valor_risco=3
+    ).count()
+
+    total_geral_risco_4 = Empresas.objects.filter(
+        status_funcionamento='ATIVA',
+        cnae_principal__risco_cnae__valor_risco=4
+    ).count()
+
+    total_geral_risco_5 = Empresas.objects.filter(
+        status_funcionamento='ATIVA',
+        cnae_principal__risco_cnae__valor_risco=5
+    ).count()
+
+    # Continua com o resto da lógica da view
+    dados = []
+    cnaes = Cnae.objects \
+        .annotate(total_empresas=Count('CNAE_Principal')) \
+        .filter(total_empresas__gt=0, risco_cnae__valor_risco__gt=2) \
+        .order_by('-risco_cnae__valor_risco', 'descricao_cnae')
+
+    for cnae in cnaes:
+        # Filtra e conta as empresas para cada risco
+        dados_risco = Empresas.objects.filter(cnae_principal=cnae) \
+            .annotate(
+                risco_3=Count('id', filter=Q(status_funcionamento__in=['ATIVA', 'DISPENSADA'], cnae_principal__risco_cnae__valor_risco=3)),
+                risco_4=Count('id', filter=Q(status_funcionamento='ATIVA', cnae_principal__risco_cnae__valor_risco=4)),
+                risco_5=Count('id', filter=Q(status_funcionamento='ATIVA', cnae_principal__risco_cnae__valor_risco=5))
+            ).aggregate(risco_3_total=Sum('risco_3'), risco_4_total=Sum('risco_4'), risco_5_total=Sum('risco_5'))
+
+        # Adiciona o cnae e seus respectivos totais na lista
+        dados.append({
+            'cnae': cnae,
+            'risco': cnae.risco_cnae.risco,
+            'total_risco_3': dados_risco['risco_3_total'],
+            'total_risco_4': dados_risco['risco_4_total'],
+            'total_risco_5': dados_risco['risco_5_total']
+        })
+        context = {
+        'dados': dados,
+        'total_geral_risco_3': total_geral_risco_3,
+        'total_geral_risco_4': total_geral_risco_4,
+        'total_geral_risco_5': total_geral_risco_5
+    }
+
+    return render(request, 'empresas/painel.html', context)

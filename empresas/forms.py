@@ -1,5 +1,5 @@
 from django import forms
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, FiscalAuxiliarRel
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
 from cadastros.models import Logradouro, Fiscal, Cidade, Bairro
 from django.core.exceptions import ValidationError
 import re
@@ -193,7 +193,7 @@ class AcaoProdutividadeForm(forms.ModelForm):
 class ProdutividadeForm(forms.ModelForm):
     class Meta:
         model = Produtividade
-        fields = ['acoes', 'total', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'fiscal_auxiliar', 'validacao']
+        fields = ['acoes', 'total', 'tempo_gasto', 'mes_produtividade', 'inspecao', 'validacao']
         widgets = {
             'inspecao': forms.HiddenInput(),  # Escondendo o campo inspecao porque você vai amarrá-lo a um ID específico
         }
@@ -209,11 +209,6 @@ class ProdutividadeAcaoForm(forms.ModelForm):
     class Meta:
         model = AcaoProdutividadeRel
         fields = ['acao_produtividade', 'multiplicador']
-
-class ProdutividadeFiscalAuxiliarForm(forms.ModelForm):
-    class Meta:
-        model = FiscalAuxiliarRel
-        fields = ['fiscal', 'data_fiscal_auxiliar']
 
 class EmpresaCnaeForm(forms.ModelForm):
     cnae = forms.ModelMultipleChoiceField(
