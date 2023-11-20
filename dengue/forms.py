@@ -104,3 +104,4 @@ class EncerrarNotificacaoForm(forms.ModelForm):
             self.add_error('data_encerramento', 'Por favor, preencha a data do encerramento.')
         elif data_encerramento and data_notificacao and data_encerramento < data_notificacao:
             self.add_error('data_encerramento', 'A data de encerramento não pode ser inferior à data de notificação.')
+

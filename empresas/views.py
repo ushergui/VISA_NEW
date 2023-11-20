@@ -6,7 +6,7 @@ from django.db.models import Max
 from django.http import JsonResponse
 from django.views.generic import TemplateView, ListView
 from django.db.models import Q
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from django.db.models import Max, Subquery, OuterRef, Prefetch, Case, When, Value, CharField,Sum
 from cadastros.models import Fiscal
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
@@ -17,6 +17,8 @@ from django.forms import formset_factory
 from django.db.models.functions import Concat
 from django.db.models import Count
 from django.contrib import messages
+from PIL import Image, ImageDraw, ImageFont
+import os
 
 # Contabilidade
 def listar_contabilidades(request):
@@ -1027,3 +1029,185 @@ def painel(request):
     }
 
     return render(request, 'empresas/painel.html', context)
+
+
+def gerar_alvara(request, empresa_id):
+    inspecao_recente = Inspecao.objects.filter(protocolo__empresa=empresa_id).latest('data_inspecao')
+    protocolo = inspecao_recente.protocolo
+    razao_social = inspecao_recente.protocolo.empresa.razao
+    nome_fantasia = inspecao_recente.protocolo.empresa.nome_fantasia
+    if not nome_fantasia:
+            nome_fantasia = "********"
+    logradouro = inspecao_recente.protocolo.empresa.logradouro_empresa.nome_logradouro
+    tipo = inspecao_recente.protocolo.empresa.logradouro_empresa.tipo
+    numero = inspecao_recente.protocolo.empresa.numero_empresa
+    complemento = inspecao_recente.protocolo.empresa.complemento_empresa
+    if complemento:
+        endereco = f"{tipo} {logradouro}, {numero} - {complemento}"
+    else:
+        endereco = f"{tipo} {logradouro}, {numero}"
+    bairro = inspecao_recente.protocolo.empresa.logradouro_empresa.bairro.nome_bairro
+    cnpj = inspecao_recente.protocolo.empresa.cnpj
+    cpf = inspecao_recente.protocolo.empresa.cpf_responsavel_legal
+    if not cnpj:
+            cnpj = cpf                      
+            if not cnpj:
+                cnpj = "PREENCHER O CNPJ OU CPF DO RESPONSÁVEL LEGAL"
+    if not cpf:
+                cpf = "PREENCHER O CPF"
+    rg_responsavel = inspecao_recente.protocolo.empresa.rg_responsavel_legal 
+    inscricao = inspecao_recente.protocolo.empresa.inscricao_estadual
+    if not inscricao:
+            inscricao = rg_responsavel                      
+            if not inscricao:
+                inscricao = "PREENCHER A I.E. ou RG DO RESPONSÁVEL LEGAL"
+    if not rg_responsavel:
+                rg_responsavel = "PREENCHER O RG"       
+    cnae_principal = inspecao_recente.protocolo.empresa.cnae_principal
+    cnae_principal_codigo = cnae_principal.codigo_cnae      
+    cnae_principal_descricao = cnae_principal.descricao_cnae
+
+    cnae_sujeitos = ""
+    cnae_nao_sujeitos = ""
+
+    if cnae_principal.risco_cnae.valor_risco in [4, 5]:
+        cnae_sujeitos = f"{cnae_principal_codigo} - {cnae_principal_descricao}"
+
+    cnaes_adicionais = inspecao_recente.protocolo.empresa.cnae.all()
+    
+    for cnae in cnaes_adicionais:
+        if cnae.risco_cnae.valor_risco in [4, 5]:
+            if cnae_sujeitos:
+                cnae_sujeitos += "; " # Adiciona vírgula para separar se já houver CNAEs
+            cnae_sujeitos += f"{cnae.codigo_cnae} - {cnae.descricao_cnae}"
+    
+    cnaes_adicionais2 = inspecao_recente.protocolo.empresa.cnae.all()
+    for cnae in cnaes_adicionais2:
+        if cnae.risco_cnae.valor_risco in [1,2,3]:
+            if cnae_nao_sujeitos:
+                cnae_nao_sujeitos += "; " # Adiciona vírgula para separar se já houver CNAEs
+            cnae_nao_sujeitos += f"{cnae.codigo_cnae} - {cnae.descricao_cnae}"
+    
+    responsavel_legal = inspecao_recente.protocolo.empresa.responsavel_legal
+    responsavel_tecnico = inspecao_recente.protocolo.empresa.responsavel_tecnico
+    cpf_responsavel_tecnico = inspecao_recente.protocolo.empresa.cpf_responsavel_tecnico
+    conselho_responsavel_tecnico = inspecao_recente.protocolo.empresa.conselho_responsavel_tecnico
+    alvara_data = inspecao_recente.protocolo.empresa.alvara
+    anos_alvara_int = int(inspecao_recente.protocolo.empresa.anos_alvara)
+    dias_a_subtrair = 364 * anos_alvara_int
+    emissao = alvara_data - timedelta(days=dias_a_subtrair)
+
+    context = {
+        'protocolo': protocolo,
+        'razao_social': razao_social,
+        'nome_fantasia': nome_fantasia,
+        'endereco': endereco,
+        'bairro': bairro,
+        'cnpj': cnpj,
+        'cpf': cpf,
+        'inscricao': inscricao,
+        'rg_responsavel': rg_responsavel,
+        'cnae_sujeitos': cnae_sujeitos,
+        'cnae_nao_sujeitos': cnae_nao_sujeitos,
+        'responsavel_legal': responsavel_legal,
+        'responsavel_tecnico': responsavel_tecnico,
+        'cpf_responsavel_tecnico': cpf_responsavel_tecnico,
+        'conselho_responsavel_tecnico': conselho_responsavel_tecnico,
+        'alvara_data': alvara_data,
+        'emissao': emissao,
+    }
+
+    html_template = get_template('empresas/alvara_pdf.html').render(context)
+    html = HTML(string=html_template, base_url=request.build_absolute_uri())
+    pdf = html.write_pdf(stylesheets=[CSS(string='@page { size: A4 landscape; }')])
+    
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=alvara.pdf'
+    return response
+
+
+'''class AlvaraSanitarioView(View):
+    def get(self, request, empresa_id, *args, **kwargs):
+        # Encontrar a inspeção mais recente para a empresa específica
+        inspecao_recente = Inspecao.objects.filter(protocolo__empresa=empresa_id).latest('data_inspecao')
+        numero_protocolo = inspecao_recente.protocolo.numero_protocolo
+        razao_social = inspecao_recente.protocolo.empresa.razao  
+        nome_fantasia = inspecao_recente.protocolo.empresa.nome_fantasia
+        if not nome_fantasia:
+            nome_fantasia = "********"
+        logradouro = inspecao_recente.protocolo.empresa.logradouro_empresa.nome_logradouro
+        tipo = inspecao_recente.protocolo.empresa.logradouro_empresa.tipo
+        numero = inspecao_recente.protocolo.empresa.numero_empresa
+        complemento = inspecao_recente.protocolo.empresa.complemento_empresa
+        if complemento:
+            endereco = f"{tipo} {logradouro}, {numero} - {complemento}"
+        else:
+            endereco = f"{tipo} {logradouro}, {numero}"
+        
+        # Caminho para o arquivo da imagem de fundo
+        base_img_path = os.path.join('static', 'alvara.png')
+        base_image = Image.open(base_img_path)
+        draw = ImageDraw.Draw(base_image)
+
+        # Caminho da fonte
+        if os.name == 'nt':  # Windows
+            font_path = 'C:\\Windows\\Fonts\\times.ttf'
+        else:  # Linux
+            font_path = '/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf'
+
+        font = ImageFont.truetype(font_path, 58)
+
+        # Coordenadas e desenho para o número do protocolo
+        x_proto, y_proto = 1220, 231  # Ajuste conforme necessário
+        draw.text((x_proto, y_proto), numero_protocolo, font=font, fill='black')
+
+        # Ajustar o tamanho da fonte baseado no comprimento da razão social
+        tamanho_fonte = 43
+        limite_caracteres = 59
+        if len(razao_social) > limite_caracteres:
+            # Reduzir o tamanho da fonte proporcionalmente ao excesso de caracteres
+            excedente = len(razao_social) - limite_caracteres
+            diminuir = int(excedente / 2)  # Ajuste este fator conforme necessário
+            tamanho_fonte = max(43 - diminuir, 20)  # 20 é o tamanho mínimo da fonte
+
+        font = ImageFont.truetype(font_path, tamanho_fonte)
+
+        # Coordenadas e desenho para a razão social
+        x_razao, y_razao = 70, 365  # Posição inicial da razão social
+        draw.text((x_razao, y_razao), razao_social, font=font, fill='black')
+
+        # Ajustar o tamanho da fonte para o nome fantasia
+        tamanho_fonte_fantasia = 43
+        limite_caracteres_fantasia = 59
+        if len(nome_fantasia) > limite_caracteres_fantasia:
+            excedente_fantasia = len(nome_fantasia) - limite_caracteres_fantasia
+            diminuir_fantasia = int(excedente_fantasia / 2)
+            tamanho_fonte_fantasia = max(43 - diminuir_fantasia, 20)  # 20 é o tamanho mínimo da fonte
+
+        font_fantasia = ImageFont.truetype(font_path, tamanho_fonte_fantasia)
+
+        # Coordenadas e desenho para o nome fantasia
+        # Ajuste as coordenadas conforme necessário
+        x_fantasia, y_fantasia = 70, 470  # Posição inicial do nome fantasia
+        draw.text((x_fantasia, y_fantasia), nome_fantasia, font=font_fantasia, fill='black')
+
+        tamanho_fonte_endereco = 27
+        limite_caracteres_endereco = 39
+        if len(endereco) > limite_caracteres_endereco:
+            # Reduzir o tamanho da fonte proporcionalmente ao excesso de caracteres
+            excedente_endereco = len(endereco) - limite_caracteres_endereco
+            diminuir_endereco = int(excedente_endereco / 1.5)
+            tamanho_fonte_endereco = max(33 - diminuir_endereco, 27)  # 20 é o tamanho mínimo da fonte
+
+        font_endereco = ImageFont.truetype(font_path, tamanho_fonte_endereco)
+
+        # Coordenadas e desenho para o endereço
+        # Ajuste as coordenadas conforme necessário
+        x_endereco, y_endereco = 70, 570  # Posição inicial do endereço
+        draw.text((x_endereco, y_endereco), endereco, font=font_endereco, fill='black')
+
+
+        # Salvar ou retornar a imagem
+        response = HttpResponse(content_type="image/png")
+        base_image.save(response, "PNG")
+        return response'''

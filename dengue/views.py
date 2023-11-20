@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from datetime import datetime
 from django.urls import reverse
 
+
 def check_duplicate(request):
     nome = request.GET.get("nome")
     logradouro = request.GET.get("logradouro")
@@ -94,43 +95,63 @@ def total_bairros(request):
 
     return render(request, 'dengue/total_por_bairros.html', context)
     
+def get_semanas_e_anos(semana, ano):
+    if semana >= 4:
+        # Se a semana for maior ou igual a 4, simplesmente pegue as últimas 4 semanas do mesmo ano
+        semanas = [semana - i for i in range(4)]
+        anos = [ano] * 4
+    else:
+        # Se a semana for menor que 4, precisamos buscar as semanas do ano anterior também
+        semanas = [semana - i for i in range(semana)] + [52, 51, 50][:4 - semana]
+        ano_anterior = ano - 1
+        anos = [ano] * semana + [ano_anterior] * (4 - semana)
+
+    return list(zip(semanas, anos))
+
 def positivos_bairros(request):
-    semana = request.GET.get('semana')
-    ano = request.GET.get('ano')
+    semana_query = request.GET.get('semana')
+    ano_query = request.GET.get('ano')
     
     notificacoes = None
-    pesquisa_realizada = False  # Inicializa a variável como False
-    if semana and ano:
+    total_geral = 0  # Inicializa o contador geral
+    pesquisa_realizada = False
+    if semana_query and ano_query:
         pesquisa_realizada = True
         try:
-            semana = int(semana)
-            ano = int(ano)
-            notificacoes = Notificacao.objects.filter(
-                semana_epidemiologica__semana=semana,
-                semana_epidemiologica__ano=ano,
-                resultado__in=["Positivo NS1", "Positivo sorologia", "Isolamento viral positivo"]
-            ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+            semana = int(semana_query)
+            ano = int(ano_query)
+            semanas_e_anos = get_semanas_e_anos(semana, ano)
+            
+            # Construir o Q object para as semanas e anos
+            semanas_filters = Q()
+            for semana, ano in semanas_e_anos:
+                semanas_filters |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
+            
+            # Query base que será usada para ambas as contagens
+            base_query = Notificacao.objects.filter(semanas_filters).filter(
+                Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']) |
+                Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
+            )
+            
+            # Contagem total de casos positivos
+            total_geral = base_query.count()
+
+            # Filtro final incluindo as semanas e anos, agrupado por bairro
+            notificacoes = base_query.values('logradouro_paciente__bairro__nome_bairro') \
+                                     .annotate(quantidade=Count('id')) \
+                                     .order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
 
-    semana_menos_1 = semana - 1 if semana else None
-    semana_menos_2 = semana - 2 if semana else None
-    semana_menos_3 = semana - 3 if semana else None
-    
     context = {
         'notificacoes': notificacoes,
-        'termo_pesquisa': semana,
-        'ano_pesquisa': ano,
-        'semana': semana,
-        'semana_menos_1': semana_menos_1,
-        'semana_menos_2': semana_menos_2,
-        'semana_menos_3': semana_menos_3,
+        'total_geral': total_geral,  # Adiciona o total geral no contexto
+        'termo_pesquisa': semana_query,
+        'ano_pesquisa': ano_query,
         'pesquisa_realizada': pesquisa_realizada,
-        'ano': ano,
     }
 
     return render(request, 'dengue/positivos_bairros.html', context)
-
 
 def criar_notificacao(request):
     if request.method == 'POST':
@@ -620,7 +641,7 @@ def positivos_recentes(request):
     if request.method == 'GET':
         semana = request.GET.get('semana')
         ano = request.GET.get('ano')
-        print(semana, ano)
+
         
         if semana is not None or ano is not None:
             formulario_submetido = True
@@ -663,3 +684,4 @@ def positivos_recentes(request):
 def detalhes_notificacao(request, id_notificacao):
     notificacao = get_object_or_404(Notificacao, id=id_notificacao)
     return render(request, 'dengue/detalhes_notificacao.html', {'notificacao': notificacao})
+    

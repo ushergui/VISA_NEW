@@ -106,6 +106,7 @@ class Empresas(models.Model):
     nome_fantasia = models.CharField(max_length=70, verbose_name="Nome Fantasia", null=True, blank=True)
     mei = models.BooleanField(verbose_name="MEI", null=False, blank=False)
     cnpj = models.CharField(max_length=18, unique=True, verbose_name="CNPJ", null=True, blank=True)
+    inscricao_estadual = models.CharField(max_length=18, unique=True, verbose_name="I.E.", null=True, blank=True)
     telefone1 = models.CharField(max_length=15, verbose_name="Telefone", null=True, blank=True)
     telefone2 = models.CharField(max_length=15, verbose_name="Telefone 2", null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -121,6 +122,18 @@ class Empresas(models.Model):
     cnae_principal = models.ForeignKey(Cnae, on_delete=models.PROTECT, verbose_name='CNAE Principal', related_name='CNAE_Principal', default=96)
     cnae = models.ManyToManyField(Cnae, verbose_name='CNAE(s) Secundário(s)', related_name='CNAE_Secundario', blank=True)
     alvara = models.DateField(null=True, blank=True)
+    OPCOES_ALVARA = [
+        ('1', 'Um ano'),
+        ('2', 'Dois anos'),
+        ('3', 'Três anos'),
+    ]
+    anos_alvara = models.CharField(
+        max_length=1,
+        choices=OPCOES_ALVARA,
+        default=1,
+        null=True, 
+        blank=True, verbose_name='Quantos anos de liberação do alvará?'
+    )
     observacoes = models.CharField(max_length=400, verbose_name="Observações", null=True, blank=True)
     risco_empresa = models.ForeignKey(Risco, on_delete=models.PROTECT)
     contabilidade = models.ForeignKey(Contabilidade, on_delete=models.PROTECT)
@@ -190,6 +203,7 @@ class ProtocoloEmpresa(models.Model):
     status_protocolo = models.CharField(max_length=80, null=False, choices=STATUS_CHOICES, default=1,verbose_name="Status")
     observacoes_protocolo = models.CharField(max_length=250, null=True, blank=True, verbose_name="Observações")
     
+    
     class Meta:
         ordering = ["empresa"]
 
@@ -202,7 +216,7 @@ class ProtocoloEmpresa(models.Model):
 
 class Inspecao(models.Model):
     data_inspecao = models.DateField(null=False, verbose_name="Data da Inspeção")
-    data_relatorio = models.DateField(null=False, verbose_name="Data do Relatório")
+    data_relatorio = models.DateField(null=False, verbose_name="Data do Relatório (e data da emissão do alvará quando na liberação)")
     legislacao = models.TextField(null=True, blank=True, verbose_name="Legislação")
     desenvolvimento = models.TextField(null=True, blank=True, verbose_name="Desenvolvimento")
     inadequacoes = models.TextField(null=True, blank=True, verbose_name="Inadequações")

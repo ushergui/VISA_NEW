@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Alvará Sanitário</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        body {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+        }
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .numero-protocolo {
+            position: absolute;
+            top: 30mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 2;
+            font-size: 20pt;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .razao-social {
+            position: absolute;
+            top: 47mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: left;
+            z-index: 2;
+            font-size: {% if razao_social|length > 77 %}11pt{% elif razao_social|length > 73 %}12pt{% elif razao_social|length > 68 %}13pt{% elif razao_social|length > 62 %}14pt{% else %}15pt{% endif %};
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .nome-fantasia {
+            position: absolute;
+            top: 60mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: left;
+            z-index: 2;
+            font-size: {% if nome_fantasia|length > 77 %}11pt{% elif nome_fantasia|length > 73 %}12pt{% elif nome_fantasia|length > 68 %}13pt{% elif nome_fantasia|length > 62 %}14pt{% else %}15pt{% endif %};
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .endereco {
+            position: absolute;
+            top: 72.5mm;
+            left: 10mm;
+            right: 81mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+
+        .bairro {
+            position: absolute;
+            top: 72.5mm;
+            left: 134mm;
+            right: 10mm;
+            text-align: left;
+            z-index: 2;
+            font-size: {% if bairro|length > 38 %}10pt{% else %}11pt{% endif %};
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+
+        .cnpj {
+            position: absolute;
+            top: 82.5mm;
+            left: 10mm;
+            right: 81mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 12pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .inscricao {
+            position: absolute;
+            top: 82.5mm;
+            left: 134mm;
+            right: 10mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 12pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .cnae_sujeitos {
+            position: absolute;
+            top: 93mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: justify;
+            z-index: 2;
+            font-size: {% if cnae_sujeitos|length > 1000 %}9pt{% elif cnae_sujeitos|length > 912 %}10pt{% else %}11pt{% endif %};
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .responsavel_legal {
+            position: absolute;
+            top: 177.5mm;
+            left: 10mm;
+            right: 81mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .responsavel_tecnico {
+            position: absolute;
+            top: 189.9mm;
+            left: 10mm;
+            right: 81mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .rg_responsavel {
+            position: absolute;
+            top: 177.5mm;
+            left: 116mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .conselho_responsavel_tecnico {
+            position: absolute;
+            top: 189.9mm;
+            left: 116mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .cpf {
+            position: absolute;
+            top: 177.5mm;
+            left: 161mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .cpf_responsavel_tecnico {
+            position: absolute;
+            top: 189.9mm;
+            left: 161mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+        .cnae_nao_sujeitos {
+            position: absolute;
+            top: 133.8mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: justify;
+            z-index: 2;
+            font-size: {% if cnae_nao_sujeitos|length > 1000 %}9pt{% elif cnae_nao_sujeitos|length > 912 %}10pt{% else %}11pt{% endif %};
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+
+        .emissao {
+            position: absolute;
+            top: 256.2mm;
+            left: 40mm;
+            right: 81mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 24pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+
+        .alvara_data {
+            position: absolute;
+            top: 256.2mm;
+            left: 138mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 24pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+
+        
+        
+    </style>
+</head>
+<body>
+    <img class="background-image" src="{% static 'img/alvara.png' %}" alt="Fundo do Alvará">
+    <div class="numero-protocolo">ALVARÁ SANITÁRIO MUNICIPAL Nº:  {{ protocolo.numero_protocolo }}</div>
+    <div class="razao-social">{{ razao_social }}</div>
+    <div class="nome-fantasia">{{ nome_fantasia }}</div>
+    <div class="endereco">{{ endereco|capitalize_name }}</div>
+    <div class="bairro">{{ bairro|capitalize_name }}</div>
+    <div class="cnpj">{{ cnpj }}</div>
+    <div class="inscricao">{{ inscricao }}</div>
+    <div class="cnae_sujeitos">{{ cnae_sujeitos }}</div>
+    <div class="cnae_nao_sujeitos">{{ cnae_nao_sujeitos }}</div>
+    <div class="responsavel_legal">{{ responsavel_legal|capitalize_name }}</div>
+    <div class="rg_responsavel">{{ rg_responsavel }}</div>
+    <div class="cpf">{{ cpf }}</div>
+    <div class="responsavel_tecnico">{{ responsavel_tecnico|capitalize_name }}</div>
+    <div class="cpf_responsavel_tecnico">{{ cpf_responsavel_tecnico }}</div>
+    <div class="conselho_responsavel_tecnico">{{ conselho_responsavel_tecnico }}</div>
+    <div class="alvara_data">{{ alvara_data|date:"d/m/Y" }}</div>
+    <div class="emissao">{{ emissao|date:"d/m/Y" }}</div>
+
+</body>
+</html>

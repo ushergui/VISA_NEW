@@ -77,4 +77,6 @@ urlpatterns = [
     path('fechamento/', views.fechamento, name='fechamento'),
     path('painel/', views.painel, name='painel'),
 
+    path('empresas/<int:empresa_id>/alvara', views.gerar_alvara, name='gerar_alvara'),
+
 ]
