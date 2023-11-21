@@ -1094,8 +1094,9 @@ def gerar_alvara(request, empresa_id):
     conselho_responsavel_tecnico = inspecao_recente.protocolo.empresa.conselho_responsavel_tecnico
     alvara_data = inspecao_recente.protocolo.empresa.alvara
     anos_alvara_int = int(inspecao_recente.protocolo.empresa.anos_alvara)
-    dias_a_subtrair = 364 * anos_alvara_int
-    emissao = alvara_data - timedelta(days=dias_a_subtrair)
+    novo_ano = alvara_data.year - anos_alvara_int
+    nova_data = datetime(novo_ano, alvara_data.month, alvara_data.day) + timedelta(days=1)
+    emissao = nova_data.strftime("%d/%m/%Y")    
 
     context = {
         'protocolo': protocolo,
