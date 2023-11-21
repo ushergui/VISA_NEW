@@ -112,9 +112,12 @@
 					<h4>Alvará</h4>
                     <p>
                         {% if empresa.alvara %}
+                            {% if empresa.mei %}
+                                {{ empresa.alvara|date:"d/m/Y" }}
+                            {% else %}
+                            {{ empresa.alvara|date:"d/m/Y" }}<a href="{% url 'gerar_alvara' empresa.id %}" target="_blank">  <i class="fas fa-file-pdf"></i></a>
 
-                        
-                        <a href="{% url 'gerar_alvara' empresa.id %}" target="_blank">{{ empresa.alvara|date:"d/m/Y" }}</a>
+                            {% endif %}
                         {% else %}
                             ********
                         {% endif %}

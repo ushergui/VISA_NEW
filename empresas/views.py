@@ -1093,7 +1093,7 @@ def gerar_alvara(request, empresa_id):
     cpf_responsavel_tecnico = inspecao_recente.protocolo.empresa.cpf_responsavel_tecnico
     conselho_responsavel_tecnico = inspecao_recente.protocolo.empresa.conselho_responsavel_tecnico
     alvara_data = inspecao_recente.protocolo.empresa.alvara
-    anos_alvara_int = int(inspecao_recente.protocolo.empresa.anos_alvara)
+    anos_alvara_int = int(getattr(inspecao_recente.protocolo.empresa, 'anos_alvara', 1))
     novo_ano = alvara_data.year - anos_alvara_int
     nova_data = datetime(novo_ano, alvara_data.month, alvara_data.day) + timedelta(days=1)
     emissao = nova_data.strftime("%d/%m/%Y")    
@@ -1126,89 +1126,3 @@ def gerar_alvara(request, empresa_id):
     response['Content-Disposition'] = 'inline; filename=alvara.pdf'
     return response
 
-
-'''class AlvaraSanitarioView(View):
-    def get(self, request, empresa_id, *args, **kwargs):
-        # Encontrar a inspeção mais recente para a empresa específica
-        inspecao_recente = Inspecao.objects.filter(protocolo__empresa=empresa_id).latest('data_inspecao')
-        numero_protocolo = inspecao_recente.protocolo.numero_protocolo
-        razao_social = inspecao_recente.protocolo.empresa.razao  
-        nome_fantasia = inspecao_recente.protocolo.empresa.nome_fantasia
-        if not nome_fantasia:
-            nome_fantasia = "********"
-        logradouro = inspecao_recente.protocolo.empresa.logradouro_empresa.nome_logradouro
-        tipo = inspecao_recente.protocolo.empresa.logradouro_empresa.tipo
-        numero = inspecao_recente.protocolo.empresa.numero_empresa
-        complemento = inspecao_recente.protocolo.empresa.complemento_empresa
-        if complemento:
-            endereco = f"{tipo} {logradouro}, {numero} - {complemento}"
-        else:
-            endereco = f"{tipo} {logradouro}, {numero}"
-        
-        # Caminho para o arquivo da imagem de fundo
-        base_img_path = os.path.join('static', 'alvara.png')
-        base_image = Image.open(base_img_path)
-        draw = ImageDraw.Draw(base_image)
-
-        # Caminho da fonte
-        if os.name == 'nt':  # Windows
-            font_path = 'C:\\Windows\\Fonts\\times.ttf'
-        else:  # Linux
-            font_path = '/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf'
-
-        font = ImageFont.truetype(font_path, 58)
-
-        # Coordenadas e desenho para o número do protocolo
-        x_proto, y_proto = 1220, 231  # Ajuste conforme necessário
-        draw.text((x_proto, y_proto), numero_protocolo, font=font, fill='black')
-
-        # Ajustar o tamanho da fonte baseado no comprimento da razão social
-        tamanho_fonte = 43
-        limite_caracteres = 59
-        if len(razao_social) > limite_caracteres:
-            # Reduzir o tamanho da fonte proporcionalmente ao excesso de caracteres
-            excedente = len(razao_social) - limite_caracteres
-            diminuir = int(excedente / 2)  # Ajuste este fator conforme necessário
-            tamanho_fonte = max(43 - diminuir, 20)  # 20 é o tamanho mínimo da fonte
-
-        font = ImageFont.truetype(font_path, tamanho_fonte)
-
-        # Coordenadas e desenho para a razão social
-        x_razao, y_razao = 70, 365  # Posição inicial da razão social
-        draw.text((x_razao, y_razao), razao_social, font=font, fill='black')
-
-        # Ajustar o tamanho da fonte para o nome fantasia
-        tamanho_fonte_fantasia = 43
-        limite_caracteres_fantasia = 59
-        if len(nome_fantasia) > limite_caracteres_fantasia:
-            excedente_fantasia = len(nome_fantasia) - limite_caracteres_fantasia
-            diminuir_fantasia = int(excedente_fantasia / 2)
-            tamanho_fonte_fantasia = max(43 - diminuir_fantasia, 20)  # 20 é o tamanho mínimo da fonte
-
-        font_fantasia = ImageFont.truetype(font_path, tamanho_fonte_fantasia)
-
-        # Coordenadas e desenho para o nome fantasia
-        # Ajuste as coordenadas conforme necessário
-        x_fantasia, y_fantasia = 70, 470  # Posição inicial do nome fantasia
-        draw.text((x_fantasia, y_fantasia), nome_fantasia, font=font_fantasia, fill='black')
-
-        tamanho_fonte_endereco = 27
-        limite_caracteres_endereco = 39
-        if len(endereco) > limite_caracteres_endereco:
-            # Reduzir o tamanho da fonte proporcionalmente ao excesso de caracteres
-            excedente_endereco = len(endereco) - limite_caracteres_endereco
-            diminuir_endereco = int(excedente_endereco / 1.5)
-            tamanho_fonte_endereco = max(33 - diminuir_endereco, 27)  # 20 é o tamanho mínimo da fonte
-
-        font_endereco = ImageFont.truetype(font_path, tamanho_fonte_endereco)
-
-        # Coordenadas e desenho para o endereço
-        # Ajuste as coordenadas conforme necessário
-        x_endereco, y_endereco = 70, 570  # Posição inicial do endereço
-        draw.text((x_endereco, y_endereco), endereco, font=font_endereco, fill='black')
-
-
-        # Salvar ou retornar a imagem
-        response = HttpResponse(content_type="image/png")
-        base_image.save(response, "PNG")
-        return response'''
