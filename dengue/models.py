@@ -24,6 +24,7 @@ class Notificacao(models.Model):
         ("USF CAIC III", "USF CAIC III"),
         ("USF Cidade Industrial", "USF Cidade Industrial"),
         ("USF Diamantina", "USF Diamantina"),
+        ("EAP Guardinha", "EAP Guardinha"),
         ("EAP Rural", "EAP Rural"),
         ("USF Estação", "USF Estação"),
         ("USF Guardinha", "USF Guardinha"),
@@ -147,5 +148,3 @@ class Notificacao(models.Model):
     def __str__(self):
         return self.nome
 
-
-    

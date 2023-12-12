@@ -131,9 +131,6 @@ class EmpresasForm(forms.ModelForm):
         else:
             self.fields['logradouro_empresa'].queryset = Logradouro.objects.none()
 
-        if 'anos_alvara' in self.fields and not self.instance.pk:  # Checa se é uma criação e não edição de instância
-            self.fields['anos_alvara'].initial = 1
-
     def clean_cpf_responsavel_legal(self):
         cpf = self.cleaned_data.get('cpf_responsavel_legal')
         if cpf and not valida_cpf(cpf):

@@ -227,17 +227,14 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
     model = Infracao
     form_class = InfracaoCreateForm
     template_name = 'form5.html'
-    success_url = reverse_lazy('listar-infracoes-ativos')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         if self.request.method == 'POST':
-            # O formulário está sendo enviado, então pegue a data do POST request
             data_auto_str = self.request.POST.get('data_auto')
             data_auto = datetime.strptime(data_auto_str, "%d/%m/%Y").date()
         else:
-            # O formulário está sendo exibido, então use a data atual
             data_auto = datetime.today().date()
 
         is_pre_june_2023 = data_auto <= date(2023, 6, 2)
@@ -246,6 +243,9 @@ class InfracaoCreate(LoginRequiredMixin, CreateView):
         context['titulo'] = "Cadastro de infração"
         context['botao'] = "Cadastrar"
         return context
+
+    def get_success_url(self):
+        return reverse('detalhes-infracao', kwargs={'pk': self.object.pk})
     
 def verificar_infracao_existente(request):
     inscricao = request.GET.get('inscricao', None)

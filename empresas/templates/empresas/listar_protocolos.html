@@ -10,10 +10,12 @@
         <tr>
           <th style="text-align:center">Número</th>
           <th style="text-align:center">Empresa</th>
+          <th style="text-align:center">Risco</th>
           <th style="text-align:center">Motivo</th>
-          <th style="text-align:center">Observações</th>
+		  <th style="text-align:center">Fiscal</th>
           <th style="text-align:center">Status do Protocolo</th>
           <th style="text-align:center">Ações</th>
+		  
         </tr>
       </thead>
       <tbody>
@@ -21,8 +23,8 @@
           <tr>
             <td style="text-align:center;">{% if protocolo.numero_protocolo %}{{ protocolo.numero_protocolo }}{% else %}*******{% endif %}</td>
 		    <td>{% if protocolo.empresa %}{{ protocolo.empresa.razao|capitalize_name }}{% else %}*******{% endif %}</td>
-			
-        <td style="text-align:center;">
+			<td>{{ protocolo.empresa.cnae_principal.risco_cnae }}</td>
+			<td style="text-align:center;">
 			{% if protocolo.motivo == "1"%}
 				Alvará Sanitário Inicial
 				{% elif protocolo.motivo == "2"%}
@@ -68,9 +70,11 @@
 				{% endif %}
 			</td>
 			
-			
-			
-      <td style="text-align:center;">{% if protocolo.observacoes_protocolo %}{{ protocolo.observacoes_protocolo }}{% else %}*******{% endif %}</td>
+      <td style="text-align:center;">{% if protocolo.fiscal_responsavel %}{{ protocolo.fiscal_responsavel }}
+	  {% else %}
+	  
+	  {% endif %}</td>
+	  
       <td style="text-align:center;">{% if protocolo.status_protocolo == "1"%}
 				Aguardando escolha/entrega de fiscal (Administrativo)
 				{% elif protocolo.status_protocolo == "2"%}

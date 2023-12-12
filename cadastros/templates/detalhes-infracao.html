@@ -1,37 +1,144 @@
 {% extends 'modelo-ifpr.html' %}
 
 {% load static %}
+{% load custom_filters %}
 
 {% block conteudo %}
+<div class="container-centralizado" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+    <div style="width: 50%;">
+        <div class="empresa-container">
+            <h4>Detalhes do Auto de Infração nº {{ infracao.numero_format_ano }} </h4><br>
+            <div class="row">
+				<div class="col-lg-2 ">
+					<h5>Inscrição</h5>
+					<p>{{ infracao.inspecao.terreno.inscricao }}</p>
+				</div>
+				<div class="col-lg-5 ">
+					<h5>Endereço terreno</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.logradouro_terreno.tipo|capitalize_name }}
+                        {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro|capitalize_name }}, {{ infracao.inspecao.terreno.numero_terreno }} -
+                        {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro|capitalize_name }}
+                    </p>
+				</div>
+                <div class="col-lg-5 ">
+					<h5>Endereço de correspondência</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.logradouro_correspondencia.tipo|capitalize_name }}
+                        {{ infracao.inspecao.terreno.logradouro_correspondencia.nome_logradouro|capitalize_name }}, {{ infracao.inspecao.terreno.numero_correspondencia }} -
+                        {% if infracao.inspecao.terreno.complemento_correspondencia %} - {{ infracao.inspecao.terreno.complemento_correspondencia }}{% else %}{% endif %}{{ infracao.inspecao.terreno.logradouro_correspondencia.bairro.nome_bairro|capitalize_name }}
+                    </p>
+				</div>
+				
+            </div>
+            <div class="row">
+                <div class="col-lg-1 ">
+					<h5>Quadra</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.quadra }}
+                    </p>
+				</div>
+                <div class="col-lg-1 ">
+					<h5>Lote</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.lote }}
+                    </p>
+				</div>
+                <div class="col-lg-1 ">
+					<h5>Área</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.area }}
+                    </p>
+				</div>
+                <div class="col-lg-1 ">
+					<h5>Multa</h5>
+                    <p>
+                       VER
+                    </p>
+				</div>
+                <div class="col-lg-3 ">
+					<h5>Proprietário</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.proprietario.nome_proprietario|capitalize_name }}
+                    </p>
+				</div>
+                <div class="col-lg-5 ">
+					<h5>Endereço do proprietário</h5>
+                    <p>
+                        {{ infracao.inspecao.terreno.proprietario.logradouro_proprietario.tipo|capitalize_name }}
+                        {{ infracao.inspecao.terreno.proprietario.logradouro_proprietario.nome_logradouro|capitalize_name }}, {{ infracao.inspecao.terreno.proprietario.numero_proprietario }} -
+                        {% if infracao.inspecao.terreno.proprietario.complemento_proprietario %} - {{ infracao.inspecao.terreno.proprietario.complemento_proprietario }}{% else %}{% endif %}{{ infracao.inspecao.terreno.proprietario.logradouro_proprietario.bairro.nome_bairro|capitalize_name }}
+                    </p>
+				</div>
+                
+                
+			</div>
+            <div class="row">
+                <div class="col-lg-2 ">
+					<h5>Protocolo</h5>
+                    <p>
+                        {{ infracao.inspecao.protocolo }}
+                    </p>
+				</div>
+                <div class="col-lg-2 ">
+					<h5>AR Notif.</h5>
+                    <a href="{% url 'gerar_ar1' pk=infracao.pk %}">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                      </a>
+                      <a href="{% url 'gerar_ar2' pk=infracao.pk %}">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                      </a>
+                     
+              
+                      <a href="{% url 'gerar_ar3' pk=infracao.pk %}">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                      </a>
+                     
+              
+                     
+                      <a href="{% url 'gerar_ar4' pk=infracao.pk %}">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                      </a>
+				</div>
+                <div class="col-lg-2 ">
+					<h5>Relatório</h5>
+                    <a href="{% url 'gerar_relatorio' pk=infracao.inspecao.pk %}">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+            
+                    </a> 
+				</div>
+                <div class="col-lg-2 ">
+					<h5>AR indiv./colet.</h5>
+                    <a href="{% url 'cadastrar-AR' infracao.pk %}" class="text-center">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        </a>
+                    <a href="{% url 'editar_infracao' infracao.pk %}" class="text-center">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        </a>
+				</div>
 
-<div class="container-fluid py-5 ">
-<h1 style="position:absolute;top:70px;">Detalhes do Auto de Infração nº {{ infracao.numero_format_ano }} <a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 " >Voltar</a> </h1>
-    <br>
+                <div class="col-lg-2 ">
+					<h5>Defesa indiv./colet.</h5>
+                    <a href="{% url 'gerenciar_defesa' infracao.pk %}" class="text-center">
+                        <i class="fa fa-suitcase" aria-hidden="true"></i>
+                        </a>
+                        
+				</div>
 
-<h4 style="position:absolute;top:140px;">Inscrição Imobiliária: {{ infracao.inspecao.terreno.inscricao }}&#160;&#160;&#160;&#160;
-    Proprietário: {{ infracao.inspecao.terreno.proprietario }}&#160;&#160;&#160;&#160;Endereço: {{ infracao.inspecao.terreno.logradouro_terreno.tipo }}
-    {{ infracao.inspecao.terreno.logradouro_terreno.nome_logradouro }}, {{ infracao.inspecao.terreno.numero_terreno }} -
-    {{ infracao.inspecao.terreno.logradouro_terreno.bairro.nome_bairro }}
- </h4>
+			</div>
+        </div>
+    </div>
+</div>
 
-    <h4 style="position:absolute;top:175px;">Protocolo: {{ infracao.inspecao.protocolo }}&#160;&#160;&#160;&#160;&#160;&#160;&#160;
-    Fiscal: {{ infracao.inspecao.fiscal }}    &#160;&#160;&#160;&#160;&#160;&#160;&#160;Data da inspeção:
-    {{ infracao.inspecao.data_inspecao1|date:"d/m/Y" }}&#160;&#160;&#160;&#160;&#160;&#160;
-    <a href="{% url 'gerar_auto' pk=infracao.pk %}" target="_blank">Auto de Infração</a>&#160;&#160;&#160;
-        &#160;&#160;&#160;<a href="{% url 'cadastrar-AR' infracao.pk %}"
-    target="_blank">AR individual</a>&#160;&#160;&#160;&#160;&#160;&#160;
 
-    <a href="{% url 'cadastrar-defesa' infracao.pk %}" target="_blank">Defesa individual</a>
 
-    </h4>
-    <h4 style="position:absolute;top:210px;">Data de recebimento da AR: {% if infracao.data_entrega_autuacao == None %} Não entregue {% else %} {{ infracao.data_entrega_autuacao }} {% endif %}&#160;&#160;&#160;&#160;Protocolo de defesa: {% if infracao.protocolo_defesa == None %} Não defendeu {% else %} {{ infracao.protocolo_defesa }} {% endif %}
 
-    </h4>
+
     {% if infracao.inspecao.foto_inspecao_1 %}
-    <img src='{{ infracao.inspecao.foto_inspecao_1.url }}' style="position:absolute;left:30px;top:270px;height:450px;width:700px" />
+    <img src='{{ infracao.inspecao.foto_inspecao_1.url }}' style="position:absolute;left:30px;top:770px;height:450px;width:700px" />
     {% else %}{% endif %}
     {% if infracao.foto_inspecao_2 %}
-    <img src='{{ infracao.foto_inspecao_2.url }}' style="position:absolute;left:800px;top:270px;height:450px;width:700px" />
+    <img src='{{ infracao.foto_inspecao_2.url }}' style="position:absolute;left:800px;top:750px;height:450px;width:700px" />
     {% else %}{% endif %}
 
 </div>

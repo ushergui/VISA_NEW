@@ -41,7 +41,7 @@
             right: 10mm;
             text-align: left;
             z-index: 2;
-            font-size: {% if razao_social|length > 77 %}11pt{% elif razao_social|length > 73 %}12pt{% elif razao_social|length > 68 %}13pt{% elif razao_social|length > 62 %}14pt{% else %}15pt{% endif %};
+            font-size: {% if razao_social|length > 73 %}09pt{% elif razao_social|length > 68 %}10pt{% elif razao_social|length > 64 %}11pt{% elif razao_social|length > 56 %}12pt{% else %}14pt{% endif %};
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;
@@ -207,12 +207,12 @@
 
         .emissao {
             position: absolute;
-            top: 256.2mm;
-            left: 40mm;
+            top: 257.2mm;
+            left: 46mm;
             right: 81mm;
             text-align: left;
             z-index: 2;
-            font-size: 24pt;
+            font-size: 18pt;
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;
@@ -220,12 +220,37 @@
 
         .alvara_data {
             position: absolute;
-            top: 256.2mm;
-            left: 138mm;
+            top: 257.2mm;
+            left: 146mm;
             right: 0mm;
             text-align: left;
             z-index: 2;
-            font-size: 24pt;
+            font-size: 18pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+		.nome_referencia {
+            position: absolute;
+            top: 275.2mm;
+            left: 77mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 12pt;
+            font-family: 'Times New Roman', Times, serif;
+            overflow-wrap: break-word;
+            max-width: 190mm;
+        }
+		
+		.cargo_referencia {
+            position: absolute;
+            top: 282.2mm;
+            left: 60mm;
+            right: 0mm;
+            text-align: left;
+            z-index: 2;
+            font-size: 12pt;
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;
@@ -245,15 +270,33 @@
     <div class="cnpj">{{ cnpj }}</div>
     <div class="inscricao">{{ inscricao }}</div>
     <div class="cnae_sujeitos">{{ cnae_sujeitos }}</div>
+	{% if cnae_nao_sujeitos %}
     <div class="cnae_nao_sujeitos">{{ cnae_nao_sujeitos }}</div>
+	{% else %}
+	<div class="cnae_nao_sujeitos">********</div>
+	{% endif %}
     <div class="responsavel_legal">{{ responsavel_legal|capitalize_name }}</div>
     <div class="rg_responsavel">{{ rg_responsavel }}</div>
     <div class="cpf">{{ cpf }}</div>
+	{% if responsavel_tecnico %}
     <div class="responsavel_tecnico">{{ responsavel_tecnico|capitalize_name }}</div>
+	{% else %}
+	<div class="responsavel_tecnico">********</div>
+	{% endif %}
+	{% if responsavel_tecnico %}
     <div class="cpf_responsavel_tecnico">{{ cpf_responsavel_tecnico }}</div>
+	{% else %}
+	<div class="cpf_responsavel_tecnico">********</div>
+	{% endif %}
+	{% if conselho_responsavel_tecnico %}
     <div class="conselho_responsavel_tecnico">{{ conselho_responsavel_tecnico }}</div>
+	{% else %}
+	<div class="conselho_responsavel_tecnico">********</div>
+	{% endif %}
     <div class="alvara_data">{{ alvara_data|date:"d/m/Y" }}</div>
     <div class="emissao">{{ emissao }}</div>
+	<div class="nome_referencia">Guilherme Firmino Duarte</div>
+	<div class="cargo_referencia">Referência Técnica da Vigilância Sanitária</div>
 
 </body>
 </html>

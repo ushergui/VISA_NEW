@@ -106,7 +106,7 @@ class Empresas(models.Model):
     nome_fantasia = models.CharField(max_length=70, verbose_name="Nome Fantasia", null=True, blank=True)
     mei = models.BooleanField(verbose_name="MEI", null=False, blank=False)
     cnpj = models.CharField(max_length=18, unique=True, verbose_name="CNPJ", null=True, blank=True)
-    inscricao_estadual = models.CharField(max_length=18, unique=True, verbose_name="I.E.", null=True, blank=True)
+    inscricao_estadual = models.CharField(max_length=18, verbose_name="I.E.", null=True, blank=True)
     telefone1 = models.CharField(max_length=15, verbose_name="Telefone", null=True, blank=True)
     telefone2 = models.CharField(max_length=15, verbose_name="Telefone 2", null=True, blank=True)
     email = models.EmailField(null=True, blank=True)

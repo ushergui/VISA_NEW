@@ -126,3 +126,33 @@ Largura máxima das tabelas para não ficar mal formatada
 table td{
     max-width: 500px;
 }
+
+
+
+.empresa-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    padding: 17px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    margin-right: 0px;
+    margin-left: 10px;
+}
+
+.empresa-container p {
+    word-break: break-word;
+
+}
+
+.protocolos-container {
+    box-sizing: border-box;
+    border: 4px solid #76a2ce;
+    width: calc(100% - 50%  - 8px); 
+    padding: 17px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    margin-right: 0px;
+    
+}

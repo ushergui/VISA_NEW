@@ -5,12 +5,12 @@
         <title>Empresas CNAE</title>
         <style>
             @page {
-                size: A4 landscape;
-                margin: 0cm;
-            }
-            body {
-                margin: 1cm;  /* margem ao redor do conteúdo do body */
-            }
+        size: A4 landscape;
+        margin: 1cm; /* Definindo uma margem para todas as páginas */
+    }
+    body {
+        margin: 0; /* Removendo a margem adicional do body */
+    }
             table { 
                 font-size: 12px; 
                 text-align: center; 
@@ -25,6 +25,9 @@
                 border: 1px solid #000; 
                 border-radius: 5px;  /* Arredonda as bordas */
             }
+			tr { 
+				page-break-inside: avoid; /* Evita que as linhas da tabela sejam quebradas entre páginas */
+			}
             tr:nth-child(even) {background-color: #f2f2f2;}  /* Linhas zebradas */
         </style>
     </head>

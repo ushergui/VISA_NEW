@@ -445,10 +445,19 @@ class EmpresasCnaeListView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         if query:
-            empresas = Empresas.objects.filter(
+            # Filtrar com base no código e descrição do CNAE
+            base_query = Empresas.objects.filter(
                 Q(cnae_principal__codigo_cnae__icontains=query) |
                 Q(cnae_principal__descricao_cnae__icontains=query)
             ).distinct()
+
+            # Aplicar os filtros adicionais com base no valor do risco
+            filtro_risco_3 = Q(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"])
+            filtro_risco_4_5 = Q(cnae_principal__risco_cnae__valor_risco__in=[4, 5], status_funcionamento="ATIVA")
+            filtro_risco_1_2 = Q(cnae_principal__risco_cnae__valor_risco__in=[1, 2])
+
+            # Combinar os filtros
+            empresas = base_query.exclude(filtro_risco_1_2).filter(filtro_risco_3 | filtro_risco_4_5)
 
             return empresas.order_by('razao')
         else:
@@ -459,10 +468,18 @@ class EmpresasCnaeListView(ListView):
         query = self.request.GET.get('q')
 
         if query:
-            empresas = Empresas.objects.filter(
+            base_query = Empresas.objects.filter(
                 Q(cnae_principal__codigo_cnae__icontains=query) |
                 Q(cnae_principal__descricao_cnae__icontains=query)
             ).distinct()
+            
+             # Aplicar os filtros adicionais com base no valor do risco
+            filtro_risco_3 = Q(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"])
+            filtro_risco_4_5 = Q(cnae_principal__risco_cnae__valor_risco__in=[4, 5], status_funcionamento="ATIVA")
+            filtro_risco_1_2 = Q(cnae_principal__risco_cnae__valor_risco__in=[1, 2])
+
+            # Combinar os filtros
+            empresas = base_query.exclude(filtro_risco_1_2).filter(filtro_risco_3 | filtro_risco_4_5)
 
             context['total_registros'] = empresas.count()
 
@@ -542,17 +559,23 @@ def empresas_endereco_pdf(request):
 
 
 def empresas_cnae_pdf(request):
-    # Recupera o parâmetro da URL
     query = request.GET.get('q')
-    # Inicia a query como vazia
     empresas = Empresas.objects.none()
 
     if query:
-        # Faz a consulta caso a query tenha sido preenchida
-        empresas = Empresas.objects.filter(
+        # Filtrar com base no código e descrição do CNAE
+        base_query = Empresas.objects.filter(
             Q(cnae_principal__codigo_cnae__icontains=query) |
             Q(cnae_principal__descricao_cnae__icontains=query)
-        ).distinct().order_by(
+        ).distinct()
+
+        # Aplicar os filtros adicionais com base no valor do risco
+        filtro_risco_3 = Q(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"])
+        filtro_risco_4_5 = Q(cnae_principal__risco_cnae__valor_risco__in=[4, 5], status_funcionamento="ATIVA")
+        filtro_risco_1_2 = Q(cnae_principal__risco_cnae__valor_risco__in=[1, 2])
+
+        # Combinar os filtros
+        empresas = base_query.exclude(filtro_risco_1_2).filter(filtro_risco_3 | filtro_risco_4_5).order_by(
             'cnae_principal__descricao_cnae', 
             'logradouro_empresa__bairro__nome_bairro', 
             'logradouro_empresa__nome_logradouro', 
@@ -597,13 +620,15 @@ class EmpresasView(TemplateView):
         context['executado_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
         context['porcentagem_i'] = round(context['executado_i'] / context['nivel_risco_i'] * 100, 1) if context['nivel_risco_i'] > 0 else 0
 
-        context['nivel_risco_ii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4).count()
-        context['executado_ii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['nivel_risco_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4).count()
+        context['executado_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
         context['porcentagem_ii'] = round(context['executado_ii'] / context['nivel_risco_ii'] * 100, 1) if context['nivel_risco_ii'] > 0 else 0
 
-        context['nivel_risco_iii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=5).count()
-        context['executado_iii'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+
+        context['nivel_risco_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5).count()
+        context['executado_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
         context['porcentagem_iii'] = round(context['executado_iii'] / context['nivel_risco_iii'] * 100, 1) if context['nivel_risco_iii'] > 0 else 0
+
 
         return context
     
@@ -707,17 +732,17 @@ def listar_risco_dois(request):
         status_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+             ).order_by('-entrada_protocolo').values('status_protocolo')[:1]
         ),
         numero_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+            ).order_by('-entrada_protocolo').values('numero_protocolo')[:1]
          ),
          primeiro_nome_fiscal=Subquery(
              ProtocoloEmpresa.objects.filter(
              empresa=OuterRef('pk')
-         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ).order_by('-entrada_protocolo').values('fiscal_responsavel__primeiro_nome')[:1]
          ),
      ).annotate(
          protocolo_aberto_fiscal=Case(
@@ -745,17 +770,17 @@ def listar_risco_dois_pdf(request):
         status_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+             ).order_by('-entrada_protocolo').values('status_protocolo')[:1]
         ),
         numero_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+            ).order_by('-entrada_protocolo').values('numero_protocolo')[:1]
          ),
          primeiro_nome_fiscal=Subquery(
              ProtocoloEmpresa.objects.filter(
              empresa=OuterRef('pk')
-         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ).order_by('-entrada_protocolo').values('fiscal_responsavel__primeiro_nome')[:1]
          ),
      ).annotate(
          protocolo_aberto_fiscal=Case(
@@ -793,17 +818,17 @@ def listar_risco_tres(request):
         status_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+             ).order_by('-entrada_protocolo').values('status_protocolo')[:1]
         ),
         numero_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+            ).order_by('-entrada_protocolo').values('numero_protocolo')[:1]
          ),
          primeiro_nome_fiscal=Subquery(
              ProtocoloEmpresa.objects.filter(
              empresa=OuterRef('pk')
-         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ).order_by('-entrada_protocolo').values('fiscal_responsavel__primeiro_nome')[:1]
          ),
      ).annotate(
          protocolo_aberto_fiscal=Case(
@@ -831,17 +856,17 @@ def listar_risco_tres_pdf(request):
         status_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-             ).order_by('-entrada_fiscal').values('status_protocolo')[:1]
+             ).order_by('-entrada_protocolo').values('status_protocolo')[:1]
         ),
         numero_protocolo=Subquery(
             ProtocoloEmpresa.objects.filter(
                 empresa=OuterRef('pk')
-            ).order_by('-entrada_fiscal').values('numero_protocolo')[:1]
+            ).order_by('-entrada_protocolo').values('numero_protocolo')[:1]
          ),
          primeiro_nome_fiscal=Subquery(
              ProtocoloEmpresa.objects.filter(
              empresa=OuterRef('pk')
-         ).order_by('-entrada_fiscal').values('fiscal_responsavel__primeiro_nome')[:1]
+         ).order_by('-entrada_protocolo').values('fiscal_responsavel__primeiro_nome')[:1]
          ),
      ).annotate(
          protocolo_aberto_fiscal=Case(

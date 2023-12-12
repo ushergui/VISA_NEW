@@ -20,10 +20,10 @@ MONTHS_PT_BR = {
 
 def capitalize_name(name):
     # lista de artigos que devem ser mantidos em minúsculo
-    articles = ['de', 'e','da', 'do', 'das', 'dos']
+    articles = ['de', 'e','da', 'do', 'das', 'dos','s/n']
 
     # lista de números romanos que devem ser mantidos em maiúsculo
-    roman_numerals = ['II', 'III', 'VI', 'VII', 'XIII', 'XXIII', 'IV', 'LTDA']
+    roman_numerals = ['II', 'III', 'VI', 'VII', 'XIII', 'XXIII', 'IV', 'LTDA','S/N']
 
     # separa o nome em palavras
     words = name.split(' ')

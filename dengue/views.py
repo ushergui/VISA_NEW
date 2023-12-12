@@ -9,7 +9,6 @@ from django.http import JsonResponse
 from datetime import datetime
 from django.urls import reverse
 
-
 def check_duplicate(request):
     nome = request.GET.get("nome")
     logradouro = request.GET.get("logradouro")
@@ -307,7 +306,12 @@ def boletim_resumo_totais(request):
             Q(classificacao__isnull=True, resultado__in=['Faltou', 'Recusou', 'Inconclusivo', 'Não agendado'])
         ).count()
 
-        total_obito = queryset.filter(obito__range=[data_inicial, data_final]).count()
+        total_obito_investigacao = queryset.filter(obito__range=[data_inicial, data_final], evolucao="Óbito em investigação").count()
+        total_obito_agravo = queryset.filter(obito__range=[data_inicial, data_final], evolucao="Óbito pelo agravo").count()
+        total_chikungunya = queryset.filter(obito__range=[data_inicial, data_final], classificacao="Chikungunya").count()
+        total_chikungunya = queryset.filter(
+            Q(classificacao__in=['Chikungunya'])
+        ).count()
         total_internacao = queryset.filter(internacao__range=[data_inicial, data_final]).count()
 
         context = {
@@ -316,8 +320,10 @@ def boletim_resumo_totais(request):
             'total_casos_negativos': total_casos_negativos,
             'total_aguardando': total_aguardando,
             'total_faltas_recusa': total_faltas_recusa,
-            'total_obito': total_obito,
+            'total_obito_investigacao': total_obito_investigacao,
+            'total_obito_agravo': total_obito_agravo,
             'total_internacao': total_internacao,
+            'total_chikungunya': total_chikungunya,
             'data_inicial': data_inicial,  
             'data_final': data_final,  
             'erro_msg': erro_msg,
@@ -684,4 +690,3 @@ def positivos_recentes(request):
 def detalhes_notificacao(request, id_notificacao):
     notificacao = get_object_or_404(Notificacao, id=id_notificacao)
     return render(request, 'dengue/detalhes_notificacao.html', {'notificacao': notificacao})
-    
