@@ -141,6 +141,7 @@ class Empresas(models.Model):
         ("ATIVA", "ATIVA"),
         ("BAIXADA", "BAIXADA"),
         ("DISPENSADA", "DISPENSADA"),
+        ("SUSPENSA", "SUSPENSA"),
     )
     status_funcionamento = models.CharField(max_length=20, null=False, blank=False, choices=STATUS_CHOICES)
 
@@ -149,6 +150,13 @@ class Empresas(models.Model):
     
     def get_cnae_max_risco(self):
         return self.cnae.order_by('-risco_cnae__valor_risco').first()
+    
+    def inspecao_mais_recente(self):
+        inspecao_recente = Inspecao.objects.filter(protocolo__empresa=self).order_by('-data_inspecao').first()
+        return inspecao_recente.data_inspecao if inspecao_recente else None
+    
+    def protocolo_aberto(self):
+        return ProtocoloEmpresa.objects.filter(empresa=self).exclude(status_protocolo='4').exists()
 
 class ProtocoloEmpresa(models.Model):
     numero_protocolo = models.CharField(max_length=12, null=False, verbose_name="Número do protocolo")
@@ -230,6 +238,11 @@ class Inspecao(models.Model):
 
     def __str__(self):
         return f"{self.protocolo.numero_protocolo} - {self.protocolo.empresa}"
+    
+    def save(self, *args, **kwargs):
+        super(Inspecao, self).save(*args, **kwargs)
+        # Marcar inspeção como realizada no planejamento
+        PlanejamentoInspecao.objects.filter(fiscal=self.protocolo.fiscal_responsavel, empresa=self.protocolo.empresa, ano=self.data_inspecao.year).update(inspecao_realizada=True)
 
 class AcaoProdutividade(models.Model):
     codigo_produtividade = models.CharField(max_length=15, unique=True, verbose_name="Código")
@@ -254,3 +267,12 @@ class Produtividade(models.Model):
 
     def __str__(self):
         return f"Produtividade da inspecao {self.inspecao}"
+
+class PlanejamentoInspecao(models.Model):
+    fiscal = models.ForeignKey(Fiscal, on_delete=models.CASCADE)
+    empresa = models.ForeignKey(Empresas, on_delete=models.CASCADE)
+    ano = models.IntegerField()
+    inspecao_realizada = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.fiscal} - {self.empresa} - {"Realizada" if self.inspecao_realizada else "Pendente"}'

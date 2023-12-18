@@ -1,8 +1,10 @@
 from django import forms
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, PlanejamentoInspecao
 from cadastros.models import Logradouro, Fiscal, Cidade, Bairro
 from django.core.exceptions import ValidationError
 import re
+from django.utils.text import capfirst
+from django.forms import ModelChoiceField
 
 
 class ContabilidadeForm(forms.ModelForm):
@@ -236,3 +238,51 @@ class EmpresaCnaeForm(forms.ModelForm):
             raise forms.ValidationError("O CNAE principal não pode ser o mesmo que um dos CNAEs secundários.")
 
         return cleaned_data
+    
+def capitalize_name(name):
+    articles = ['de', 'e', 'da', 'do', 'das', 'dos', 's/n']
+    roman_numerals = ['II', 'III', 'VI', 'VII', 'XIII', 'XXIII', 'IV', 'LTDA', 'S/N']
+    words = name.split(' ')
+    for i, word in enumerate(words):
+        if word.lower() in articles:
+            words[i] = word.lower()
+        elif word.upper() in roman_numerals:
+            words[i] = word.upper()
+        else:
+            words[i] = capfirst(word.lower())
+    return ' '.join(words)
+
+class PlanejamentoInspecaoForm(forms.ModelForm):
+    empresa = ModelChoiceField(
+        queryset=Empresas.objects.all(),
+        label='Empresa',
+        empty_label="Selecione a Empresa",
+        widget=forms.Select(attrs={'class': 'custom-select'})
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super(PlanejamentoInspecaoForm, self).__init__(*args, **kwargs)
+        self.fields['empresa'].label_from_instance = self.label_from_instance_empresa
+
+    def clean(self):
+        cleaned_data = super().clean()
+        empresa = cleaned_data.get("empresa")
+        ano = cleaned_data.get("ano")
+
+        # Verifica se já existe um planejamento com este fiscal, empresa e ano
+        if PlanejamentoInspecao.objects.filter(empresa=empresa, ano=ano).exists():
+            raise ValidationError("Já existe um planejamento para esta empresa neste ano.")
+
+        return cleaned_data
+
+    def label_from_instance_empresa(self, obj):
+        # Aplica a função de capitalização ao nome da empresa.
+        empresa_razao = capitalize_name(obj.razao)
+        cnae_codigo = obj.cnae_principal.codigo_cnae
+        cnae_descricao = obj.cnae_principal.descricao_cnae
+        risco_descricao = obj.cnae_principal.risco_cnae.risco
+        return f"{empresa_razao} - {cnae_codigo} - {cnae_descricao} - {risco_descricao}"
+
+    class Meta:
+        model = PlanejamentoInspecao
+        fields = ['fiscal', 'empresa', 'ano', 'inspecao_realizada']

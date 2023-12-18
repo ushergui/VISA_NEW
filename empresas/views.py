@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel
+from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, PlanejamentoInspecao
 from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, AcaoProdutividadeForm
+from .forms import PlanejamentoInspecaoForm
 from django.views import View
 from django.db.models import Max
 from django.http import JsonResponse
@@ -1151,3 +1152,43 @@ def gerar_alvara(request, empresa_id):
     response['Content-Disposition'] = 'inline; filename=alvara.pdf'
     return response
 
+# Listagem de Planejamentos
+def listar_planejamentos(request):
+    planejamentos = PlanejamentoInspecao.objects.all()
+    return render(request, 'empresas/listar_planejamento.html', {'planejamentos': planejamentos})
+
+# Criação de Planejamento
+def criar_planejamento(request):
+    titulo = "Planejar inspeção"
+    botao = "Gravar"
+    if request.method == 'POST':
+        form = PlanejamentoInspecaoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_planejamentos')
+    else:
+        form = PlanejamentoInspecaoForm()
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao})
+
+# Edição de Planejamento
+def editar_planejamento(request, pk):
+    titulo = "Editar planejamento"
+    botao = "Gravar"
+
+    planejamento = get_object_or_404(PlanejamentoInspecao, pk=pk)
+    if request.method == 'POST':
+        form = PlanejamentoInspecaoForm(request.POST, instance=planejamento)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_planejamentos')
+    else:
+        form = PlanejamentoInspecaoForm(instance=planejamento)
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao, 'planejamento': planejamento})
+
+# Exclusão de Planejamento
+def excluir_planejamento(request, pk):
+    planejamento = get_object_or_404(PlanejamentoInspecao, pk=pk)
+    if request.method == 'POST':
+        planejamento.delete()
+        return redirect('listar_planejamentos')
+    return render(request, 'empresas/form-excluir.html', {'planejamento': planejamento})

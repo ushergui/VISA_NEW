@@ -79,4 +79,10 @@ urlpatterns = [
 
     path('empresas/<int:empresa_id>/alvara', views.gerar_alvara, name='gerar_alvara'),
 
+
+    path('planejamentos/', views.listar_planejamentos, name='listar_planejamentos'),
+    path('planejamento/criar/', views.criar_planejamento, name='criar_planejamento'),
+    path('planejamento/editar/<int:pk>/', views.editar_planejamento, name='editar_planejamento'),
+    path('planejamento/excluir/<int:pk>/', views.excluir_planejamento, name='excluir_planejamento'),
+
 ]
