@@ -3,10 +3,8 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime, date
-#Pra deixar cada um ver somente aquilo que cadastrou, exemplo pra usar: Produtividade
-
-# Create your models here.
 from django.urls import reverse
+from usuarios.models import Perfil
 
 
 class Estado (models.Model):
@@ -216,6 +214,7 @@ class Fiscal(models.Model):
     nivel = models.CharField(max_length=19, null=False, choices=NIVEL_CHOICES)
 
     primeiro_nome = models.CharField(max_length=16, null=False)
+    perfil = models.OneToOneField(Perfil, on_delete=models.CASCADE, null=True, blank=True)
     class Meta:
         ordering = ["nome_fiscal"]
 

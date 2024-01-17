@@ -65,7 +65,7 @@
             right: 81mm;
             text-align: left;
             z-index: 2;
-            font-size: 11pt;
+			font-size: {% if endereco|length > 56 %}9pt{% else %}11pt{% endif %};
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;
@@ -78,7 +78,7 @@
             right: 10mm;
             text-align: left;
             z-index: 2;
-            font-size: {% if bairro|length > 38 %}10pt{% else %}11pt{% endif %};
+            font-size: {% if bairro|length > 32 %}9pt{% else %}11pt{% endif %};
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;
@@ -199,7 +199,7 @@
             right: 10mm;
             text-align: justify;
             z-index: 2;
-            font-size: {% if cnae_nao_sujeitos|length > 1000 %}9pt{% elif cnae_nao_sujeitos|length > 912 %}10pt{% else %}11pt{% endif %};
+            font-size: {% if cnae_nao_sujeitos|length > 1000 %}7.3pt{% elif cnae_nao_sujeitos|length > 912 %}10pt{% else %}11pt{% endif %};
             font-family: 'Times New Roman', Times, serif;
             overflow-wrap: break-word;
             max-width: 190mm;

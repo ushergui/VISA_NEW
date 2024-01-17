@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos, EmpresasView, listar_risco_um, listar_risco_um_pdf, listar_risco_dois, listar_risco_dois_pdf, listar_risco_tres, listar_risco_tres_pdf
-
+from .views import listar_nao_planejadas
 
 urlpatterns = [
     # Contabilidade
@@ -21,6 +21,7 @@ urlpatterns = [
     path('empresas/novo/', views.criar_empresa, name='criar_empresa'),
     path('empresas/editar/<int:id>/', views.editar_empresa, name='editar_empresa'),
     path('empresas/editar_observacoes/<int:id>/', views.editar_observacoes, name='editar_observacoes'),
+    path('empresas/editar_inscricao_estadual/<int:id>/', views.editar_inscricao_estadual, name='editar_inscricao_estadual'),
     path('empresas/excluir/<int:id>/', views.excluir_empresa, name='excluir_empresa'),
     path('empresa/<int:empresa_id>/', views.detalhe_empresa, name='detalhe_empresa'),
 
@@ -84,5 +85,7 @@ urlpatterns = [
     path('planejamento/criar/', views.criar_planejamento, name='criar_planejamento'),
     path('planejamento/editar/<int:pk>/', views.editar_planejamento, name='editar_planejamento'),
     path('planejamento/excluir/<int:pk>/', views.excluir_planejamento, name='excluir_planejamento'),
+    path('empresas/listar_empresas_inscricao', views.listar_empresas_inscricao, name='listar_empresas_inscricao'),
+    path('empresas/nao-planejadas/', listar_nao_planejadas, name='listar_nao_planejadas'),
 
 ]

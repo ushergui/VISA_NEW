@@ -51,9 +51,9 @@
             
             <td>
                 <a href="{% url 'detalhe_empresa' empresa.id %}">
-                {% if empresa.status_protocolo != 4 %}
+
                     {{ empresa.protocolo_aberto_fiscal|capitalize_name }}
-                {% endif %}
+
                 </a>
             </td>
 

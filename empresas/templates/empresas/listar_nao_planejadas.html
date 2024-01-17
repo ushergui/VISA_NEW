@@ -1,0 +1,35 @@
+{% extends 'basy.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<h3>Empresas sem Planejamento para 2024</h3>
+<hr>
+<div class="table responsive">
+    <table class="table table-striped" id="tabela-listar">
+        <thead>
+        <tr>
+            <th>Razão Social</th>
+            <th>Status</th>
+            <th>CNAE</th>
+            <th>Risco</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for empresa in empresas %}
+        <tr>
+            <td>{{ empresa.razao|capitalize_name }}</td>
+            <td>{{ empresa.status_funcionamento }}</td>
+            <td>{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae|capitalize_name }}</td>
+            <td>{{ empresa.cnae_principal.risco_cnae }}</td>
+        </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">Nenhuma empresa sem planejamento para 2024.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

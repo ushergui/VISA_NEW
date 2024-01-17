@@ -246,3 +246,20 @@ Largura máxima das tabelas para não ficar mal formatada
     word-break: break-word; /*ou word-wrap: break-word;*/
     width: 100px; /*ajuste conforme necessário*/
 }
+
+.pesquisa-container {
+    justify-content: space-between; /* Isso irá separar os dois itens igualmente */
+    padding: 10px; /* Ou o que quer que combine com seu design */
+}
+
+
+/* Isso é para garantir que no mobile eles fiquem um abaixo do outro */
+@media screen and (max-width: 768px) {
+    .pesquisa-container {
+        flex-direction: column;
+    }
+    .pesquisa-empresa, .pesquisa-protocolo {
+        margin-right: 0;
+        margin-bottom: 20px; /* Espaço entre os formulários no mobile */
+    }
+}

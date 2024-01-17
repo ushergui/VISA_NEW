@@ -20,7 +20,8 @@
             <th style="text-align:center">CNAE</th>
             <th style="text-align:center">Risco</th>
             <th style="text-align:center">Ano</th>
-            <th style="text-align:center">Status</th>
+            <th style="text-align:center">Protocolo</th>
+            <th style="text-align:center">Executado?</th>
             <th style="text-align:center">Ações</th>
         </tr>
         </thead>
@@ -59,6 +60,7 @@
                     {% endif %}
                 </a>
             </td>
+            <td style="font-size:13px; text-align:center;">{% if planejamento.inspecao_realizada == True %} SIM {% else %}NÃO{% endif %}</td>
             <td style="text-align:center; width: 170px">
                 <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_planejamento' planejamento.id %}">Editar</a>
                 <a class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'excluir_planejamento' planejamento.id %}">Excluir</a>

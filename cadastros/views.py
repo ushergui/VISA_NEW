@@ -180,7 +180,7 @@ class ProtocoloCreate(LoginRequiredMixin, CreateView):
 class FiscalCreate(LoginRequiredMixin, CreateView):
     login_url = reverse_lazy('login')
     model = Fiscal
-    fields = ['nome_fiscal', 'matricula_fiscal', 'nivel', 'primeiro_nome']
+    fields = ['nome_fiscal', 'matricula_fiscal', 'nivel', 'primeiro_nome','perfil']
     template_name = 'form.html'
     success_url = reverse_lazy('listar-fiscais')
 
@@ -390,7 +390,7 @@ class ProtocoloUpdate(LoginRequiredMixin, UpdateView):
 class FiscalUpdate(LoginRequiredMixin, UpdateView):
     login_url = reverse_lazy('login')
     model = Fiscal
-    fields = ['nome_fiscal', 'matricula_fiscal', 'nivel', 'primeiro_nome']
+    fields = ['nome_fiscal', 'matricula_fiscal', 'nivel', 'primeiro_nome','perfil']
     template_name = 'form.html'
     success_url = reverse_lazy('listar-fiscais')
 

@@ -18,8 +18,19 @@
         <th style="text-align:center">Razão Social</th>
         <th style="text-align:center">CNPJ</th>
         <th style="text-align:center">Nome Fantasia</th>
+        <th style="text-align:center">Logradouro</th>
+        <th style="text-align:center">Nº</th>
         <th style="text-align:center">CNAE</th>
+        <th style="text-align:center">Risco</th>
+        <th style="text-align:center">Alvará</th>
+		<th style="text-align:center">Inspeção recente</th>
+		<th style="text-align:center">Protocolo recente</th>
+		<th style="text-align:center">Motivo</th>
+		<th style="text-align:center">Fiscal Responsável</th>
+		<th style="text-align:center">Status do Protocolo</th>
+        <th style="text-align:center">Status da Empresa</th>
         <th style="text-align:center">Responsável Legal</th>
+		
         <th style="text-align:center">Ações</th>
     </tr>
     </thead>
@@ -31,8 +42,39 @@
         <td style="font-size:13px;">
         {% if empresa.nome_fantasia %}
         {{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
+		
+		<td style="font-size:13px;">{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}</td>
+		<td style="font-size:13px;">{{ empresa.numero_empresa }}</td>
+		
+		
         <td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae|capitalize_name }}</td>
+        <td style="font-size:13px; text-align:left;">{{empresa.cnae_principal.risco_cnae}}</td>
+        <td style="font-size:13px;">{{ empresa.alvara|date:"d/m/Y" }}</td>
+		<td style="font-size:13px;">{{ empresa.inspecao_recente|date:"d/m/Y" }}</td>
+		
+		
+		<td style="font-size:13px;">{% if empresa.numero_protocolo %}{{ empresa.numero_protocolo }}{% else %}********{% endif %}</td>
+		
+		
+		<td style="font-size:13px;">{% if empresa.motivo_protocolo %}{% if empresa.motivo_protocolo == "3" %}Verificação de risco a pedido {% elif empresa.motivo_protocolo == "4" %}Busca Ativa 
+		{% elif empresa.motivo_protocolo == "2" %}Renovação do alvará {% elif empresa.motivo_protocolo == "1" %}Alvará inicial{% else %} Busca ativa{% endif %}
+		
+				{% else %}********{% endif %}
+		
+		</td>
+		
+		<td style="font-size:13px;">{% if empresa.fiscal_responsavel_protocolo %}{{ empresa.fiscal_responsavel_protocolo }}{% else %}********{% endif %}</td>
+		
+		
+
+		<td style="font-size:13px;">{% if empresa.status_protocolo_recente %}  {% if empresa.status_protocolo_recente == "1"%} Administrativo {% elif empresa.status_protocolo_recente == "2"%}Fiscal 
+		{% elif empresa.status_protocolo_recente == "3"%}Coordenador{% else %}Finalizado{% endif %}{% else %}********{% endif %}</td>
+		
+		
+		
+        <td style="font-size:13px;">{{ empresa.status_funcionamento }}</td>
         <td style="font-size:13px;">{{ empresa.responsavel_legal|capitalize_name }}</td>
+
         <td style="text-align:center; width: 170px">
             <a class="btn btn-primary" title="Detalhe" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'detalhe_empresa' empresa.id %}">Detalhes</a>
             <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_empresa' empresa.id %}">Editar</a>
@@ -60,7 +102,7 @@
             responsive: true,
             // "bSort": false,
             "aaSorting": [],
-            "pageLength": 50,
+            "pageLength": 9999,
             "language": {
                 "decimal": "",
                 "emptyTable": "Sem dados disponíveis",

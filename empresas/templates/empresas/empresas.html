@@ -4,57 +4,108 @@
 
 {% block conteudo %}
 
+<div class="container-centralizado" style="display: flex; ">
+    <div style="width: 22%;">
+<div class="pesquisa-empresa">
 <h3>Pesquisa empresas</h3>
+
 <form method="get" action="{% url 'listar_empresas' %}">
     <div class="form-group">
-      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise pela razão ou nome fantasia ou cnpj ou proprietario" size="58" class="form-control-sm">
+      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Razão ou nome fantasia ou cnpj ou proprietario" size="38" class="form-control-sm">
       <button type="submit" class="btn btn-primary">Buscar</button>
     </div>
 </form>
-<br>
+</div>
+<div class="pesquisa-protocolo">
 <h3>Pesquisa protocolos</h3>
 <form method="get" action="{% url 'listar_protocolos' %}">
     <div class="form-group">
-      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise por parte do protocolo" size="58" class="form-control-sm">
+      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise por parte do protocolo" size="38" class="form-control-sm">
       <button type="submit" class="btn btn-success">Buscar</button>
     </div>
 </form>
-<br>
-<h3 style="text-align:center">Metas 2023</h3>
-<div style="width: 70%; margin: 0 auto;">
-  <table class="table table-bordered text-center" style="width: 100%;">
+</div>
+</div>
+
+
+<div style="width: 38%; margin: 0 0">
+    <h3 style="text-align:center">Meta coletiva 2024</h3>
+  <table class="table table-bordered text-center" style="width: 88%;">
       <thead>
           <tr>
-              <th colspan="3" style="background-color: rgb(35, 172, 35);"><a href="{% url 'listar_risco_um' %}">Nível de risco I - Baixo risco A (40%)</a></th>
-              <th colspan="3" style="background-color: pink;"><a href="{% url 'listar_risco_dois' %}">Nível de risco II - Baixo risco B (80%)</a></th>
-              <th colspan="3" style="background-color: yellow;"><a href="{% url 'listar_risco_tres' %}">Nível de risco III - Alto risco (100%)</a></th>
+              <th colspan="3" style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_um' %}">Nível de risco I (40%)</a></th>
+              <th colspan="3" style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_dois' %}">Nível de risco II (80%)</a></th>
+              <th colspan="3" style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_tres' %}">Nível de risco III - Alto risco (100%)</a></th>
           </tr>
           <tr>
-              <th style="background-color: rgb(35, 172, 35);">Cadastrado</th>
-              <th style="background-color: rgb(35, 172, 35);">Executado</th>
-              <th style="background-color: rgb(35, 172, 35);">Percentual</th>
-              <th style="background-color: pink;">Cadastrado</th>
-              <th style="background-color: pink;">Executado</th>
-              <th style="background-color: pink;">Percentual</th>
-              <th style="background-color: yellow;">Cadastrado</th>
-              <th style="background-color: yellow;">Executado</th>
-              <th style="background-color: yellow;">Percentual</th>
+            <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">Cadastro</th>
+            <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+            <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">%</th>
+            <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">Cadastro</th>
+            <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+            <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">%</th>
+            <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">Cadastro</th>
+            <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+            <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">%</th>
           </tr>
       </thead>
       <tbody>
           <tr>
-              <td style="background-color: rgb(35, 172, 35);">{{ nivel_risco_i }}</td>
-              <td style="background-color: rgb(35, 172, 35);">{{ executado_i }}</td>
-              <td style="background-color: rgb(35, 172, 35);">{{ porcentagem_i }}%</td>
-              <td style="background-color: pink;">{{ nivel_risco_ii }}</td>
-              <td style="background-color: pink;">{{ executado_ii }}</td>
-              <td style="background-color: pink;">{{ porcentagem_ii }}%</td>
-              <td style="background-color: yellow;">{{ nivel_risco_iii }}</td>
-              <td style="background-color: yellow;">{{ executado_iii }}</td>
-              <td style="background-color: yellow;">{{ porcentagem_iii }}%</td>
+              <td style="background-color: rgb(35, 172, 35);font-size: 12px; vertical-align: middle; line-height: normal;">{{ nivel_risco_i }}</td>
+              <td style="background-color: rgb(35, 172, 35);font-size: 12px; vertical-align: middle; line-height: normal;">{{ executado_i }}</td>
+              <td style="background-color: rgb(35, 172, 35);font-size: 12px; vertical-align: middle; line-height: normal;">{{ porcentagem_i }}%</td>
+              <td style="background-color: pink;font-size: 12px; vertical-align: middle; line-height: normal;">{{ nivel_risco_ii }}</td>
+              <td style="background-color: pink;font-size: 12px; vertical-align: middle; line-height: normal;">{{ executado_ii }}</td>
+              <td style="background-color: pink;font-size: 12px; vertical-align: middle; line-height: normal;">{{ porcentagem_ii }}%</td>
+              <td style="background-color: yellow;font-size: 12px; vertical-align: middle; line-height: normal;">{{ nivel_risco_iii }}</td>
+              <td style="background-color: yellow;font-size: 12px; vertical-align: middle; line-height: normal;">{{ executado_iii }}</td>
+              <td style="background-color: yellow;font-size: 12px; vertical-align: middle; line-height: normal;">{{ porcentagem_iii }}%</td>
           </tr>
       </tbody>
   </table>
+</div>
+{% if fiscal_logado %}
+<div style="width: 38%; margin: 0 0">
+    <h3 style="text-align:center">Meta individual 2024</h3>
+  <table class="table table-bordered text-center" style="width: 88%;">
+      <thead>
+          <tr>
+            <th colspan="3" style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_um' %}">Nível de risco I (40%)</a></th>
+              <th colspan="3" style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_dois' %}">Nível de risco II (80%)</a></th>
+              <th colspan="3" style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;"><a href="{% url 'listar_risco_tres' %}">Nível de risco III - Alto risco (100%)</a></th>
+          </tr>
+          <tr>
+              <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">Planejado</th>
+              <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+              <th style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">%  </th>
+              <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">Planejado</th>
+              <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+              <th style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">Percentual</th>
+              <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">Planejado</th>
+              <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">Feito</th>
+              <th style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">Percentual</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% if tem_planejamento %}
+            <tr>
+                <td style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_planejado_risco_3 }}</td>
+                <td style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_executado_risco_3 }}</td>
+                <td style="background-color: rgb(35, 172, 35); font-size: 12px; vertical-align: middle; line-height: normal;">{{ percentual_risco_3 }}%</td>
+                <td style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_planejado_risco_4 }}</td>
+                <td style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_executado_risco_4 }}</td>
+                <td style="background-color: pink; font-size: 12px; vertical-align: middle; line-height: normal;">{{ percentual_risco_4 }}%</td>
+                <td style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_planejado_risco_5 }}</td>
+                <td style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">{{ total_executado_risco_5 }}</td>
+                <td style="background-color: yellow; font-size: 12px; vertical-align: middle; line-height: normal;">{{ percentual_risco_5 }}%</td>
+            </tr>
+            {% else %}
+            
+            {% endif %}
+        </tbody>
+  </table>
+</div>
+{% endif %}
 </div>
 
 

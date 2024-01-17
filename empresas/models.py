@@ -157,6 +157,14 @@ class Empresas(models.Model):
     
     def protocolo_aberto(self):
         return ProtocoloEmpresa.objects.filter(empresa=self).exclude(status_protocolo='4').exists()
+    
+    def protocolo_recente_especifico(self):
+        return ProtocoloEmpresa.objects.filter(
+            empresa=self,
+            motivo__in=['1', '2', '3', '4', '10']
+        ).order_by('-entrada_protocolo').first()    
+   
+    
 
 class ProtocoloEmpresa(models.Model):
     numero_protocolo = models.CharField(max_length=12, null=False, verbose_name="Número do protocolo")
@@ -242,7 +250,7 @@ class Inspecao(models.Model):
     def save(self, *args, **kwargs):
         super(Inspecao, self).save(*args, **kwargs)
         # Marcar inspeção como realizada no planejamento
-        PlanejamentoInspecao.objects.filter(fiscal=self.protocolo.fiscal_responsavel, empresa=self.protocolo.empresa, ano=self.data_inspecao.year).update(inspecao_realizada=True)
+        PlanejamentoInspecao.objects.filter(empresa=self.protocolo.empresa, ano=self.data_inspecao.year).update(inspecao_realizada=True)
 
 class AcaoProdutividade(models.Model):
     codigo_produtividade = models.CharField(max_length=15, unique=True, verbose_name="Código")

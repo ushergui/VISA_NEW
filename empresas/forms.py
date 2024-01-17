@@ -163,6 +163,11 @@ class EmpresasObservacoesForm(forms.ModelForm):
     class Meta:
         model = Empresas
         fields = ['observacoes']
+        
+class EmpresasInscricaoForm(forms.ModelForm):
+    class Meta:
+        model = Empresas
+        fields = ['inscricao_estadual']
 
 class RiscoForm(forms.ModelForm):
     class Meta:
@@ -269,8 +274,10 @@ class PlanejamentoInspecaoForm(forms.ModelForm):
         empresa = cleaned_data.get("empresa")
         ano = cleaned_data.get("ano")
 
-        # Verifica se já existe um planejamento com este fiscal, empresa e ano
-        if PlanejamentoInspecao.objects.filter(empresa=empresa, ano=ano).exists():
+        # Exclui o planejamento atual da verificação se estiver em modo de edição
+        planejamento_atual_id = self.instance.id if self.instance else None
+
+        if PlanejamentoInspecao.objects.exclude(id=planejamento_atual_id).filter(empresa=empresa, ano=ano).exists():
             raise ValidationError("Já existe um planejamento para esta empresa neste ano.")
 
         return cleaned_data

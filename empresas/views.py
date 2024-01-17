@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from usuarios.models import Perfil
 from .models import Contabilidade, Cnae, Empresas, Risco, Legislacao, ProtocoloEmpresa, Inspecao, AcaoProdutividade, Produtividade, AcaoProdutividadeRel, PlanejamentoInspecao
-from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, AcaoProdutividadeForm
+from .forms import ContabilidadeForm, CnaeForm, EmpresasForm, RiscoForm, LegislacaoForm, ProtocoloEmpresaForm, InspecaoForm, ProdutividadeAcaoForm, ProdutividadeForm, EmpresasObservacoesForm, EmpresaCnaeForm, AcaoProdutividadeForm, EmpresasInscricaoForm
 from .forms import PlanejamentoInspecaoForm
 from django.views import View
 from django.db.models import Max
@@ -111,7 +112,22 @@ def listar_empresas(request):
     else:
         empresas = Empresas.objects.all()
 
+    for empresa in empresas:
+        empresa.inspecao_recente = empresa.inspecao_mais_recente()
+        protocolo_recente = empresa.protocolo_recente_especifico()
+        if protocolo_recente:
+            empresa.protocolo_recente = protocolo_recente  # Armazenando o objeto inteiro
+            empresa.fiscal_responsavel_protocolo = protocolo_recente.fiscal_responsavel
+            empresa.motivo_protocolo = protocolo_recente.motivo
+            empresa.numero_protocolo = protocolo_recente.numero_protocolo
+            empresa.status_protocolo_recente = protocolo_recente.status_protocolo
+        else:
+            empresa.protocolo_recente = None
+            empresa.fiscal_responsavel_protocolo = None
+            empresa.status_protocolo_recente = None
+
     return render(request, 'empresas/listar_empresas.html', {'empresas': empresas, 'termo_pesquisa': termo_pesquisa})
+
 
 
 def criar_empresa(request):
@@ -617,17 +633,50 @@ class EmpresasView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        perfil_usuario = Perfil.objects.get(usuario=self.request.user)
+        try:
+            fiscal_logado = Fiscal.objects.get(perfil=perfil_usuario)
+        except Fiscal.DoesNotExist:
+            fiscal_logado = None
+
+        if fiscal_logado:
+            context['fiscal_logado'] = fiscal_logado
+            planejamento_fiscal = PlanejamentoInspecao.objects.filter(fiscal=fiscal_logado, ano=2024)
+            context['tem_planejamento'] = planejamento_fiscal.exists()
+
+            # Cálculos para as métricas individuais por nível de risco
+            for nivel in [3, 4, 5]:  # Níveis de risco I, II, III
+                empresas_risco = Empresas.objects.filter(
+                    Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA') if nivel == 3 else Q(status_funcionamento='ATIVA'),
+                    cnae_principal__risco_cnae__valor_risco=nivel
+                )
+
+                total_planejado = planejamento_fiscal.filter(empresa__in=empresas_risco).count()
+                total_executado = planejamento_fiscal.filter(
+                    empresa__in=empresas_risco, 
+                    inspecao_realizada=True,
+                    empresa__protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))
+                ).distinct().count()
+                percentual = round(total_executado / total_planejado * 100, 1) if total_planejado > 0 else 0
+
+                context[f'total_planejado_risco_{nivel}'] = total_planejado
+                context[f'total_executado_risco_{nivel}'] = total_executado
+                context[f'percentual_risco_{nivel}'] = percentual
+        else:
+            context['fiscal_logado'] = None
+        
         context['nivel_risco_i'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA') | Q(status_funcionamento='DISPENSADA'),cnae_principal__risco_cnae__valor_risco=3).count()
-        context['executado_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['executado_i'] = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
         context['porcentagem_i'] = round(context['executado_i'] / context['nivel_risco_i'] * 100, 1) if context['nivel_risco_i'] > 0 else 0
 
         context['nivel_risco_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4).count()
-        context['executado_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['executado_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
         context['porcentagem_ii'] = round(context['executado_ii'] / context['nivel_risco_ii'] * 100, 1) if context['nivel_risco_ii'] > 0 else 0
 
 
         context['nivel_risco_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5).count()
-        context['executado_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2023, 1, 1), datetime(2023, 12, 31))).count()
+        context['executado_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
         context['porcentagem_iii'] = round(context['executado_iii'] / context['nivel_risco_iii'] * 100, 1) if context['nivel_risco_iii'] > 0 else 0
 
 
@@ -1014,12 +1063,12 @@ def painel(request):
     ).count()
 
     total_geral_risco_4 = Empresas.objects.filter(
-        status_funcionamento='ATIVA',
+        status_funcionamento__in=['ATIVA', 'SUSPENSA'],
         cnae_principal__risco_cnae__valor_risco=4
     ).count()
 
     total_geral_risco_5 = Empresas.objects.filter(
-        status_funcionamento='ATIVA',
+        status_funcionamento__in=['ATIVA', 'SUSPENSA'],
         cnae_principal__risco_cnae__valor_risco=5
     ).count()
 
@@ -1035,8 +1084,8 @@ def painel(request):
         dados_risco = Empresas.objects.filter(cnae_principal=cnae) \
             .annotate(
                 risco_3=Count('id', filter=Q(status_funcionamento__in=['ATIVA', 'DISPENSADA'], cnae_principal__risco_cnae__valor_risco=3)),
-                risco_4=Count('id', filter=Q(status_funcionamento='ATIVA', cnae_principal__risco_cnae__valor_risco=4)),
-                risco_5=Count('id', filter=Q(status_funcionamento='ATIVA', cnae_principal__risco_cnae__valor_risco=5))
+                risco_4=Count('id', filter=Q(status_funcionamento__in=['ATIVA', 'SUSPENSA'], cnae_principal__risco_cnae__valor_risco=4)),
+                risco_5=Count('id', filter=Q(status_funcionamento__in=['ATIVA', 'SUSPENSA'], cnae_principal__risco_cnae__valor_risco=5))
             ).aggregate(risco_3_total=Sum('risco_3'), risco_4_total=Sum('risco_4'), risco_5_total=Sum('risco_5'))
 
         # Adiciona o cnae e seus respectivos totais na lista
@@ -1192,3 +1241,33 @@ def excluir_planejamento(request, pk):
         planejamento.delete()
         return redirect('listar_planejamentos')
     return render(request, 'empresas/form-excluir.html', {'planejamento': planejamento})
+    
+def listar_empresas_inscricao(request):
+    empresas = Empresas.objects.filter(inscricao_estadual__isnull=True)
+    total_empresas = empresas.count()
+    return render(request, 'empresas/listar_empresas_inscricao.html', {'empresas': empresas, 'total_empresas': total_empresas})
+    
+def editar_inscricao_estadual(request, id):
+    empresa = Empresas.objects.get(id=id)
+    form = EmpresasInscricaoForm(request.POST or None, instance=empresa)
+    titulo = "Edição da inscrição estadual"
+    titulo2 = f"Empresa {empresa.razao}"
+    botao = "Gravar"
+    
+    if form.is_valid():
+        form.save()
+        return redirect('listar_empresas_inscricao')  # Redirecionamento atualizado
+
+    return render(request, 'empresas/form.html', {'form': form, 'titulo': titulo, 'botao': botao, 'titulo2': titulo2})
+
+def listar_nao_planejadas(request):
+    # Empresas com planejamento em 2024
+    empresas_com_planejamento = PlanejamentoInspecao.objects.filter(ano=2024).values_list('empresa', flat=True)
+
+    # Empresas sem planejamento em 2024 e que atendem aos critérios de status e risco
+    empresas_sem_planejamento = Empresas.objects.exclude(id__in=empresas_com_planejamento).filter(
+        Q(status_funcionamento='ATIVA', cnae_principal__risco_cnae__valor_risco__in=[3, 4, 5]) |
+        Q(status_funcionamento='DISPENSADA', cnae_principal__risco_cnae__valor_risco=3)
+    )
+
+    return render(request, 'empresas/listar_nao_planejadas.html', {'empresas': empresas_sem_planejamento})
