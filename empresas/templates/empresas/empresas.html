@@ -5,22 +5,23 @@
 {% block conteudo %}
 
 <div class="container-centralizado" style="display: flex; ">
-    <div style="width: 22%;">
 <div class="pesquisa-empresa">
 <h3>Pesquisa empresas</h3>
 
 <form method="get" action="{% url 'listar_empresas' %}">
     <div class="form-group">
-      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Razão ou nome fantasia ou cnpj ou proprietario" size="38" class="form-control-sm">
+      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Razão ou nome fantasia ou cnpj ou proprietario" size="50" class="form-control-sm">
       <button type="submit" class="btn btn-primary">Buscar</button>
     </div>
 </form>
 </div>
+</div>
 <div class="pesquisa-protocolo">
+
 <h3>Pesquisa protocolos</h3>
 <form method="get" action="{% url 'listar_protocolos' %}">
     <div class="form-group">
-      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise por parte do protocolo" size="38" class="form-control-sm">
+      <input type="text" name="termo_pesquisa" id="termo_pesquisa" value="{{ termo_pesquisa }}" placeholder="Pesquise por parte do protocolo" size="50" class="form-control-sm">
       <button type="submit" class="btn btn-success">Buscar</button>
     </div>
 </form>
@@ -28,7 +29,7 @@
 </div>
 
 
-<div style="width: 38%; margin: 0 0">
+<div style="width: 50%; margin: 0 auto">
     <h3 style="text-align:center">Meta coletiva 2024</h3>
   <table class="table table-bordered text-center" style="width: 88%;">
       <thead>
@@ -64,8 +65,9 @@
       </tbody>
   </table>
 </div>
+</div>
 {% if fiscal_logado %}
-<div style="width: 38%; margin: 0 0">
+<div style="width: 50%; margin: 0 auto">
     <h3 style="text-align:center">Meta individual 2024</h3>
   <table class="table table-bordered text-center" style="width: 88%;">
       <thead>

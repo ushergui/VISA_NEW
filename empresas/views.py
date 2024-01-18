@@ -674,9 +674,8 @@ class EmpresasView(TemplateView):
         context['executado_ii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=4, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
         context['porcentagem_ii'] = round(context['executado_ii'] / context['nivel_risco_ii'] * 100, 1) if context['nivel_risco_ii'] > 0 else 0
 
-
-        context['nivel_risco_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5).count()
-        context['executado_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA'), cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
+        context['nivel_risco_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA') | Q(status_funcionamento='SUSPENSA'), cnae_principal__risco_cnae__valor_risco=5).count()
+        context['executado_iii'] = Empresas.objects.filter(Q(status_funcionamento='ATIVA') | Q(status_funcionamento='SUSPENSA'), cnae_principal__risco_cnae__valor_risco=5, protocoloempresa__inspecao__data_inspecao__range=(datetime(2024, 1, 1), datetime(2024, 12, 31))).count()
         context['porcentagem_iii'] = round(context['executado_iii'] / context['nivel_risco_iii'] * 100, 1) if context['nivel_risco_iii'] > 0 else 0
 
 
