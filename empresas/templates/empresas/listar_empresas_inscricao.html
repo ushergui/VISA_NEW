@@ -13,6 +13,7 @@
     <thead>
         <tr>
             <th style="font-size:14px" class="text-center">Razão Social/Nome</th>
+            <th style="font-size:14px" class="text-center">CNPJ</th>
             <th style="font-size:14px" class="text-center">Fantasia</th>
             <th style="font-size:14px" class="text-center">CNAE</th>
             <th style="font-size:14px" class="text-center">Inscrição Estadual</th>
@@ -23,6 +24,7 @@
         {% for empresa in empresas %}
         <tr>
             <td style="font-size:13px; text-align:left;">{{ empresa.razao|capitalize_name }}</td>
+            <td style="font-size:13px; text-align:center;">{{ empresa.cnpj }}</td>
             
             <td style="font-size:13px; text-align:left;">{% if empresa.nome_fantasia%}{{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
 			<td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>

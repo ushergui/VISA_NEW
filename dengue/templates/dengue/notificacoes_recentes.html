@@ -3,7 +3,7 @@
 {% load custom_filters %}
 {% block conteudo %}
 
-<h4>Total de notificações das últimas 4 semanas</h4>
+<h4>Total de notificações das últimas 4 semanas: {{ total_notificacoes }}</h4>
 {% if erro_msg %}
     <div class="alert alert-danger">
         {{ erro_msg }}

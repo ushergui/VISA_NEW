@@ -298,12 +298,12 @@ def boletim_resumo_totais(request):
             Q(classificacao__isnull=True, resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])
         ).count()
 
-        total_aguardando = queryset.filter(
-            Q(classificacao__isnull=True,resultado__in=['Aguardando agendamento', 'Aguardando coleta', 'Aguardando resultado'])
+        casos_aberto = queryset.filter(
+            Q(classificacao__isnull=True,resultado__in=['Aguardando agendamento', 'Aguardando coleta', 'Aguardando resultado', 'Faltou', 'Recusou', 'Inconclusivo', 'Não agendado'])
         ).count()
 
-        total_faltas_recusa = queryset.filter(
-            Q(classificacao__isnull=True, resultado__in=['Faltou', 'Recusou', 'Inconclusivo', 'Não agendado'])
+        total_faltas = queryset.filter(
+            Q(classificacao__isnull=True, resultado__in=['Faltou', 'Recusou'])
         ).count()
 
         total_obito_investigacao = queryset.filter(obito__range=[data_inicial, data_final], evolucao="Óbito em investigação").count()
@@ -318,8 +318,8 @@ def boletim_resumo_totais(request):
             'total_notificacoes': total_notificacoes,
             'total_casos_positivos': total_casos_positivos,
             'total_casos_negativos': total_casos_negativos,
-            'total_aguardando': total_aguardando,
-            'total_faltas_recusa': total_faltas_recusa,
+            'casos_aberto': casos_aberto,
+            'total_faltas': total_faltas,
             'total_obito_investigacao': total_obito_investigacao,
             'total_obito_agravo': total_obito_agravo,
             'total_internacao': total_internacao,
@@ -503,7 +503,7 @@ def notificacoes_recentes(request):
                 semana_epidemiologica__semana__in=semanas_pesquisa,
                 semana_epidemiologica__ano=ano
             ).order_by('nome')
-
+            total_notificacoes = tabela_notificacoes.count()
             if not tabela_notificacoes:
                 erro_msg = "Nenhuma notificação encontrada no período"
         else:
@@ -511,6 +511,7 @@ def notificacoes_recentes(request):
 
     return render(request, 'dengue/notificacoes_recentes.html', {
         'tabela_notificacoes': tabela_notificacoes,
+        'total_notificacoes': total_notificacoes,
         'erro_msg': erro_msg
     })
 
