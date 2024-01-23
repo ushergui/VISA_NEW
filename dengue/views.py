@@ -5,7 +5,7 @@ from .forms import NotificacaoForm, SemanaForm, EncerrarNotificacaoForm
 from django.db.models import Q, Count
 from django.core.exceptions import ValidationError
 from cadastros.models import Logradouro
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from datetime import datetime
 from django.urls import reverse
 
@@ -74,24 +74,38 @@ def listar_notificacoes_gerais(request):
 
 
 def total_bairros(request):
-    search_query = request.GET.get('q')
-    if search_query:
+    semana_query = request.GET.get('semana')
+    ano_query = request.GET.get('ano')
+    if semana_query and ano_query:
         try:
-            semana_atual = int(search_query)
-            ultimas_4_semanas = [semana_atual - i for i in range(4)]
+            semana_atual = int(semana_query)
+            ano_atual = int(ano_query)
+            # Preparar uma lista para armazenar as semanas e anos
+            semanas_e_anos = []
+
+            for i in range(4):
+                if semana_atual - i > 0:
+                    # Adiciona a semana e o ano corrente
+                    semanas_e_anos.append((semana_atual - i, ano_atual))
+                else:
+                    # Determinar o último ano e a última semana
+                    ano_anterior = ano_atual - 1
+                    ultima_semana_ano_anterior = Semana.objects.filter(ano=ano_anterior).order_by('-semana').first().semana
+                    semanas_e_anos.append((ultima_semana_ano_anterior - (i - semana_atual), ano_anterior))
+
+            # Filtrar as notificações com base nas semanas e anos
             notificacoes = Notificacao.objects.filter(
-                semana_epidemiologica__in=ultimas_4_semanas
+                semana_epidemiologica__semana__in=[s[0] for s in semanas_e_anos],
+                semana_epidemiologica__ano__in=[s[1] for s in semanas_e_anos]
             ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
     else:
         notificacoes = Notificacao.objects.all().values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
-
     context = {
         'notificacoes': notificacoes,
-        'termo_pesquisa': search_query
+        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
     }
-
     return render(request, 'dengue/total_por_bairros.html', context)
     
 def get_semanas_e_anos(semana, ano):
@@ -212,28 +226,15 @@ def boletim_resumo(request):
             resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo'])),
         casos_negativos=Count('pk', filter=Q(
             resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])),
-        aguardando=Count('pk', filter=Q(
-            resultado__in=['Aguardando coleta', 'Aguardando agendamento', 'Aguardando resultado', 'Não agendado'])),
-        faltas_recusa=Count('pk', filter=Q(resultado__in=['Faltou', 'Recusou'])),
-        total_internacao=Count('pk', filter=Q(internacao__isnull=False)),
-        total_obito=Count('pk', filter=Q(obito__isnull=False)),
     ).order_by('semana_epidemiologica')
     total_casos_positivos = sum(item['casos_positivos'] for item in resultado_agrupado)
     total_casos_negativos = sum(item['casos_negativos'] for item in resultado_agrupado)
-    total_aguardando = sum(item['aguardando'] for item in resultado_agrupado)
-    total_faltas_recusa = sum(item['faltas_recusa'] for item in resultado_agrupado)
-    total_internacao = sum(item['total_internacao'] for item in resultado_agrupado)
-    total_obito = sum(item['total_obito'] for item in resultado_agrupado)
 
     context = {
         'resultado_agrupado': resultado_agrupado,
         'termo_pesquisa': search_query,
         'total_casos_positivos': total_casos_positivos,
         'total_casos_negativos': total_casos_negativos,
-        'total_aguardando': total_aguardando,
-        'total_faltas_recusa': total_faltas_recusa,
-        'total_internacao': total_internacao,
-        'total_obito': total_obito,
     }
     return render(request, 'dengue/boletim_resumo.html', context)
 
@@ -259,6 +260,8 @@ def semana_epidemiologica(request):
             notificacoes = Notificacao.objects.none()
 
     return render(request, 'dengue/semana_epidemiologica.html', {'notificacoes': notificacoes, 'termo_pesquisa': search_query, 'ano_pesquisa': search_year})
+
+
 
 def boletim_resumo_totais(request):
     erro_msg = None  # Inicializando a variável aqui
@@ -303,8 +306,9 @@ def boletim_resumo_totais(request):
         ).count()
 
         total_faltas = queryset.filter(
-            Q(classificacao__isnull=True, resultado__in=['Faltou', 'Recusou'])
+            resultado__in=['Faltou', 'Recusou']
         ).count()
+
 
         total_obito_investigacao = queryset.filter(obito__range=[data_inicial, data_final], evolucao="Óbito em investigação").count()
         total_obito_agravo = queryset.filter(obito__range=[data_inicial, data_final], evolucao="Óbito pelo agravo").count()
@@ -492,6 +496,7 @@ def encerrar_notificacao(request, pk):
 def notificacoes_recentes(request):
     erro_msg = None
     tabela_notificacoes = []
+    total_notificacoes = 0  # Inicialize a variável aqui
 
     if request.method == 'GET' and 'semana' in request.GET and 'ano' in request.GET:
         semana = request.GET.get('semana')
@@ -691,3 +696,36 @@ def positivos_recentes(request):
 def detalhes_notificacao(request, id_notificacao):
     notificacao = get_object_or_404(Notificacao, id=id_notificacao)
     return render(request, 'dengue/detalhes_notificacao.html', {'notificacao': notificacao})
+
+def listar_notificacoes_data(request):
+    if request.method == 'GET':
+        data_inicial_str = request.GET.get('data_inicial')
+        data_final_str = request.GET.get('data_final')
+
+        # Verifique se ambos os campos de data foram fornecidos
+        if data_inicial_str and data_final_str:
+            try:
+                data_inicial = datetime.strptime(data_inicial_str, '%d/%m/%Y').date()
+                data_final = datetime.strptime(data_final_str, '%d/%m/%Y').date()
+
+                notificacoes = Notificacao.objects.filter(
+                    data_notificacao__range=(data_inicial, data_final)
+                ).order_by('data_notificacao')
+                total_notificacoes = notificacoes.count()
+
+                context = {
+                    'notificacoes': notificacoes,
+                    'total_notificacoes': total_notificacoes,
+                    'data_inicial': data_inicial,
+                    'data_final': data_final
+                }
+
+                return render(request, 'dengue/listar_notificacoes_data.html', context)
+            except ValueError:
+                # Trate o erro de conversão de data aqui
+                return HttpResponseRedirect('alguma_url_de_erro')
+        else:
+            # Redirecionar ou mostrar uma mensagem de erro se os campos de data não forem fornecidos
+            return HttpResponseRedirect('alguma_url_de_erro')
+
+    return render(request, 'dengue/listar_notificacoes_data.html')

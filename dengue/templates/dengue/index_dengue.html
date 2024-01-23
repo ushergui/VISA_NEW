@@ -13,55 +13,44 @@
 <div class="row">
 
   <div class="col-6">
-
-    <h4>Notificações por bairro nas últimas 4 semanas</h4>
-    <form class="form-inline" action="{% url 'total_bairros' %}" method="get">
-      <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" placeholder="Digite a semana atual" size="58">
-      </div>
-      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
-    </form>
-
-      <br>
     <h4>Pesquisar por nome, endereço ou SINAN</h4>
     <form class="form-inline" action="{% url 'pesquisar_notificacoes' %}" method="get">
       <div class="form-group mx-sm-1 mb-2">
-        <input class="form-control-sm" type="text" name="q" placeholder="Digite o nome ou endereço ou ou SINAM" size="58">
+        <input class="form-control-sm" type="text" name="q" placeholder="Digite o nome ou endereço ou ou SINAN" size="59">
       </div>
       <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
     </form>
+    <br>
+    <h4>Notificações por bairro nas últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'total_bairros' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <div class="form-group mx-sm-1 mb-2">
+        <label for="semana" class="mr-2">Semana:</label>
+        <input class="form-control-sm" type="text" name="semana" placeholder="Digite a semana atual" size="20">
+      </div>
+      <div class="form-group mx-sm-1 mb-2">
+        <label for="ano" class="mr-2">Ano:</label>
+        <input class="form-control-sm" type="text" name="ano" placeholder="Digite o ano" size="20"></div>
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+    <br>
+    <h4>Notificações por data</h4>
+      
+    <form method="get" action="{% url 'listar_notificacoes_data' %}" onsubmit="return validateForm()">
+      <div class="form-group mx-sm-1 mb-2">
+          <label for="data_inicial">Data inicial:</label>
+          <input type="text" id="data_inicial" name="data_inicial" class="form-control-sm mr-4" value="{{ data_inicial|date:'d/m/Y' }}">
+          
+          <label for="data_final">Data final:</label>
+          <input type="text" id="data_final" name="data_final" class="form-control-sm mr-4" value="{{ data_final|date:'d/m/Y' }}">
+        
+          <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+      </div>
+  </form>
 
-  </div>
 </div>
-<br>
-<h4>Boletim de dengue</h4>
-<form class="form-inline" action="{% url 'boletim_resumo' %}" method="get">
-    <div class="form-group">
-        <label for="year" class="mr-2">Ano:</label>
-        <input type="number" name="year" id="year" value="{{ ano_pesquisa }}" class="form-control-sm mr-4">
-    </div>
-    <div class="form-group">
-        <label for="q" class="mr-2">Semana epidemiológica:</label>
-        <input type="number" name="q" id="q" value="{{ termo_pesquisa }}" class="form-control-sm mr-4">
-    </div>
-    <button type="submit" class="btn btn-primary">Filtrar</button>
-</form>
 
-<br>
-
-<h4>Notificações nas últimas 4 semanas epidemiológicas</h4>
-<form class="form-inline" action="{% url 'semana_epidemiologica' %}" method="get">
-    <div class="form-group">
-        <label for="year" class="mr-2">Ano:</label>
-        <input type="number" name="year2" id="year2" value="{{ ano_pesquisa }}" class="form-control-sm mr-4">
-    </div>
-    <div class="form-group">
-        <label for="week" class="mr-2">Semana:</label>
-		<input type="number" name="q2" id="week" min="1" max="52" value="{{ semana_pesquisa }}" class="form-control-sm mr-4">
-
-    </div>
-    <button type="submit" class="btn btn-primary btn-sm">Pesquisar</button>
-</form>
 
 {% endblock %}
 
@@ -72,6 +61,24 @@
 $(document).ready(function() {
         $('#motorista').mask("00/00/0000");
         $('#agendados').mask("00/00/0000");
+        $('#data_inicial').mask("00/00/0000");
+      $('#data_final').mask("00/00/0000");
 });
+
+function isValidDate(dateString) {
+    const regEx = /^\d{2}\/\d{2}\/\d{4}$/;
+    return dateString.match(regEx) !== null;
+}
+
+function validateForm() {
+    const dataInicial = document.getElementById('data_inicial').value;
+    const dataFinal = document.getElementById('data_final').value;
+
+    if (!isValidDate(dataInicial) || !isValidDate(dataFinal)) {
+        alert('Formato de data inválido!');
+        return false; // impede o envio do formulário
+    }
+    return true; // permite o envio do formulário
+}
 </script>
 {% endblock %}

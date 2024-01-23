@@ -6,31 +6,11 @@
         margin-top: -25px; /* Ajuste esse valor conforme a quantidade de espaço que deseja remover */
     }
 </style>
-{% if termo_pesquisa %}
 
-<div align="center"><h3>Você pesquisou pela semana: "{{ termo_pesquisa }}"</h3></div>
-<h3>Total de {{ notificacoes|length }} notificações</h3>
-{% elif termo_pesquisas %}
-<div align="center"><h3>Você pesquisou pela semana: "{{ termo_pesquisas }}"</h3></div>
-<h3>Total de {{ notificacoes|length }} notificações</h3>
-{% else %}
-<h3 align="center">Notificações</h3>
-{% endif %}
+<div align="center"><h3>Você pesquisou pelas notificações entre as datas {{ data_inicial|date:'d/m/Y' }} e {{ data_final|date:'d/m/Y' }}</h3></div>
+<h3>Total de notificações: {{ total_notificacoes }}</h3>
 
-{% if termo_buscas %}
-<br>
-<div align="center"><h3>Você pesquisou pelo termo: "{{ termo_buscas }}"</h3></div>
-<h3>Total de {{ notificacoes|length }} notificações</h3>
-{% else %}
-
-{% endif %}
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
-
-<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
-
-
-
-    <div class="table responsive">
+<div class="table responsive">
 <table class="table table-striped" id="tabela-listar" style="font-size: 11px;">
         <thead>
             <tr>
@@ -58,7 +38,11 @@
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.semana_epidemiologica }}</td>
+                {% if notificacao.sinan is not none %}
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.sinan }}</td>
+                {% else %}
+                <td style="vertical-align: middle;"></td>
+                {% endif %}
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.resultado }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.internacao|date:"d/m/Y" }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.obito|date:"d/m/Y" }}</td>

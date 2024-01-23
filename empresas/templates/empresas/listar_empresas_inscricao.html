@@ -24,7 +24,7 @@
         {% for empresa in empresas %}
         <tr>
             <td style="font-size:13px; text-align:left;">{{ empresa.razao|capitalize_name }}</td>
-            <td style="font-size:13px; text-align:center;">{{ empresa.cnpj }}</td>
+            <td style="font-size:13px; text-align:center;">{% if empresa.cnpj %}{{ empresa.cnpj }}{% else %}********{% endif %}</td>
             
             <td style="font-size:13px; text-align:left;">{% if empresa.nome_fantasia%}{{ empresa.nome_fantasia|capitalize_name }}{% else %}********{% endif %}</td>
 			<td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae }}</td>

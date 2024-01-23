@@ -3,7 +3,7 @@ from cadastros.models import Logradouro
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Semana(models.Model):
-    semana = models.IntegerField(verbose_name="Semana epidemiológica", validators=[MinValueValidator(1), MaxValueValidator(52)], choices=[(i, i) for i in range(1, 53)])
+    semana = models.IntegerField(verbose_name="Semana epidemiológica", validators=[MinValueValidator(1), MaxValueValidator(53)], choices=[(i, i) for i in range(1, 53)])
     data_inicio_semana = models.DateField(verbose_name="Início", null=False)
     data_fim_semana = models.DateField(verbose_name="Término", null=False)
     ano = models.PositiveIntegerField(validators=[MinValueValidator(2022),MaxValueValidator(2100)])

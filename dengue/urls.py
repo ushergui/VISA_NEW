@@ -32,4 +32,5 @@ urlpatterns = [
     path('listar_casos_abertos/', views.listar_casos_abertos, name='listar_casos_abertos'),
     path('encerrar_notificacao/<int:pk>/', views.encerrar_notificacao, name='encerrar_notificacao'),
     path('notificacao/<int:id_notificacao>/', views.detalhes_notificacao, name='detalhes_notificacao'),
+    path('listar_notificacoes_data', views.listar_notificacoes_data, name='listar_notificacoes_data'),
 ]
