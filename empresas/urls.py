@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import GetRisco, listar_protocolos, novo_protocolo, editar_protocolo, excluir_protocolo, get_pontos, EmpresasView, listar_risco_um, listar_risco_um_pdf, listar_risco_dois, listar_risco_dois_pdf, listar_risco_tres, listar_risco_tres_pdf
-from .views import listar_nao_planejadas
+from .views import listar_nao_planejadas, ListarPlanejamentoIndividualView
 
 urlpatterns = [
     # Contabilidade
@@ -77,7 +77,7 @@ urlpatterns = [
 
     path('fechamento/', views.fechamento, name='fechamento'),
     path('painel/', views.painel, name='painel'),
-
+    path('listar-planejamento-individual/', ListarPlanejamentoIndividualView.as_view(), name='listar_planejamento_individual'),
     path('empresas/<int:empresa_id>/alvara', views.gerar_alvara, name='gerar_alvara'),
 
 

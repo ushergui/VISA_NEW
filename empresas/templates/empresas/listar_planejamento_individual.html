@@ -1,0 +1,135 @@
+{% extends 'basy.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block conteudo %}
+<style>
+   .fundo-vermelho {
+    background-color: #f07973;
+}
+
+.fundo-amarelo {
+    background-color: rgb(241, 241, 146);
+}
+
+.fundo-verde {
+    background-color: rgb(99, 185, 99);
+}
+
+</style>
+
+<h3>Planejamento de inspeção {{ ano }}{% if fiscal_logado %} - {{ fiscal_logado.primeiro_nome|capitalize_name }}{% endif %}</h3>   <div>
+    <input type="checkbox" id="checkbox-pendente" checked> Pendente
+    <input type="checkbox" id="checkbox-em-andamento" checked> Em andamento
+    <input type="checkbox" id="checkbox-realizada" checked> Realizada
+</div>
+
+<hr>
+<div class="table responsive">
+    <table class="table" id="tabela-listar">
+        <thead>
+        <tr>
+            {% if not fiscal_logado %}<th style="text-align:center">Fiscal</th>{% else %}{% endif %}
+            <th style="text-align:center">Empresa</th>
+            <th style="text-align:center">Alvará</th>
+            <th style="text-align:center">Última inspeção</th>
+            <th style="text-align:center">CNAE</th>
+            <th style="text-align:center">Risco</th>
+            <th style="text-align:center">Planejamento</th>
+            
+        </tr>
+        </thead>
+        <tbody>
+        {% for planejamento in planejamentos %}
+        <tr class="{% if not planejamento.inspecao_realizada %}{% if planejamento.empresa.protocolo_aberto %}fundo-amarelo{% else %}fundo-vermelho{% endif %}{% else %}fundo-verde{% endif %}">
+            {% if not fiscal_logado %}<td style="text-align:center; font-size:13px;">{{ planejamento.fiscal.primeiro_nome|capitalize_name }}</td>{% else %}{% endif %}    
+            <td style="text-align:center; font-size:13px;">{{ planejamento.empresa.razao|capitalize_name }} <a href="{% url 'detalhe_empresa' planejamento.empresa.id %}"><i class="fa fa-eye" aria-hidden="true"></i>
+            </a></td>
+            <td style="text-align:center; font-size:13px;">{% if planejamento.empresa.alvara %}{{ planejamento.empresa.alvara|date:"d/m/Y" }}{% else %}********{% endif %}</td>
+            <td style="text-align:center; font-size:13px;">
+                {% if planejamento.empresa.inspecao_mais_recente %}
+                    {{ planejamento.empresa.inspecao_mais_recente|date:"d/m/Y" }}
+                {% else %}
+                    ********
+                {% endif %}
+            </td>
+            <td style="font-size:13px; text-align:left;">{{ planejamento.empresa.cnae_principal.codigo_cnae }} - {{ planejamento.empresa.cnae_principal.descricao_cnae|capitalize_name }}</td>
+            <td style="font-size:13px; text-align:left;">{{ planejamento.empresa.cnae_principal.risco_cnae }}</td>
+          
+            <td style="text-align:center; width: 170px">
+                <a class="btn btn-warning" title="Editar" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'editar_planejamento' planejamento.id %}">Editar</a>
+                <a class="btn btn-danger" title="Excluir" style="font-size: 11px; padding: 1px 4px; margin-right: 3px; text-align: center" href="{% url 'excluir_planejamento' planejamento.id %}">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+            <tr>
+                <td colspan="11">Nenhum planejamento registrado.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        function updateVisibility() {
+            var showPendente = $("#checkbox-pendente").is(":checked");
+            var showEmAndamento = $("#checkbox-em-andamento").is(":checked");
+            var showRealizada = $("#checkbox-realizada").is(":checked");
+
+            $("#tabela-listar tbody tr").each(function() {
+                var row = $(this);
+                if(row.hasClass("fundo-vermelho") && !showPendente) {
+                    row.hide();
+                } else if(row.hasClass("fundo-amarelo") && !showEmAndamento) {
+                    row.hide();
+                } else if(row.hasClass("fundo-verde") && !showRealizada) {
+                    row.hide();
+                } else {
+                    row.show();
+                }
+            });
+        }
+
+        // Evento de mudança para os checkboxes
+        $("#checkbox-pendente, #checkbox-em-andamento, #checkbox-realizada").change(updateVisibility);
+
+        // Atualiza a visibilidade inicial das linhas
+        updateVisibility();
+   
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            "aaSorting": [],
+            "pageLength": 50,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

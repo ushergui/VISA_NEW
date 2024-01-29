@@ -19,14 +19,6 @@ class UsuarioCreate(CreateView):
          Perfil.objects.create(usuario=self.object)
          return url
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-
-        context["titulo"] = "Cadastrar usuário"
-        context["botao"] = "Cadastrar"
-
-        return context
-
 class PerfilUpdate(UpdateView):
     template_name = "form.html"
     model = Perfil

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Notificacao, Semana
 from .forms import NotificacaoForm, SemanaForm, EncerrarNotificacaoForm
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max
 from django.core.exceptions import ValidationError
 from cadastros.models import Logradouro
 from django.http import JsonResponse, HttpResponseRedirect
@@ -71,8 +71,7 @@ def listar_notificacoes_gerais(request):
     }
 
     return render(request, 'dengue/listar_notificacoes.html', context)
-
-
+    
 def total_bairros(request):
     semana_query = request.GET.get('semana')
     ano_query = request.GET.get('ano')
@@ -80,46 +79,75 @@ def total_bairros(request):
         try:
             semana_atual = int(semana_query)
             ano_atual = int(ano_query)
-            # Preparar uma lista para armazenar as semanas e anos
-            semanas_e_anos = []
 
-            for i in range(4):
-                if semana_atual - i > 0:
-                    # Adiciona a semana e o ano corrente
-                    semanas_e_anos.append((semana_atual - i, ano_atual))
-                else:
-                    # Determinar o último ano e a última semana
-                    ano_anterior = ano_atual - 1
-                    ultima_semana_ano_anterior = Semana.objects.filter(ano=ano_anterior).order_by('-semana').first().semana
-                    semanas_e_anos.append((ultima_semana_ano_anterior - (i - semana_atual), ano_anterior))
+            # Utilizando a função para obter as semanas e anos
+            semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
 
-            # Filtrar as notificações com base nas semanas e anos
-            notificacoes = Notificacao.objects.filter(
-                semana_epidemiologica__semana__in=[s[0] for s in semanas_e_anos],
-                semana_epidemiologica__ano__in=[s[1] for s in semanas_e_anos]
-            ).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+            # Criando um query complexa com Q objects
+            query = Q()
+            for semana, ano in semanas_e_anos:
+                query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
+
+            # Filtrar as notificações com base na query
+            notificacoes = Notificacao.objects.filter(query).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
     else:
         notificacoes = Notificacao.objects.all().values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+    total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
     context = {
+        'total_notificacoes': total_notificacoes,
         'notificacoes': notificacoes,
         'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
     }
     return render(request, 'dengue/total_por_bairros.html', context)
     
-def get_semanas_e_anos(semana, ano):
-    if semana >= 4:
-        # Se a semana for maior ou igual a 4, simplesmente pegue as últimas 4 semanas do mesmo ano
-        semanas = [semana - i for i in range(4)]
-        anos = [ano] * 4
-    else:
-        # Se a semana for menor que 4, precisamos buscar as semanas do ano anterior também
-        semanas = [semana - i for i in range(semana)] + [52, 51, 50][:4 - semana]
-        ano_anterior = ano - 1
-        anos = [ano] * semana + [ano_anterior] * (4 - semana)
+def total_usf(request):
+    semana_query = request.GET.get('semana')
+    ano_query = request.GET.get('ano')
+    if semana_query and ano_query:
+        try:
+            semana_atual = int(semana_query)
+            ano_atual = int(ano_query)
 
-    return list(zip(semanas, anos))
+            # Utilizando a função para obter as semanas e anos
+            semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
+
+            # Criando um query complexa com Q objects
+            query = Q()
+            for semana, ano in semanas_e_anos:
+                query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
+
+            # Filtrar as notificações com base na query
+            notificacoes = Notificacao.objects.filter(query).values('usf').annotate(quantidade=Count('id')).order_by('-quantidade')
+        except ValueError:
+            notificacoes = Notificacao.objects.none()
+    else:
+        notificacoes = Notificacao.objects.all().values('usf').annotate(quantidade=Count('id')).order_by('-quantidade')
+    total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
+    context = {
+        'total_notificacoes': total_notificacoes,
+        'notificacoes': notificacoes,
+        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
+    }
+    return render(request, 'dengue/total_por_usf.html', context)
+    
+def get_semanas_e_anos(semana, ano):
+    semanas_e_anos = []
+    for i in range(4):
+        semana_atual = semana - i
+        ano_atual = ano
+
+        # Se a semana retroceder antes do início do ano atual
+        if semana_atual <= 0:
+            ano_atual -= 1
+            # Obter o total de semanas no ano anterior
+            total_semanas_ano_anterior = Semana.objects.filter(ano=ano_atual).aggregate(Max('semana'))['semana__max']
+            semana_atual = total_semanas_ano_anterior + semana_atual
+
+        semanas_e_anos.append((semana_atual, ano_atual))
+
+    return semanas_e_anos
 
 def positivos_bairros(request):
     semana_query = request.GET.get('semana')
@@ -200,68 +228,86 @@ def deletar_notificacao(request, pk):
     return redirect('listar_notificacoes')
 
 def boletim_resumo(request):
-    search_query = request.GET.get('q')
-    search_year = request.GET.get('year')
     notificacoes = Notificacao.objects.all()
 
-    if search_year:
-        try:
-            year = int(search_year)
-            notificacoes = notificacoes.filter(semana_epidemiologica__ano=year)
-        except ValueError:
-            notificacoes = Notificacao.objects.none()
+    # Já temos a lógica para casos positivos, vamos manter e adicionar a lógica para casos negativos
+    resultado_agrupado = notificacoes.values(
+        'semana_epidemiologica__ano', 
+        'semana_epidemiologica__semana'
+    ).annotate(
+        casos_positivos=Count(
+            'pk', 
+            filter=Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave']) |
+            Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo'])
+        ),
+        casos_negativos=Count(
+            'pk',
+            filter=Q(classificacao__in=['Descartado', 'Chikungunya']) |
+            Q(classificacao__isnull=True, resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])
+        ),
+        total_notificacoes=Count('pk')
+    ).order_by('semana_epidemiologica__ano', 'semana_epidemiologica__semana')
 
-    if search_query:
-        try:
-            semana_atual = int(search_query)
-            ultimas_4_semanas = [semana_atual - i for i in range(4)]
-            notificacoes = notificacoes.filter(
-                semana_epidemiologica__semana__in=ultimas_4_semanas
-            )
-        except ValueError:
-            notificacoes = Notificacao.objects.none()
+    dados_por_ano = {
+        'positivos': {},
+        'negativos': {},
+        'total': {} 
+    }
+    for item in resultado_agrupado:
+        ano = item['semana_epidemiologica__ano']
+        semana = item['semana_epidemiologica__semana']
+        casos_pos = item['casos_positivos']
+        casos_neg = item['casos_negativos']
+        total = item['total_notificacoes']  # Novo total
 
-    resultado_agrupado = notificacoes.values('semana_epidemiologica').annotate(
-        casos_positivos=Count('pk', filter=Q(
-            resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo'])),
-        casos_negativos=Count('pk', filter=Q(
-            resultado__in=['Negativo NS1', 'Negativo sorologia', 'Isolamento viral negativo'])),
-    ).order_by('semana_epidemiologica')
-    total_casos_positivos = sum(item['casos_positivos'] for item in resultado_agrupado)
-    total_casos_negativos = sum(item['casos_negativos'] for item in resultado_agrupado)
+        if ano not in dados_por_ano['positivos']:
+            dados_por_ano['positivos'][ano] = {}
+            dados_por_ano['negativos'][ano] = {}
+            dados_por_ano['total'][ano] = {}  # Inicialização para totais
+
+        dados_por_ano['positivos'][ano][semana] = casos_pos
+        dados_por_ano['negativos'][ano][semana] = casos_neg
+        dados_por_ano['total'][ano][semana] = total 
 
     context = {
-        'resultado_agrupado': resultado_agrupado,
-        'termo_pesquisa': search_query,
-        'total_casos_positivos': total_casos_positivos,
-        'total_casos_negativos': total_casos_negativos,
+        'dados_por_ano': dados_por_ano,
     }
     return render(request, 'dengue/boletim_resumo.html', context)
 
 def semana_epidemiologica(request):
-    search_query = request.GET.get('q2')
-    search_year = request.GET.get('ano_pesquisa')
-    notificacoes = Notificacao.objects.values('semana_epidemiologica', 'semana_epidemiologica__data_inicio_semana',
-                                              'semana_epidemiologica__data_fim_semana').annotate(quantidade=Count('semana_epidemiologica')).order_by('semana_epidemiologica')
-
-    if search_year:
+    notificacoes = None
+    termo_pesquisa = request.GET.get('semana')
+    ano_pesquisa = request.GET.get('ano')
+    
+    if termo_pesquisa and ano_pesquisa:
         try:
-            year = int(search_year)
-            notificacoes = notificacoes.filter(semana_epidemiologica__ano=year)
+            semana_atual = int(termo_pesquisa)
+            ano_atual = int(ano_pesquisa)
+
+            semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
+
+                # Criando um query complexa com Q objects
+            query = Q()
+            for semana, ano in semanas_e_anos:
+                query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
+
+                # Filtrar as notificações com base na query
+            notificacoes = Notificacao.objects.filter(query).values(
+                    'semana_epidemiologica__semana', 
+                    'semana_epidemiologica__ano', 
+                    'semana_epidemiologica__data_inicio_semana',
+                    'semana_epidemiologica__data_fim_semana'
+            ).annotate(quantidade=Count('semana_epidemiologica')).order_by('semana_epidemiologica')
+                
         except ValueError:
-            notificacoes = Notificacao.objects.none()
+            notificacoes = None
 
-    if search_query:
-        try:
-            semana_atual = int(search_query)
-            ultimas_4_semanas = [semana_atual - i for i in range(4)]
-            notificacoes = notificacoes.filter(semana_epidemiologica__semana__in=ultimas_4_semanas)
-        except ValueError:
-            notificacoes = Notificacao.objects.none()
-
-    return render(request, 'dengue/semana_epidemiologica.html', {'notificacoes': notificacoes, 'termo_pesquisa': search_query, 'ano_pesquisa': search_year})
-
-
+        # Se não houver parâmetros de pesquisa, retorna todas as notificações por semana epidemiológica
+    return render(request, 'dengue/semana_epidemiologica.html', {
+        'notificacoes': notificacoes,
+        'termo_pesquisa': termo_pesquisa,
+        'ano_pesquisa': ano_pesquisa
+    })
 
 def boletim_resumo_totais(request):
     erro_msg = None  # Inicializando a variável aqui

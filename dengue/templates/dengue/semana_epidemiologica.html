@@ -14,38 +14,27 @@
 {% if termo_pesquisa and ano_pesquisa %}
     <div align="center"><h3>Você pesquisou pelas últimas 4 semanas a partir da semana: "{{ termo_pesquisa }}" do ano {{ ano_pesquisa }}</h3></div>
 {% endif %}
+<br>
 
-    <div align="center"><h3>Notificações por semana epidemiológica</h3></div>
-
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a>
-
-<a href="{% url 'criar_notificacao' %}" class="btn btn-primary btn-sm">Nova Notificação</a></h3></div>
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Semana</th>
-                            {% for notificacao in notificacoes %}
-                                <th>{{ notificacao.semana_epidemiologica }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Quantidade</td>
-                            {% for notificacao in notificacoes %}
-                                <td>{{ notificacao.quantidade }}</td>
-                            {% endfor %}
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<form class="form-inline" action="{% url 'semana_epidemiologica' %}" method="get">
+    <div class="form-group">
+      <label class="mr-2">Semana epidemiológica (em número)</label>
+      <input type="number" name="semana" placeholder="Exemplo 8" class="form-control-sm">
+  </div>
+  &#160;&#160;&#160;&#160;&#160;&#160;
+  <div class="form-group">
+    <label class="mr-2">Ano</label>
+    <input type="number" name="ano" placeholder="2023" class="form-control-sm">
+  </div>
+  &#160;&#160;&#160;&#160;
+  
+  <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i>
+    Pesquisar</button>&#160;&#160;&#160;&#160;
+  
+  
+  </form><br>
+  {% if notificacoes %}
+    
     <div class="row mt-4">
         <div class="col-md-12 d-flex justify-content-center">
             <div class="chart-container">
@@ -54,7 +43,7 @@
         </div>
     </div>
 </div>
-
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/chart.js' %}"></script>
@@ -122,7 +111,7 @@ function createChart(labels, data, chartTitle) {
     const data = [];
 
     {% for notificacao in notificacoes %}
-    labels.push("{{ notificacao.semana_epidemiologica }} ({{ notificacao.semana_epidemiologica__data_inicio_semana|date:"d/m" }} a {{ notificacao.semana_epidemiologica__data_fim_semana|date:"d/m" }})");
+    labels.push("{{ notificacao.semana_epidemiologica__semana }}/{{ notificacao.semana_epidemiologica__ano }} ({{ notificacao.semana_epidemiologica__data_inicio_semana|date:"d/m" }} a {{ notificacao.semana_epidemiologica__data_fim_semana|date:"d/m" }})");
     data.push({{ notificacao.quantidade }});
     {% endfor %}
 

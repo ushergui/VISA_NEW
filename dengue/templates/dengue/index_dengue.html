@@ -2,14 +2,6 @@
 {% load static %}
 {% block conteudo %}
 
-
-{% if user.perfil.nome_completo %}
-<h3>Bem vindo ao sistema {{ user.perfil.nome_completo }}</h3>
-{% else %}
-<h3>Você precisa completar seu cadastro. Acesse os <a href="{% url 'atualizar-dados' %}">meus dados</a> para atualizar.</h3>
-{% endif %}
-<br>
-
 <div class="row">
 
   <div class="col-6">
@@ -35,15 +27,29 @@
       <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
     </form>
     <br>
+	<h4>Notificações por USF nas últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'total_usf' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <div class="form-group mx-sm-1 mb-2">
+        <label for="semana" class="mr-2">Semana:</label>
+        <input class="form-control-sm" type="text" name="semana" placeholder="Digite a semana atual" size="20">
+      </div>
+      <div class="form-group mx-sm-1 mb-2">
+        <label for="ano" class="mr-2">Ano:</label>
+        <input class="form-control-sm" type="text" name="ano" placeholder="Digite o ano" size="20"></div>
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+    <br>
     <h4>Notificações por data</h4>
       
     <form method="get" action="{% url 'listar_notificacoes_data' %}" onsubmit="return validateForm()">
       <div class="form-group mx-sm-1 mb-2">
           <label for="data_inicial">Data inicial:</label>
-          <input type="text" id="data_inicial" name="data_inicial" class="form-control-sm mr-4" value="{{ data_inicial|date:'d/m/Y' }}">
+          <input type="text" id="data_inicial" name="data_inicial" size="14"  class="form-control-sm mr-4" value="{{ data_inicial|date:'d/m/Y' }}">
           
           <label for="data_final">Data final:</label>
-          <input type="text" id="data_final" name="data_final" class="form-control-sm mr-4" value="{{ data_final|date:'d/m/Y' }}">
+          <input type="text" id="data_final" name="data_final" size="14" class="form-control-sm mr-4" value="{{ data_final|date:'d/m/Y' }}">
         
           <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
       </div>

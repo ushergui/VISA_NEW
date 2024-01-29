@@ -1242,7 +1242,7 @@ def excluir_planejamento(request, pk):
     return render(request, 'empresas/form-excluir.html', {'planejamento': planejamento})
     
 def listar_empresas_inscricao(request):
-    empresas = Empresas.objects.filter(inscricao_estadual__isnull=True)
+    empresas = Empresas.objects.filter(inscricao_estadual__isnull=True).exclude(status_funcionamento="BAIXADA")
     total_empresas = empresas.count()
     return render(request, 'empresas/listar_empresas_inscricao.html', {'empresas': empresas, 'total_empresas': total_empresas})
     
@@ -1270,3 +1270,36 @@ def listar_nao_planejadas(request):
     )
 
     return render(request, 'empresas/listar_nao_planejadas.html', {'empresas': empresas_sem_planejamento})
+
+class ListarPlanejamentoIndividualView(TemplateView):
+    template_name = 'empresas/listar_planejamento_individual.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ano = 2024  # Ano desejado
+
+        perfil_usuario = Perfil.objects.get(usuario=self.request.user)
+        fiscal_logado = None
+
+        try:
+            fiscal_logado = Fiscal.objects.get(perfil=perfil_usuario)
+        except Fiscal.DoesNotExist:
+            pass
+
+        # Primeiro, tenta buscar planejamentos para o fiscal logado no ano especificado
+        if fiscal_logado:
+            planejamentos = PlanejamentoInspecao.objects.filter(fiscal=fiscal_logado, ano=ano)
+        else:
+            planejamentos = PlanejamentoInspecao.objects.none()
+
+        # Se não houver planejamentos para o fiscal logado, busca todos os planejamentos do ano
+        if not planejamentos.exists():
+            planejamentos = PlanejamentoInspecao.objects.filter(ano=ano)
+
+        # Ordenação no Python
+        planejamentos = sorted(planejamentos, key=lambda p: p.empresa.inspecao_mais_recente() or datetime.min)
+
+        context['fiscal_logado'] = fiscal_logado
+        context['planejamentos'] = planejamentos
+        context['ano'] = ano
+        return context

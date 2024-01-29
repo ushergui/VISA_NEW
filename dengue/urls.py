@@ -10,6 +10,7 @@ urlpatterns = [
     path('obitos/', views.obitos, name='obitos'),
     path('positivos_recentes/', views.positivos_recentes, name='positivos_recentes'),
     path('total_bairros/', views.total_bairros, name='total_bairros'),
+    path('total_usf/', views.total_usf, name='total_usf'),
     path('positivos_bairros/', views.positivos_bairros, name='positivos_bairros'),
     path('notificacoes/criar/', views.criar_notificacao, name='criar_notificacao'),
     path('notificacoes/editar/<int:pk>/', views.editar_notificacao, name='editar_notificacao'),

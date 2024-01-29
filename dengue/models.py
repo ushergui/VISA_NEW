@@ -66,6 +66,7 @@ class Notificacao(models.Model):
         ("Laboratório Hormossul", "Laboratório Hormossul"),
         ("Laboratório JG", "Laboratório JG"),
         ("Laboratório São Lucas", "Laboratório São Lucas"),
+        ("Laboratório Santa Casa", "Laboratório Santa Casa"),
         ("Laboratório Vitale", "Laboratório Vitale"),
         ("USF Lagoinha", "USF Lagoinha"),
         ("USF Jardim Planalto", "USF Jardim Planalto"),

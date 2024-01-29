@@ -16,6 +16,8 @@
             <tr>
 
                 <th style="vertical-align: middle;text-align: center">Nome</th>
+                <th style="vertical-align: middle;text-align: center">Bairro</th>
+                <th style="vertical-align: middle;text-align: center">USF</th>
                 <th style="vertical-align: middle; text-align: center">Notificação</th>
                 <th style="vertical-align: middle; text-align: center">Início de sintomas</th>
                 <th style="vertical-align: middle; text-align: center">Semana epidemiológica</th>
@@ -35,6 +37,8 @@
             {% for notificacao in notificacoes %}
             <tr>
                 <td style="vertical-align: middle;">{{ notificacao.nome|capitalize_name }}</td>
+                <td style="vertical-align: middle;">{{ notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                <td style="vertical-align: middle;">{{ notificacao.usf }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
                 <td style="text-align: center; vertical-align: middle;">{{ notificacao.semana_epidemiologica }}</td>

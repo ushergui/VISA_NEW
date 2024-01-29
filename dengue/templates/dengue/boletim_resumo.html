@@ -3,8 +3,9 @@
 {% load static %}
 <style>
     .chart-container {
-        height: 400px;
-        width: 100%;
+        height: 550px;
+        width: 85%;  /* Ajustado para 80% */
+        margin: auto; /* Isso vai centralizar o contêiner */
     }
     .custom-table tr td, .custom-table tr th {
         height: 25px; /* Ajuste esse valor conforme a altura desejada */
@@ -19,47 +20,14 @@
 </style>
 {% endblock %}
 {% block conteudo %}
-{% if termo_pesquisa %}
-    <div align="left"><h4>Você pesquisou pelas últimas 4 semanas a partir da semana: "{{ termo_pesquisa }}"</h4></div>
-{% endif %}
-<div align="right"><h3><a href="javascript:history.back()" class="btn btn-secondary btn-sm mr-2 ">Voltar</a></h3></div>
-<div align="center"><h3>Boletim Dengue</h3></div>
+<div align="center"><h3>Comparativo de casos por semana epidemiológica</h3></div>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <table class="table table-striped custom-table">
-        <thead>
-            <tr>
-                <th></th>
-                {% for resultado in resultado_agrupado %}
-                    <th>{{ resultado.semana_epidemiologica }}</th>
-                {% endfor %}
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Casos positivos</td>
-                {% for resultado in resultado_agrupado %}
-                    <td>{{ resultado.casos_positivos }}</td>
-                {% endfor %}
-                <td>{{ total_casos_positivos }}</td>
-            </tr>
-            <tr>
-                <td>Casos negativos</td>
-                {% for resultado in resultado_agrupado %}
-                    <td>{{ resultado.casos_negativos }}</td>
-                {% endfor %}
-                <td>{{ total_casos_negativos }}</td>
-            </tr>
-            <tr>
-        </tbody>
-   </table>
-        </div>
-        <div class="col-md-12">
-            <div class="chart-container">
-                <canvas id="myChart"></canvas>
-            </div>
+    <div class="col-md-12">
+        <label><input type="checkbox" id="positivosCheckbox" checked> Casos Positivos</label>
+        <label><input type="checkbox" id="negativosCheckbox" checked> Casos Negativos</label>
+        <label><input type="checkbox" id="totalCheckbox" checked> Total de Notificações</label>
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
         </div>
     </div>
 </div>
@@ -68,56 +36,120 @@
 <script src="{% static 'js/chart.js' %}"></script>
 <script src="{% static 'js/chartjs-plugin-datalabels.js' %}"></script>
 <script>
-    const labels = [{% for resultado in resultado_agrupado %}'{{ resultado.semana_epidemiologica }}'{% if not forloop.last %},{% endif %}{% endfor %}];
-    const casos_positivos = [{% for resultado in resultado_agrupado %}{{ resultado.casos_positivos }}{% if not forloop.last %},{% endif %}{% endfor %}];
-    const casos_negativos = [{% for resultado in resultado_agrupado %}{{ resultado.casos_negativos }}{% if not forloop.last %},{% endif %}{% endfor %}];
-    const aguardando = [{% for resultado in resultado_agrupado %}{{ resultado.aguardando }}{% if not forloop.last %},{% endif %}{% endfor %}];
-    const faltas_recusa = [{% for resultado in resultado_agrupado %}{{ resultado.faltas_recusa }}{% if not forloop.last %},{% endif %}{% endfor %}];
-    const internacoes = [{% for resultado in resultado_agrupado %}{{ resultado.total_internacao }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    const dadosPorAno = {{ dados_por_ano|safe }};
+    const labels = Object.keys(dadosPorAno['positivos'][Object.keys(dadosPorAno['positivos'])[0]]);
+
+    // Define as cores frias para os casos positivos
+    const coresFrias = [
+        'rgba(0, 137, 123, 1)',   // Tons de verde-azulado
+        'rgba(3, 155, 229, 1)',   // Azul
+        'rgba(38, 198, 218, 1)',  // Ciano
+        'rgba(0, 172, 193, 1)',   // Azul celeste
+        'rgba(77, 182, 172, 1)'   // Verde marinho
+    ];
+    const coresCinza = [
+        'rgba(105, 105, 105, 1)',  // Cinza escuro
+        'rgba(128, 128, 128, 1)',  // Cinza médio
+        'rgba(169, 169, 169, 1)',  // Cinza claro
+        'rgba(192, 192, 192, 1)',  // Cinza mais claro
+        'rgba(211, 211, 211, 1)'   // Cinza quase branco
+    ];
+
+    // Define as cores quentes para os casos negativos
+    const coresQuentes = [
+        'rgba(255, 87, 34, 1)',   // Vermelho
+        'rgba(255, 193, 7, 1)',   // Amarelo
+        'rgba(255, 152, 0, 1)',   // Laranja
+    ];
+
+    // Função para gerar uma cor de fundo mais clara com base na cor da borda
+    function corDeFundo(corBorda) {
+        const cor = corBorda.match(/\d+/g).map(n => parseInt(n));
+        cor[3] = '0.2'; // Ajusta a opacidade para a cor de fundo
+        return 'rgba(' + cor.join(', ') + ')';
+    }
     
+    // Cria os datasets para casos positivos e negativos
+    function criarDatasets(dados, cores, tipo) {
+        return Object.entries(dados).map(([ano, dadosAno], index) => {
+            const corBorda = cores[index % cores.length];
+            return {
+                label: `${tipo} ${ano}`,
+                data: labels.map(label => dadosAno[label] || 0),
+                borderColor: corBorda,
+                backgroundColor: corDeFundo(corBorda),
+                fill: false,
+            };
+        });
+    }
+
+    const datasetsPositivos = criarDatasets(dadosPorAno['positivos'], coresFrias, 'Casos Positivos');
+    const datasetsNegativos = criarDatasets(dadosPorAno['negativos'], coresQuentes, 'Casos Negativos');
+    const datasetsTotal = criarDatasets(dadosPorAno['total'], coresCinza, 'Total Notificações');
 
     const ctx = document.getElementById('myChart').getContext('2d');
     const myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Casos positivos',
-                data: casos_positivos,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: false,
-            }, {
-                label: 'Casos negativos',
-                data: casos_negativos,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                fill: false,
-            }]
+            datasets: [...datasetsPositivos, ...datasetsNegativos, ...datasetsTotal]
         },
         options: {
             maintainAspectRatio: false,
-            height: 700,
-            plugins: {
-                datalabels: {
-                    color: '#000',
-                    anchor: 'end',
-                    align: 'top',
-                    offset: 5,
-                    font: {
-                        size: 14
-                    }
+            responsive: true,
+            layout: {
+                padding: {
+                    top: 60, // Espaço no topo
+                    bottom: 50 // Espaço na parte inferior para a legenda
                 }
-            },
+        },
             scales: {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true,
-                        stepSize: 10
+                        stepSize: 30
                     }
                 }]
+            },
+            plugins: {
+                datalabels: {
+                    color: '#000',
+                    display: function(context) {
+                        return context.dataset.data[context.dataIndex] > 0;
+                    },
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 5
+                }
+            },
+            legend: {
+            position: 'bottom', // Garante que a legenda está na parte inferior
+            labels: {
+                boxWidth: 20,
+                padding: 20, // Espaço entre as legendas para evitar sobreposição
+                fontSize: 12, // Pode ajustar o tamanho da fonte se necessário
+                usePointStyle: true // Usa o estilo de ponto para a caixa da legenda
             }
         }
+        }
     });
+
+    function updateChart() {
+        myChart.data.datasets.forEach((dataset) => {
+            if (dataset.label.startsWith('Casos Positivos')) {
+                dataset.hidden = !document.getElementById('positivosCheckbox').checked;
+            } else if (dataset.label.startsWith('Casos Negativos')) {
+                dataset.hidden = !document.getElementById('negativosCheckbox').checked;
+            } else if (dataset.label.startsWith('Total Notificações')) {
+                dataset.hidden = !document.getElementById('totalCheckbox').checked;
+            }
+        });
+        myChart.update();
+    }
+
+    // Event listeners para os checkboxes
+    document.getElementById('positivosCheckbox').addEventListener('change', updateChart);
+    document.getElementById('negativosCheckbox').addEventListener('change', updateChart);
+    document.getElementById('totalCheckbox').addEventListener('change', updateChart);
 </script>
 {% endblock %}
