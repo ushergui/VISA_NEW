@@ -1,0 +1,124 @@
+{% extends 'bases.html' %}
+{% block extra_css %}
+{% load static %}
+<style>
+    .chart-container {
+        height: 700px;
+        width: {% if termo_pesquisa and ano_pesquisa %}20{% else %}80{% endif %}%;
+    }
+</style>
+{% endblock %}
+{% block conteudo %}
+{% if termo_pesquisa %}
+    <div align="center"><h3>{{ termo_pesquisa }} - Total {{ total_notificacoes }}</h3></div>
+{% endif %}
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Notificadora</th>
+                            <th>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for notificacao in notificacoes|slice:":50" %}
+                        <tr>
+                            <td>{{ notificacao.notificadora }}</td>
+                            <td>{{ notificacao.quantidade }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/chart.js' %}"></script>
+<script src="{% static 'js/chartjs-plugin-datalabels.js' %}"></script>
+<script>
+    // Função para criar o gráfico
+    function createChart(labels, data, chartTitle) {
+        const ctx = document.getElementById('myChart');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Quantidade',
+                    data: data,
+                    backgroundColor: 'rgba(0, 138, 139, 1.2)',
+                    borderColor: 'rgba(0, 138, 139, 1.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                title: { 
+                    display: true,
+                    text: chartTitle,
+                    fontSize: 18,
+                    padding: 20
+                },
+                plugins: {
+                    datalabels: {
+                        color: '#000',
+                        anchor: 'end',
+                        align: 'top',
+                        font: {
+                            size: 20
+                        },
+                        formatter: function (value, context) {
+                            return value;
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+    yAxes: [{
+        ticks: {
+            beginAtZero: true,
+            max: Math.max(...data) + 3
+        }
+    }],
+    xAxes: [{
+        ticks: {
+            fontSize: 16,
+            maxRotation: 80, // Define a rotação máxima para 80 graus
+            minRotation: 80 // Define a rotação mínima para 80 graus
+        }
+    }]
+}
+            }
+        });
+    }
+
+    // Carregar os dados do Django para o gráfico
+    const labels = [];
+    const data = [];
+
+    {% for notificacao in notificacoes|slice:":50" %}
+        labels.push("{{ notificacao.usf }}");
+        data.push("{{ notificacao.quantidade }}");
+    {% endfor %}
+
+    // Define o título do gráfico
+    const chartTitle = 'Notificações por unidade notificadora';
+
+    createChart(labels, data, chartTitle);
+</script>
+{% endblock %}

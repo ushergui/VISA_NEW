@@ -33,8 +33,11 @@ from datetime import timedelta
 from django.http import QueryDict
 from django.views import View
 from decimal import Decimal
-
-
+from collections import defaultdict
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Count
+import json
+from django.shortcuts import render
 
 
 def get_queryset(self):
@@ -1093,3 +1096,23 @@ def dados_multados(request):
     }
 
     return render(request, 'dados_multados.html', context)
+
+def infracoes_por_mes(request):
+    # Agrupar as infrações por ano e mês
+    infracoes = Infracao.objects.annotate(
+        ano=ExtractYear('data_auto'),
+        mes=ExtractMonth('data_auto')
+    ).values('ano', 'mes').annotate(total=Count('id')).order_by('ano', 'mes')
+
+    # Organizar os dados para o gráfico
+    dados = defaultdict(lambda: defaultdict(int))
+    for infracao in infracoes:
+        dados[infracao['ano']][infracao['mes']] = infracao['total']
+
+    # Converter 'dados' para um dicionário regular do Python
+    dados_simples = {ano: {mes: total for mes, total in dados_ano.items()} for ano, dados_ano in dados.items()}
+
+    # Converter os dados para JSON
+    dados_json = json.dumps(dados_simples)
+
+    return render(request, 'boletim_terrenos.html', {'dados': dados_json})

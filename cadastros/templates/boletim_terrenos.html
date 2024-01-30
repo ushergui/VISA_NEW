@@ -1,0 +1,78 @@
+{% extends 'modelo-ifpr.html' %}
+{% load static %}
+
+<!-- Seu CSS personalizado aqui -->
+
+
+
+{% block conteudo %}
+<style>
+    .chart-container {
+        height: 500px; /* Altura definida */
+        width: 85%;    /* Largura definida */
+        margin: auto;
+    }
+
+    #chartInfracoes {
+        height: 100%; /* Altura do canvas se ajustará à altura do contêiner */
+        width: 100%;  /* Largura do canvas se ajustará à largura do contêiner */
+    }
+</style>
+
+        <div class="chart-container">
+            <canvas id="chartInfracoes"></canvas>
+        </div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/chart.js' %}"></script>
+<script src="{% static 'js/chartjs-plugin-datalabels.js' %}"></script> <!-- Certifique-se de ter esse script -->
+<script>
+    const dadosJson = '{{ dados|safe }}';
+    const dados = JSON.parse(dadosJson);
+    const anos = Object.keys(dados);
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+    const datasets = anos.map((ano, index) => {
+        return {
+            label: `Infrações ${ano}`,
+            data: meses.map((mes, mesIndex) => dados[ano][mesIndex + 1] || 0),
+            borderColor: `rgba(${(index * 30) % 255}, ${(index * 60) % 255}, ${(index * 90) % 255}, 1)`,
+            backgroundColor: `rgba(${(index * 30) % 255}, ${(index * 60) % 255}, ${(index * 90) % 255}, 0.2)`,
+            fill: false,
+            lineTension: 0.1, // suaviza as linhas
+        };
+    });
+
+    const ctx = document.getElementById('chartInfracoes').getContext('2d');
+    const chartInfracoes = new Chart(ctx, {
+        type: 'line', // Alterado de 'bar' para 'line'
+        data: {
+            labels: meses,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        stepSize: 50
+                    }
+                }]
+            },  
+            plugins: {
+                datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    formatter: (value, ctx) => {
+                        return value > 0 ? value : '';
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

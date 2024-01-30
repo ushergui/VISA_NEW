@@ -41,6 +41,20 @@
       <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
     </form>
     <br>
+    <h4>Notificações por unidade notificadora nas últimas 4 semanas</h4>
+    <form class="form-inline" action="{% url 'total_por_notificadora' %}" method="get">
+      <div class="form-group mx-sm-1 mb-2">
+        <div class="form-group mx-sm-1 mb-2">
+        <label for="semana" class="mr-2">Semana:</label>
+        <input class="form-control-sm" type="text" name="semana" placeholder="Digite a semana atual" size="20">
+      </div>
+      <div class="form-group mx-sm-1 mb-2">
+        <label for="ano" class="mr-2">Ano:</label>
+        <input class="form-control-sm" type="text" name="ano" placeholder="Digite o ano" size="20"></div>
+      </div>
+      <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+    </form>
+    <br>
     <h4>Notificações por data</h4>
       
     <form method="get" action="{% url 'listar_notificacoes_data' %}" onsubmit="return validateForm()">

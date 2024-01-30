@@ -128,8 +128,6 @@ def listar_empresas(request):
 
     return render(request, 'empresas/listar_empresas.html', {'empresas': empresas, 'termo_pesquisa': termo_pesquisa})
 
-
-
 def criar_empresa(request):
     form = EmpresasForm(request.POST or None)
     titulo = "Cadastrar empresa"
@@ -1202,7 +1200,22 @@ def gerar_alvara(request, empresa_id):
 
 # Listagem de Planejamentos
 def listar_planejamentos(request):
-    planejamentos = PlanejamentoInspecao.objects.all()
+    # Prefetch para otimizar a consulta de Cnae em Empresas
+    cnaes_prefetch = Prefetch('empresa__cnae', queryset=Cnae.objects.all())
+    
+    # Usamos select_related para relações de chave estrangeira (ForeignKey)
+    # e prefetch_related para relações de muitos para muitos (ManyToMany)
+    planejamentos = PlanejamentoInspecao.objects.select_related(
+        'fiscal',
+        'empresa',
+        'empresa__logradouro_empresa',
+        'empresa__logradouro_empresa__bairro',
+        'empresa__logradouro_empresa__bairro__cidade',
+        'empresa__logradouro_empresa__bairro__cidade__estado',
+    ).prefetch_related(
+        cnaes_prefetch
+    )
+
     return render(request, 'empresas/listar_planejamento.html', {'planejamentos': planejamentos})
 
 # Criação de Planejamento
@@ -1271,6 +1284,8 @@ def listar_nao_planejadas(request):
 
     return render(request, 'empresas/listar_nao_planejadas.html', {'empresas': empresas_sem_planejamento})
 
+
+
 class ListarPlanejamentoIndividualView(TemplateView):
     template_name = 'empresas/listar_planejamento_individual.html'
 
@@ -1286,21 +1301,32 @@ class ListarPlanejamentoIndividualView(TemplateView):
         except Fiscal.DoesNotExist:
             pass
 
-        # Primeiro, tenta buscar planejamentos para o fiscal logado no ano especificado
+        # Prefetch para otimizar a consulta de Cnae em Empresas
+        cnaes_prefetch = Prefetch('empresa__cnae', queryset=Cnae.objects.all())
+
+        # Preparação da query com select_related e prefetch_related
+        planejamento_query = PlanejamentoInspecao.objects.select_related(
+            'fiscal',
+            'empresa',
+            'empresa__logradouro_empresa',
+            'empresa__logradouro_empresa__bairro',
+            'empresa__logradouro_empresa__bairro__cidade',
+            'empresa__logradouro_empresa__bairro__cidade__estado',
+        ).prefetch_related(
+            cnaes_prefetch
+        )
+
+        # Consulta condicional com a query preparada
         if fiscal_logado:
-            planejamentos = PlanejamentoInspecao.objects.filter(fiscal=fiscal_logado, ano=ano)
+            planejamentos = planejamento_query.filter(fiscal=fiscal_logado, ano=ano)
         else:
-            planejamentos = PlanejamentoInspecao.objects.none()
+            planejamentos = planejamento_query.filter(ano=ano)
 
-        # Se não houver planejamentos para o fiscal logado, busca todos os planejamentos do ano
         if not planejamentos.exists():
-            planejamentos = PlanejamentoInspecao.objects.filter(ano=ano)
+            planejamentos = planejamento_query.none()
 
         # Ordenação no Python
-        # Data muito antiga para usar como padrão
         data_antiga = date(2015, 1, 1)
-
-        # Ordenação no Python
         planejamentos = sorted(planejamentos, key=lambda p: p.empresa.inspecao_mais_recente() or data_antiga)
 
         context['fiscal_logado'] = fiscal_logado

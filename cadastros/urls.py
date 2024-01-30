@@ -50,7 +50,7 @@ urlpatterns = [
     path('inspecao/<int:pk>/', InspecaoDetalhes.as_view(), name='detalhes-inspecao'),
     path('infracao/<int:pk>/', InfracaoDetalhes.as_view(), name='detalhes-infracao'),
     path('produtividade/<int:pk>/', ProdutividadeUpdate.as_view(), name='produtividade'),
-
+    path('infracoes_por_mes/', views.infracoes_por_mes, name='infracoes_por_mes'),
 
     path('deletar/estado/<int:pk>/', EstadoDelete.as_view(), name="deletar-estado"),
     path('deletar/cidade/<int:pk>/', CidadeDelete.as_view(), name="deletar-cidade"),

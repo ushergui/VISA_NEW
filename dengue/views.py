@@ -16,9 +16,12 @@ def check_duplicate(request):
 
     if nome and logradouro:
         if notificacao_id and notificacao_id != 'None':
-            notificacoes = Notificacao.objects.filter(nome=nome, logradouro_paciente_id=logradouro).exclude(pk=notificacao_id)
+            notificacoes = Notificacao.objects.filter(nome=nome, logradouro_paciente_id=logradouro)\
+                                              .exclude(pk=notificacao_id)\
+                                              .select_related('logradouro_paciente__bairro__cidade__estado')
         else:
-            notificacoes = Notificacao.objects.filter(nome=nome, logradouro_paciente_id=logradouro)
+            notificacoes = Notificacao.objects.filter(nome=nome, logradouro_paciente_id=logradouro)\
+                                              .select_related('logradouro_paciente__bairro__cidade__estado')
 
         if notificacoes.exists():
             notificacao = notificacoes.first()
@@ -28,6 +31,7 @@ def check_duplicate(request):
             return JsonResponse({"exists": False})
     else:
         return JsonResponse({"exists": False})
+
 
 
 def listar_notificacoes(request):
@@ -60,11 +64,26 @@ def listar_notificacoes_gerais(request):
             semana_atual = int(search_query)
             ultimas_4_semanas = [semana_atual - i for i in range(4)]
             notificacoes = Notificacao.objects.filter(
-                semana_epidemiologica__in=ultimas_4_semanas            )
+                semana_epidemiologica__semana__in=ultimas_4_semanas)\
+                .select_related('semana_epidemiologica', 
+                                'logradouro_paciente',
+                                'logradouro_paciente__bairro',
+                                'logradouro_paciente__bairro__cidade',
+                                'logradouro_paciente__bairro__cidade__estado')
         except ValueError:
-            notificacoes = Notificacao.objects.all()
+            notificacoes = Notificacao.objects.all()\
+                .select_related('semana_epidemiologica', 
+                                'logradouro_paciente',
+                                'logradouro_paciente__bairro',
+                                'logradouro_paciente__bairro__cidade',
+                                'logradouro_paciente__bairro__cidade__estado')
     else:
-        notificacoes = Notificacao.objects.all()
+        notificacoes = Notificacao.objects.all()\
+            .select_related('semana_epidemiologica', 
+                            'logradouro_paciente',
+                            'logradouro_paciente__bairro',
+                            'logradouro_paciente__bairro__cidade',
+                            'logradouro_paciente__bairro__cidade__estado')
 
     context = {
         'notificacoes': notificacoes,
@@ -90,11 +109,20 @@ def total_bairros(request):
                 query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
 
             # Filtrar as notificações com base na query
-            notificacoes = Notificacao.objects.filter(query).values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+            notificacoes = Notificacao.objects.filter(query)\
+                                              .select_related('logradouro_paciente__bairro__cidade__estado', 'semana_epidemiologica')\
+                                              .values('logradouro_paciente__bairro__nome_bairro')\
+                                              .annotate(quantidade=Count('id'))\
+                                              .order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
     else:
-        notificacoes = Notificacao.objects.all().values('logradouro_paciente__bairro__nome_bairro').annotate(quantidade=Count('id')).order_by('-quantidade')
+        notificacoes = Notificacao.objects.all()\
+                                      .select_related('logradouro_paciente__bairro__cidade__estado', 'semana_epidemiologica')\
+                                      .values('logradouro_paciente__bairro__nome_bairro')\
+                                      .annotate(quantidade=Count('id'))\
+                                      .order_by('-quantidade')
+
     total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
     context = {
         'total_notificacoes': total_notificacoes,
@@ -102,6 +130,7 @@ def total_bairros(request):
         'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
     }
     return render(request, 'dengue/total_por_bairros.html', context)
+
     
 def total_usf(request):
     semana_query = request.GET.get('semana')
@@ -132,6 +161,51 @@ def total_usf(request):
         'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
     }
     return render(request, 'dengue/total_por_usf.html', context)
+
+def total_por_notificadora(request):
+    semana_query = request.GET.get('semana')
+    ano_query = request.GET.get('ano')
+
+    if semana_query and ano_query:
+        try:
+            semana_atual = int(semana_query)
+            ano_atual = int(ano_query)
+            semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
+
+            query = Q()
+            for semana, ano in semanas_e_anos:
+                query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
+
+            notificacoes = Notificacao.objects.filter(query)\
+                                              .select_related('semana_epidemiologica')\
+                                              .values('notificadora')\
+                                              .annotate(quantidade=Count('id'))\
+                                              .order_by('-quantidade')
+        except ValueError:
+            notificacoes = Notificacao.objects.none()
+    elif ano_query and not semana_query:
+        ano_atual = int(ano_query)
+        notificacoes = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
+                                          .select_related('semana_epidemiologica')\
+                                          .values('notificadora')\
+                                          .annotate(quantidade=Count('id'))\
+                                          .order_by('-quantidade')
+    elif semana_query and not ano_query:
+        notificacoes = Notificacao.objects.none()
+    else:
+        notificacoes = Notificacao.objects.all()\
+                                      .select_related('semana_epidemiologica')\
+                                      .values('notificadora')\
+                                      .annotate(quantidade=Count('id'))\
+                                      .order_by('-quantidade')
+
+    total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
+    context = {
+        'total_notificacoes': total_notificacoes,
+        'notificacoes': notificacoes,
+        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query} e 3 anteriores' if semana_query and ano_query else (f'Registros do ano {ano_query}' if ano_query and not semana_query else 'Todos os registros')
+    }
+    return render(request, 'dengue/total_por_notificadora.html', context)
     
 def get_semanas_e_anos(semana, ano):
     semanas_e_anos = []
@@ -153,47 +227,46 @@ def get_semanas_e_anos(semana, ano):
 def positivos_bairros(request):
     semana_query = request.GET.get('semana')
     ano_query = request.GET.get('ano')
-    
+
     notificacoes = None
-    total_geral = 0  # Inicializa o contador geral
+    total_geral = 0
     pesquisa_realizada = False
     if semana_query and ano_query:
         pesquisa_realizada = True
         try:
-            semana = int(semana_query)
-            ano = int(ano_query)
-            semanas_e_anos = get_semanas_e_anos(semana, ano)
-            
-            # Construir o Q object para as semanas e anos
+            semana_atual = int(semana_query)
+            ano_atual = int(ano_query)
+            semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
+
             semanas_filters = Q()
             for semana, ano in semanas_e_anos:
                 semanas_filters |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
-            
-            # Query base que será usada para ambas as contagens
-            base_query = Notificacao.objects.filter(semanas_filters).filter(
-                Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']) |
-                Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
-            )
-            
-            # Contagem total de casos positivos
+
+            base_query = Notificacao.objects.filter(semanas_filters)\
+                                            .select_related('logradouro_paciente__bairro__cidade__estado')\
+                                            .filter(
+                                                Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']) |
+                                                Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
+                                            )
+
             total_geral = base_query.count()
 
-            # Filtro final incluindo as semanas e anos, agrupado por bairro
-            notificacoes = base_query.values('logradouro_paciente__bairro__nome_bairro') \
-                                     .annotate(quantidade=Count('id')) \
+            notificacoes = base_query.values('logradouro_paciente__bairro__nome_bairro')\
+                                     .annotate(quantidade=Count('id'))\
                                      .order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
 
     context = {
         'notificacoes': notificacoes,
-        'total_geral': total_geral,  # Adiciona o total geral no contexto
+        'total_geral': total_geral,
         'termo_pesquisa': semana_query,
         'ano_pesquisa': ano_query,
         'pesquisa_realizada': pesquisa_realizada,
     }
 
     return render(request, 'dengue/positivos_bairros.html', context)
+
 
 def criar_notificacao(request):
     if request.method == 'POST':
@@ -499,6 +572,19 @@ def casos_abertos(request):
         'total_notificacoes': total_notificacoes  # passando o total como um contexto adicional
     })
 
+def sem_usf(request):
+    notificacoes = Notificacao.objects.filter(
+        usf=None
+    ).order_by('nome') 
+    
+    # Contando o número total de notificações
+    total_notificacoes = notificacoes.count()
+
+    return render(request, 'dengue/sem_usf.html', {
+        'notificacoes': notificacoes,
+        'total_notificacoes': total_notificacoes  # passando o total como um contexto adicional
+    })
+
 def pesquisar_notificacoes(request):
     termo_buscas = request.GET.get('q')
 
@@ -527,6 +613,7 @@ def listar_casos_abertos(request):
         total_registros = notificacoes.count()
 
     return render(request, 'dengue/listar_casos_abertos.html', {'notificacoes': notificacoes, 'total_registros': total_registros})
+    
 
 def encerrar_notificacao(request, pk):
     notificacao = get_object_or_404(Notificacao, pk=pk)
