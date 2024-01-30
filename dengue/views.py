@@ -36,14 +36,14 @@ def listar_notificacoes(request):
         try:
             semana_atual = int(search_query)
             ultimas_4_semanas = [semana_atual - i for i in range(4)]
-            notificacoes = Notificacao.objects.filter(
+            notificacoes = Notificacao.objects.select_related('semana_epidemiologica', 'logradouro_paciente').filter(
                 semana_epidemiologica__in=ultimas_4_semanas,
                 resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']
             )
         except ValueError:
-            notificacoes = Notificacao.objects.all()
+            notificacoes = Notificacao.objects.select_related('semana_epidemiologica', 'logradouro_paciente').all()
     else:
-        notificacoes = Notificacao.objects.all()
+        notificacoes = Notificacao.objects.select_related('semana_epidemiologica', 'logradouro_paciente').all()
 
     context = {
         'notificacoes': notificacoes,
@@ -51,6 +51,7 @@ def listar_notificacoes(request):
     }
 
     return render(request, 'dengue/listar_notificacoes.html', context)
+
 
 def listar_notificacoes_gerais(request):
     search_query = request.GET.get('q')
@@ -748,7 +749,6 @@ def listar_notificacoes_data(request):
         data_inicial_str = request.GET.get('data_inicial')
         data_final_str = request.GET.get('data_final')
 
-        # Verifique se ambos os campos de data foram fornecidos
         if data_inicial_str and data_final_str:
             try:
                 data_inicial = datetime.strptime(data_inicial_str, '%d/%m/%Y').date()
@@ -756,7 +756,8 @@ def listar_notificacoes_data(request):
 
                 notificacoes = Notificacao.objects.filter(
                     data_notificacao__range=(data_inicial, data_final)
-                ).order_by('data_notificacao')
+                ).select_related('semana_epidemiologica', 'logradouro_paciente').order_by('data_notificacao')
+
                 total_notificacoes = notificacoes.count()
 
                 context = {

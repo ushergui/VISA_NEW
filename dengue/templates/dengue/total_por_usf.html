@@ -111,7 +111,7 @@
     const labels = [];
     const data = [];
 
-    {% for notificacao in notificacoes|slice:":10" %}
+    {% for notificacao in notificacoes|slice:":50" %}
         labels.push("{{ notificacao.usf }}");
         data.push("{{ notificacao.quantidade }}");
     {% endfor %}

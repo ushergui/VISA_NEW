@@ -1297,7 +1297,11 @@ class ListarPlanejamentoIndividualView(TemplateView):
             planejamentos = PlanejamentoInspecao.objects.filter(ano=ano)
 
         # Ordenação no Python
-        planejamentos = sorted(planejamentos, key=lambda p: p.empresa.inspecao_mais_recente() or datetime.min)
+        # Data muito antiga para usar como padrão
+        data_antiga = date(2015, 1, 1)
+
+        # Ordenação no Python
+        planejamentos = sorted(planejamentos, key=lambda p: p.empresa.inspecao_mais_recente() or data_antiga)
 
         context['fiscal_logado'] = fiscal_logado
         context['planejamentos'] = planejamentos
