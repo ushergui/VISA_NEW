@@ -40,6 +40,7 @@ class Cnae(models.Model):
         ("Atividade de ensino", "Atividade de ensino"),
         ("Atividade de assistência social", "Atividade de assistência social"),
         ("Bufê", "Bufê"),
+        ("Bar", "Bar"),
         ("Cabeleireiro/manicure/pedicure", "Cabeleireiro/manicure/pedicure"),
         ("Cantina", "Cantina"),
         ("CAPS", "CAPS"),

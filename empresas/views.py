@@ -1258,6 +1258,11 @@ def listar_empresas_inscricao(request):
     empresas = Empresas.objects.filter(inscricao_estadual__isnull=True).exclude(status_funcionamento="BAIXADA")
     total_empresas = empresas.count()
     return render(request, 'empresas/listar_empresas_inscricao.html', {'empresas': empresas, 'total_empresas': total_empresas})
+
+def listar_correcao_risco_i(request):
+    empresas = Empresas.objects.filter(inscricao_estadual__isnull=True).exclude(status_funcionamento="BAIXADA")
+    total_empresas = empresas.count()
+    return render(request, 'empresas/listar_empresas_inscricao.html', {'empresas': empresas, 'total_empresas': total_empresas})
     
 def editar_inscricao_estadual(request, id):
     empresa = Empresas.objects.get(id=id)
@@ -1333,3 +1338,12 @@ class ListarPlanejamentoIndividualView(TemplateView):
         context['planejamentos'] = planejamentos
         context['ano'] = ano
         return context
+
+
+def lista_correcao_cnae(request):
+    empresas = Empresas.objects.filter(
+        (Q(cnae_principal__risco_cnae__valor_risco=3) & Q(status_funcionamento="ATIVA")) |
+        (Q(cnae_principal__risco_cnae__valor_risco=4) & Q(status_funcionamento="DISPENSADA"))
+    )
+    total_empresas = empresas.count()
+    return render(request, 'empresas/lista_correcao_cnae.html', {'empresas': empresas, 'total_empresas': total_empresas})

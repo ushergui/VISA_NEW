@@ -95,20 +95,17 @@ def listar_notificacoes_gerais(request):
 def total_bairros(request):
     semana_query = request.GET.get('semana')
     ano_query = request.GET.get('ano')
+
     if semana_query and ano_query:
         try:
             semana_atual = int(semana_query)
             ano_atual = int(ano_query)
-
-            # Utilizando a função para obter as semanas e anos
             semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
 
-            # Criando um query complexa com Q objects
             query = Q()
             for semana, ano in semanas_e_anos:
                 query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
 
-            # Filtrar as notificações com base na query
             notificacoes = Notificacao.objects.filter(query)\
                                               .select_related('logradouro_paciente__bairro__cidade__estado', 'semana_epidemiologica')\
                                               .values('logradouro_paciente__bairro__nome_bairro')\
@@ -116,6 +113,18 @@ def total_bairros(request):
                                               .order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
+
+    elif ano_query and not semana_query:
+        ano_atual = int(ano_query)
+        notificacoes = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
+                                          .select_related('logradouro_paciente__bairro__cidade__estado', 'semana_epidemiologica')\
+                                          .values('logradouro_paciente__bairro__nome_bairro')\
+                                          .annotate(quantidade=Count('id'))\
+                                          .order_by('-quantidade')
+
+    elif semana_query and not ano_query:
+        notificacoes = Notificacao.objects.none()
+
     else:
         notificacoes = Notificacao.objects.all()\
                                       .select_related('logradouro_paciente__bairro__cidade__estado', 'semana_epidemiologica')\
@@ -127,47 +136,90 @@ def total_bairros(request):
     context = {
         'total_notificacoes': total_notificacoes,
         'notificacoes': notificacoes,
-        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
+        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query} e 3 anteriores' if semana_query and ano_query else (f'Registros do ano {ano_query}' if ano_query and not semana_query else 'Todos os registros')
     }
     return render(request, 'dengue/total_por_bairros.html', context)
+
 
     
 def total_usf(request):
     semana_query = request.GET.get('semana')
     ano_query = request.GET.get('ano')
+
     if semana_query and ano_query:
         try:
             semana_atual = int(semana_query)
             ano_atual = int(ano_query)
-
-            # Utilizando a função para obter as semanas e anos
             semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
 
-            # Criando um query complexa com Q objects
             query = Q()
             for semana, ano in semanas_e_anos:
                 query |= Q(semana_epidemiologica__semana=semana, semana_epidemiologica__ano=ano)
 
-            # Filtrar as notificações com base na query
-            notificacoes = Notificacao.objects.filter(query).values('usf').annotate(quantidade=Count('id')).order_by('-quantidade')
+            notificacoes = Notificacao.objects.filter(query)\
+                                              .values('usf')\
+                                              .annotate(quantidade=Count('id'))\
+                                              .order_by('-quantidade')
         except ValueError:
             notificacoes = Notificacao.objects.none()
+
+    elif ano_query and not semana_query:
+        ano_atual = int(ano_query)
+        notificacoes = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
+                                          .values('usf')\
+                                          .annotate(quantidade=Count('id'))\
+                                          .order_by('-quantidade')
+
+    elif semana_query and not ano_query:
+        notificacoes = Notificacao.objects.none()
+
     else:
-        notificacoes = Notificacao.objects.all().values('usf').annotate(quantidade=Count('id')).order_by('-quantidade')
+        notificacoes = Notificacao.objects.all()\
+                                      .values('usf')\
+                                      .annotate(quantidade=Count('id'))\
+                                      .order_by('-quantidade')
+
     total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
     context = {
         'total_notificacoes': total_notificacoes,
         'notificacoes': notificacoes,
-        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query}' if semana_query and ano_query else ''
+        'termo_pesquisa': f'Semana {semana_query} do ano {ano_query} e 3 anteriores' if semana_query and ano_query else (f'Registros do ano {ano_query}' if ano_query and not semana_query else 'Todos os registros')
     }
     return render(request, 'dengue/total_por_usf.html', context)
+
 
 def total_por_notificadora(request):
     semana_query = request.GET.get('semana')
     ano_query = request.GET.get('ano')
 
-    if semana_query and ano_query:
-        try:
+    categorias = {
+        "Laboratórios": [
+            "Farmácia Ana Terra", "Laboratório Athena", "Laboratório Biolabory",
+            "Laboratório Hormossul", "Laboratório JG", "Laboratório Municipal",
+            "Laboratório São Lucas", "Laboratório Santa Casa", "Laboratório Vitale"
+        ],
+        "APS": [
+            "USF Alvorada", "USF Asilo", "USF Belvedere", "USF Centro",
+            "USF CAIC II", "USF CAIC III", "USF Cidade Industrial", "USF Diamantina",
+            "EAP Guardinha", "EAP Rural", "USF Estação", "USF Guardinha", "USF João XXIII",
+            "USF Lagoinha", "USF Jardim Planalto", "USF Mediterranee", "USF San Genaro",
+            "USF Santa Maria", "USF São Judas", "USF Veneza", "USF Verona",
+            "USF Vila Formosa", "USF Vila Mariana", "Unidade de Termópolis"
+        ],
+        "Ampara": ["Ampara"],
+        "Outros": ["Ambulatório de Infectologia", "Ambulatório Municipal"],
+        "Gedor Silveira": ["Gedor Silveira"],
+        "Santa Casa de Misericórdia": ["Santa Casa de Misericórdia"],
+        "Santa Casa": ["Santa Casa"],
+        "Unimed": ["Unimed"],
+        "UPA": ["UPA - Unidade de Pronto Atendimento"],
+        "Vigilância em Saúde": ["Vigilância em Saúde"]
+    }
+
+    notificadora_para_categoria = {v: k for k, vals in categorias.items() for v in vals}
+
+    try:
+        if semana_query and ano_query:
             semana_atual = int(semana_query)
             ano_atual = int(ano_query)
             semanas_e_anos = get_semanas_e_anos(semana_atual, ano_atual)
@@ -181,23 +233,52 @@ def total_por_notificadora(request):
                                               .values('notificadora')\
                                               .annotate(quantidade=Count('id'))\
                                               .order_by('-quantidade')
-        except ValueError:
+
+            # Agrupando as notificações por categoria
+            notificacoes_agrupadas = {}
+            for notificacao in notificacoes:
+                categoria = notificadora_para_categoria.get(notificacao['notificadora'], "Não Categorizado")
+                notificacoes_agrupadas.setdefault(categoria, 0)
+                notificacoes_agrupadas[categoria] += notificacao['quantidade']
+
+            notificacoes = [{'categoria': k, 'quantidade': v} for k, v in notificacoes_agrupadas.items()]
+
+        elif ano_query and not semana_query:
+            ano_atual = int(ano_query)
+            notificacoes = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
+                                            .select_related('semana_epidemiologica')\
+                                            .values('notificadora')\
+                                            .annotate(quantidade=Count('id'))\
+                                            .order_by('-quantidade')
+
+            # Agrupando as notificações por categoria
+            notificacoes_agrupadas = {}
+            for notificacao in notificacoes:
+                categoria = notificadora_para_categoria.get(notificacao['notificadora'], "Não Categorizado")
+                notificacoes_agrupadas.setdefault(categoria, 0)
+                notificacoes_agrupadas[categoria] += notificacao['quantidade']
+
+            notificacoes = [{'categoria': k, 'quantidade': v} for k, v in notificacoes_agrupadas.items()]
+        elif semana_query and not ano_query:
             notificacoes = Notificacao.objects.none()
-    elif ano_query and not semana_query:
-        ano_atual = int(ano_query)
-        notificacoes = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
-                                          .select_related('semana_epidemiologica')\
-                                          .values('notificadora')\
-                                          .annotate(quantidade=Count('id'))\
-                                          .order_by('-quantidade')
-    elif semana_query and not ano_query:
-        notificacoes = Notificacao.objects.none()
-    else:
-        notificacoes = Notificacao.objects.all()\
-                                      .select_related('semana_epidemiologica')\
-                                      .values('notificadora')\
-                                      .annotate(quantidade=Count('id'))\
-                                      .order_by('-quantidade')
+        else:
+            notificacoes = Notificacao.objects.all()\
+                                        .select_related('semana_epidemiologica')\
+                                        .values('notificadora')\
+                                        .annotate(quantidade=Count('id'))\
+                                        .order_by('-quantidade')
+
+            # Agrupando as notificações por categoria
+            notificacoes_agrupadas = {}
+            for notificacao in notificacoes:
+                categoria = notificadora_para_categoria.get(notificacao['notificadora'], "Não Categorizado")
+                notificacoes_agrupadas.setdefault(categoria, 0)
+                notificacoes_agrupadas[categoria] += notificacao['quantidade']
+
+            notificacoes = [{'categoria': k, 'quantidade': v} for k, v in notificacoes_agrupadas.items()]
+
+    except ValueError:
+        notificacoes = []
 
     total_notificacoes = sum([notificacao['quantidade'] for notificacao in notificacoes])
     context = {
@@ -206,6 +287,7 @@ def total_por_notificadora(request):
         'termo_pesquisa': f'Semana {semana_query} do ano {ano_query} e 3 anteriores' if semana_query and ano_query else (f'Registros do ano {ano_query}' if ano_query and not semana_query else 'Todos os registros')
     }
     return render(request, 'dengue/total_por_notificadora.html', context)
+        
     
 def get_semanas_e_anos(semana, ano):
     semanas_e_anos = []
@@ -231,6 +313,7 @@ def positivos_bairros(request):
     notificacoes = None
     total_geral = 0
     pesquisa_realizada = False
+
     if semana_query and ano_query:
         pesquisa_realizada = True
         try:
@@ -249,13 +332,34 @@ def positivos_bairros(request):
                                                 Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
                                             )
 
-            total_geral = base_query.count()
-
-            notificacoes = base_query.values('logradouro_paciente__bairro__nome_bairro')\
-                                     .annotate(quantidade=Count('id'))\
-                                     .order_by('-quantidade')
         except ValueError:
-            notificacoes = Notificacao.objects.none()
+            base_query = Notificacao.objects.none()
+
+    elif ano_query and not semana_query:
+        pesquisa_realizada = True
+        ano_atual = int(ano_query)
+        base_query = Notificacao.objects.filter(semana_epidemiologica__ano=ano_atual)\
+                                        .select_related('logradouro_paciente__bairro__cidade__estado')\
+                                        .filter(
+                                            Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']) |
+                                            Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
+                                        )
+
+    elif semana_query and not ano_query:
+        pesquisa_realizada = True
+        # Implemente a lógica necessária quando apenas a semana está preenchida
+
+    else:
+        base_query = Notificacao.objects.filter(
+            Q(classificacao__isnull=True, resultado__in=['Positivo NS1', 'Positivo sorologia', 'Isolamento viral positivo']) |
+            Q(classificacao__in=['Dengue', 'Dengue com Sinais de Alarme', 'Dengue Grave'])
+        )
+
+    total_geral = base_query.count()
+
+    notificacoes = base_query.values('logradouro_paciente__bairro__nome_bairro')\
+                             .annotate(quantidade=Count('id'))\
+                             .order_by('-quantidade')
 
     context = {
         'notificacoes': notificacoes,
@@ -266,6 +370,7 @@ def positivos_bairros(request):
     }
 
     return render(request, 'dengue/positivos_bairros.html', context)
+
 
 
 def criar_notificacao(request):

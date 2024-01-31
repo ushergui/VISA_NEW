@@ -45,6 +45,7 @@ class Notificacao(models.Model):
     data_recebimento = models.DateField(null=False)
     NOTIFICADORA_CHOICES = (
         ("Ambulatório de Infectologia", "Ambulatório de Infectologia"),
+        ("Ambulatório Municipal", "Ambulatório Municipal"),
         ("USF Alvorada", "USF Alvorada"),
         ("Ampara", "Ampara"),
         ("USF Asilo", "USF Asilo"),
@@ -65,6 +66,7 @@ class Notificacao(models.Model):
         ("Laboratório Biolabory", "Laboratório Biolabory"),
         ("Laboratório Hormossul", "Laboratório Hormossul"),
         ("Laboratório JG", "Laboratório JG"),
+        ("Laboratório Municipal", "Laboratório Municipal"),
         ("Laboratório São Lucas", "Laboratório São Lucas"),
         ("Laboratório Santa Casa", "Laboratório Santa Casa"),
         ("Laboratório Vitale", "Laboratório Vitale"),
@@ -72,7 +74,7 @@ class Notificacao(models.Model):
         ("USF Jardim Planalto", "USF Jardim Planalto"),
         ("USF Mediterranee", "USF Mediterranee"),
         ("USF San Genaro", "USF San Genaro"),
-        ("Santa Casa", "Santa Casa"),
+        ("Santa Casa de Misericórdia", "Santa Casa de Misericórdia"),
         ("USF Santa Maria", "USF Santa Maria"),
         ("USF São Judas", "USF São Judas"),
         ("Unidade de Termópolis", "Unidade de Termópolis"),
