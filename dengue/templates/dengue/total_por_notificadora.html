@@ -69,6 +69,9 @@
                         }
                     }]
                 },
+                legend: {
+        display: false // Isso irá remover a legenda completamente
+    },
                 plugins: {
                     datalabels: {
                         color: '#000',
@@ -95,7 +98,7 @@
             labels.push("{{ notificacao.categoria }}");
             data.push({{ notificacao.quantidade }});
         {% endfor %}
-        createChart(labels, data, 'Notificações por Categoria');
+        createChart(labels, data, 'Notificações por Unidade notificadora');
     };
 </script>
 
