@@ -196,7 +196,13 @@ def total_por_notificadora(request):
         "Laboratórios": [
             "Farmácia Ana Terra", "Laboratório Athena", "Laboratório Biolabory",
             "Laboratório Hormossul", "Laboratório JG", "Laboratório Municipal",
-            "Laboratório São Lucas", "Laboratório Santa Casa", "Laboratório Vitale"
+            "Laboratório São Lucas", "Laboratório Santa Casa", "Laboratório Vitale",
+            "Laboratório Athena", "Laboratório Athena",
+            "Laboratório Biolabory", "Laboratório Biolabory",
+            "Laboratório JG", "Laboratório JG",
+            "Laboratório Municipal", "Laboratório Municipal",
+            "Laboratório Santa Casa", "Laboratório Santa Casa",
+            "Laboratório Vitale", "Laboratório Vitale",
         ],
         "APS": [
             "USF Alvorada", "USF Asilo", "USF Belvedere", "USF Centro",
@@ -207,13 +213,15 @@ def total_por_notificadora(request):
             "USF Vila Formosa", "USF Vila Mariana", "Unidade de Termópolis"
         ],
         "Ampara": ["Ampara"],
-        "Outros": ["Ambulatório de Infectologia", "Ambulatório Municipal"],
+        "Ambulatório de Infectologia": ["Ambulatório de Infectologia"],
+        "Ambulatório Municipal": ["Ambulatório Municipal"],
         "Gedor Silveira": ["Gedor Silveira"],
-        "Santa Casa de Misericórdia": ["Santa Casa de Misericórdia"],
-        "Santa Casa": ["Santa Casa"],
+        "Santa Casa de Misericórdia": ["Santa Casa de Misericórdia", "Santa Casa"],
         "Unimed": ["Unimed"],
         "UPA": ["UPA - Unidade de Pronto Atendimento"],
-        "Vigilância em Saúde": ["Vigilância em Saúde"]
+        "Unidade de Termópolis": ["Unidade de Termópolis"],
+        "Vigilância em Saúde": ["Vigilância em Saúde"],
+
     }
 
     notificadora_para_categoria = {v: k for k, vals in categorias.items() for v in vals}

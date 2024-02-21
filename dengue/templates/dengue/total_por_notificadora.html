@@ -48,59 +48,73 @@
 <script src="{% static 'js/chartjs-plugin-datalabels.js' %}"></script>
 <script>
     function createChart(labels, data, chartTitle) {
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: chartTitle,
-                    data: data,
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var maxValue = Math.max(...data);
+    var chartPadding = maxValue * 0.2; // Aumenta para 20% do valor máximo como padding
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: chartTitle,
+                data: data,
+                backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            layout: {
+                padding: {
+                    top: chartPadding // Aumenta o padding calculado ao topo do gráfico
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        max: maxValue + chartPadding // Ajusta o espaço superior do gráfico
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        fontSize: 14,
+                        maxRotation: 85, // Mantém a rotação para 85 graus
+                        minRotation: 85 // Mantém a rotação para 85 graus
+                    }
                 }]
             },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
-                legend: {
-        display: false // Isso irá remover a legenda completamente
-    },
-                plugins: {
-                    datalabels: {
-                        color: '#000',
-                        anchor: 'end',
-                        align: 'top',
-                        offset: 10, // Ajuste conforme necessário para mover os rótulos para cima
-                        font: {
-                            weight: 'bold',
-                            size: 14
-                        },
-                        formatter: function(value, context) {
-                            return value;
-                        }
+            legend: {
+                display: false // Mantém a legenda oculta
+            },
+            plugins: {
+                datalabels: {
+                    color: '#000',
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 10, // Aumenta o deslocamento conforme necessário para evitar sobreposição
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                    formatter: function(value, context) {
+                        return value;
                     }
                 }
             }
-        });
-    }
+        }
+    });
+}
 
-    window.onload = function() {
-        var labels = [];
-        var data = [];
-        {% for notificacao in notificacoes %}
-            labels.push("{{ notificacao.categoria }}");
-            data.push({{ notificacao.quantidade }});
-        {% endfor %}
-        createChart(labels, data, 'Notificações por Unidade notificadora');
-    };
+window.onload = function() {
+    var labels = [];
+    var data = [];
+    {% for notificacao in notificacoes %}
+        labels.push("{{ notificacao.categoria }}");
+        data.push({{ notificacao.quantidade }});
+    {% endfor %}
+    createChart(labels, data, 'Notificações por Unidade notificadora');
+};
+
 </script>
-
-
 {% endblock %}
