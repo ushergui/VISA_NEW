@@ -46,6 +46,7 @@ class Notificacao(models.Model):
     NOTIFICADORA_CHOICES = (
         ("Ambulatório de Infectologia", "Ambulatório de Infectologia"),
         ("Ambulatório Municipal", "Ambulatório Municipal"),
+        ("Asilo São Vicente de Paulo", "Asilo São Vicente de Paulo"),
         ("USF Alvorada", "USF Alvorada"),
         ("Ampara", "Ampara"),
         ("USF Asilo", "USF Asilo"),
@@ -92,6 +93,18 @@ class Notificacao(models.Model):
     data_limite_coleta = models.DateField(verbose_name="Data de limite da coleta",null=False)
     semana_epidemiologica = models.ForeignKey(Semana, on_delete=models.PROTECT)
     sinan = models.PositiveIntegerField(verbose_name="SINAN", null=True, blank=True)
+    GRUPO_ESTIMADO_CHOICES = (
+        ('A', 'Grupo A'),
+        ('B', 'Grupo B'),
+        ('C', 'Grupo C'),
+        ('D', 'Grupo D'),
+    )
+    grupo_estimado = models.CharField(
+        max_length=1,
+        choices=GRUPO_ESTIMADO_CHOICES,
+        default='A',
+        verbose_name="Grupo Estimado"
+    )
     RESULTADO_CHOICES = (
         ("Positivo NS1", "Positivo NS1"),
         ("Positivo sorologia", "Positivo sorologia"),

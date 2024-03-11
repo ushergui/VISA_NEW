@@ -7,7 +7,12 @@ from django.core.exceptions import ValidationError
 from cadastros.models import Logradouro
 from django.http import JsonResponse, HttpResponseRedirect
 from datetime import datetime
+import datetime
 from django.urls import reverse
+from weasyprint import HTML, CSS
+from django.template.loader import render_to_string
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
+
 
 def check_duplicate(request):
     nome = request.GET.get("nome")
@@ -221,6 +226,7 @@ def total_por_notificadora(request):
         "UPA": ["UPA - Unidade de Pronto Atendimento"],
         "Unidade de Termópolis": ["Unidade de Termópolis"],
         "Vigilância em Saúde": ["Vigilância em Saúde"],
+        "Asilo São Vicente de Paulo": ["Asilo São Vicente de Paulo"],
 
     }
 
@@ -379,6 +385,64 @@ def positivos_bairros(request):
 
     return render(request, 'dengue/positivos_bairros.html', context)
 
+def busca_notificacao(request):
+    termo_pesquisa = request.GET.get('q')
+    
+    try:
+        data_pesquisa = datetime.datetime.strptime(termo_pesquisa, "%d/%m/%Y").date()
+    except (ValueError, TypeError):
+        data_pesquisa = None
+        notificacoes = None
+    else:
+        notificacoes = Notificacao.objects.filter(data_recebimento=data_pesquisa).order_by('usf', 'logradouro_paciente__nome_logradouro', 'logradouro_paciente__bairro__nome_bairro', 'nome')
+
+    context = {
+        'termo_pesquisa': termo_pesquisa,
+        'notificacoes': notificacoes,
+    }
+
+    return render(request, 'dengue/grupo_usf.html', context)
+
+def busca_notificacao_pdf(request):
+    termo_pesquisa = request.GET.get('q')
+    
+    try:
+        data_pesquisa = datetime.datetime.strptime(termo_pesquisa, "%d/%m/%Y").date()
+    except (ValueError, TypeError):
+        data_pesquisa = None
+        notificacoes = None
+    else:
+        notificacoes = Notificacao.objects.filter(data_recebimento=data_pesquisa).order_by('usf', 'logradouro_paciente__nome_logradouro', 'logradouro_paciente__bairro__nome_bairro', 'nome')
+
+    context = {
+        'termo_pesquisa': termo_pesquisa,
+        'notificacoes': notificacoes,
+    }
+
+    html_string = render_to_string('dengue/grupo_usf_pdf.html', context)
+
+    # Em seguida, vamos transformar essa string em um objeto HTML do WeasyPrint
+    html = HTML(string=html_string)
+
+    # Agora podemos gerar o PDF
+    pdf = html.write_pdf()
+
+    # E finalmente, retornamos o PDF como uma resposta de arquivo
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename=grupo_usf.pdf'
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def criar_notificacao(request):
@@ -392,6 +456,7 @@ def criar_notificacao(request):
         form = NotificacaoForm()
 
     return render(request, 'dengue/form_dengue.html', {'form': form})
+
 
 
 def editar_notificacao(request, pk):

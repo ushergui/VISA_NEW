@@ -21,6 +21,7 @@ from django.db.models import Count
 from django.contrib import messages
 from PIL import Image, ImageDraw, ImageFont
 import os
+from datetime import date, timedelta
 
 # Contabilidade
 def listar_contabilidades(request):
@@ -1347,3 +1348,57 @@ def lista_correcao_cnae(request):
     )
     total_empresas = empresas.count()
     return render(request, 'empresas/lista_correcao_cnae.html', {'empresas': empresas, 'total_empresas': total_empresas})
+
+
+def listar_empresas_cadastradas(request):
+    # Filtrando empresas com base nos critérios de risco e status
+    empresas = Empresas.objects.filter(
+        Q(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"]) |
+        Q(cnae_principal__risco_cnae__valor_risco=4, status_funcionamento="ATIVA") |
+        Q(cnae_principal__risco_cnae__valor_risco=5, status_funcionamento="ATIVA", 
+          protocoloempresa__inspecao__data_inspecao__year=2023)
+    ).distinct()
+
+    def calcular_proxima_inspecao(empresa):
+        inspecao_2023 = empresa.inspecao_2023()
+        inspecao_recente = empresa.inspecao_mais_recente()
+
+        # Se houve inspeção em 2023, mas não em 2024
+        if inspecao_2023 and (not inspecao_recente or inspecao_recente.year != 2024):
+            return inspecao_2023 + timedelta(days=365)
+
+        # Se houve inspeção em 2024
+        if inspecao_recente and inspecao_recente.year == 2024:
+            return inspecao_recente + timedelta(days=365)
+
+        # Se não houve inspeção em 2023 e não em 2024
+        return date(2024, 8, 31)
+
+    # Adicionando o campo inspecao_recente para cada empresa
+    for empresa in empresas:
+        empresa.inspecao_recente = empresa.inspecao_mais_recente()
+        inspecao_2023 = Inspecao.objects.filter(protocolo__empresa=empresa, data_inspecao__year=2023).first()
+        empresa.inspecao_ano_2023 = inspecao_2023.data_inspecao if inspecao_2023 else None
+        empresa.proxima_inspecao = calcular_proxima_inspecao(empresa)
+        empresa.mostrar_alvara = not (empresa.cnae_principal.risco_cnae.valor_risco == 3 and empresa.status_funcionamento in ["ATIVA", "DISPENSADA"])
+
+    # Contadores para cada nível de risco
+    total_risco_I = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"]).count()
+    total_risco_I_realizadas = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=3, status_funcionamento__in=["ATIVA", "DISPENSADA"], protocoloempresa__inspecao__data_inspecao__year=2023).count()
+    total_risco_II = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4, status_funcionamento="ATIVA").count()
+    total_risco_II_realizadas = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=4, status_funcionamento="ATIVA", protocoloempresa__inspecao__data_inspecao__year=2023).count()
+    total_risco_III = Empresas.objects.filter(cnae_principal__risco_cnae__valor_risco=5, status_funcionamento="ATIVA", protocoloempresa__inspecao__data_inspecao__year=2023).count()
+    percentual_risco_I = (total_risco_I_realizadas / total_risco_I * 100) if total_risco_I else 0
+    percentual_risco_II = (total_risco_II_realizadas / total_risco_II * 100) if total_risco_II else 0
+    context = {
+        'empresas': empresas,
+        'total_risco_I': total_risco_I,
+        'total_risco_I_realizadas': total_risco_I_realizadas,
+        'total_risco_II': total_risco_II,
+        'total_risco_II_realizadas': total_risco_II_realizadas,
+        'total_risco_III': total_risco_III,
+        'percentual_risco_I': percentual_risco_I,
+        'percentual_risco_II': percentual_risco_II,
+    }
+
+    return render(request, 'empresas/listar_empresas_cadastradas.html', context)

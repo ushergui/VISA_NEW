@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+{% load custom_filters %}
+<html>
+<head>
+    <title>Notificações por data</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+        body {
+            margin: 1cm;  /* margem ao redor do conteúdo do body */
+        }
+        table { 
+            font-size: 12px; 
+            text-align: center; 
+            width: 100%; 
+            border-collapse: collapse;
+        }
+        th { 
+            background-color: #f5f5f5; 
+        }
+        td, th { 
+            padding: 5px; 
+            border: 1px solid #000; 
+            border-radius: 5px;  /* Arredonda as bordas */
+        }
+        tr:nth-child(even) {background-color: #f2f2f2;}  /* Linhas zebradas */
+    </style>
+</head>
+<body>
+
+<h4>Pacientes notificados no dia {{ termo_pesquisa }}</h4>
+
+{% if notificacoes %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped custom-table small-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Endereço</th>
+                        <th>Bairro</th>
+                        <th>USF</th>
+                        <th>Notificadora</th>
+                        <th>Grupo Estimado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notificacao in notificacoes %}
+                    <tr>
+                        <td>{{ notificacao.nome|capitalize_name }}</td>
+                        <td>{{ notificacao.logradouro_paciente.tipo|capitalize_name }} {{ notificacao.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ notificacao.numero_paciente }}</td>
+                        <td>{{ notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                        <td>{{ notificacao.usf }}</td>
+                        <td>{{ notificacao.notificadora }}</td>
+                        <td>{{ notificacao.grupo_estimado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+    <p>Nenhuma notificação encontrada para esta data.</p>
+{% endif %}
+<br>
+
+
+</body>
+</html>

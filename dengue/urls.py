@@ -36,4 +36,6 @@ urlpatterns = [
     path('encerrar_notificacao/<int:pk>/', views.encerrar_notificacao, name='encerrar_notificacao'),
     path('notificacao/<int:id_notificacao>/', views.detalhes_notificacao, name='detalhes_notificacao'),
     path('listar_notificacoes_data', views.listar_notificacoes_data, name='listar_notificacoes_data'),
+    path('caminho/para/busca', views.busca_notificacao, name='grupo'),
+    path('caminho/para/busca/pdf', views.busca_notificacao_pdf, name='grupo_pdf'),
 ]

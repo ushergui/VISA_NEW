@@ -18,6 +18,7 @@ urlpatterns = [
 
     # Empresas
     path('empresas/listar', views.listar_empresas, name='listar_empresas'),
+    path('empresas/listar_empresas_cadastradas', views.listar_empresas_cadastradas, name='listar_empresas_cadastradas'),
     path('empresas/novo/', views.criar_empresa, name='criar_empresa'),
     path('empresas/editar/<int:id>/', views.editar_empresa, name='editar_empresa'),
     path('empresas/editar_observacoes/<int:id>/', views.editar_observacoes, name='editar_observacoes'),

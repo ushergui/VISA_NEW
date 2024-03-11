@@ -1,0 +1,113 @@
+{% extends 'basy.html' %}
+{% load static %}
+{% load custom_filters %}
+
+
+
+
+{% block conteudo %}
+<h3>Cadastro de empresas - Avaliação PDVISA
+</h3>
+<div>
+    <p>Nível de Risco I: {{ total_risco_I }}   ------- Inspeções Realizadas: {{ total_risco_I_realizadas }} -------- {{ percentual_risco_I|floatformat:2 }}%</p>
+    <p>Nível de Risco II: {{ total_risco_II }}   ------- Inspeções Realizadas: {{ total_risco_II_realizadas }}  -------- {{ percentual_risco_II|floatformat:2 }}%</p>
+    <p>Nível de Risco III: {{ total_risco_III }}   ------- Inspeções Realizadas: {{ total_risco_III }}  -------- 100%</p>
+</div>
+<hr>
+<div class="table responsive">
+<table class="table table-striped" id="tabela-listar">
+    <thead>
+    <tr>
+        <th style="text-align:center">CNPJ/CPF</th>
+        <th style="text-align:center">Razão Social</th>
+        <th style="text-align:center">Endereço</th>
+        <th style="text-align:center">CNAE</th>
+        <th style="text-align:center">Nível de Risco</th>
+        <th style="text-align:center">Inspeção em 2023</th>
+        <th style="text-align:center">Próxima Inspeção</th>
+		<th style="text-align:center">Data da última inspeção</th>
+        <th style="text-align:center">Alvará</th>
+        <th style="text-align:center">Situação</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for empresa in empresas %}
+    <tr>
+        <td style="font-size:13px; text-align: center;">{% if empresa.cnpj %}{{ empresa.cnpj }}{% else %}{{ empresa.cpf_responsavel_legal }}{% endif %}</td>
+        <td style="font-size:13px;">{{ empresa.razao|capitalize_name }}</td>
+        <td style="font-size:13px;">{{ empresa.logradouro_empresa.tipo|capitalize_name }} {{ empresa.logradouro_empresa.nome_logradouro|capitalize_name }}, {{ empresa.numero_empresa }} - {% if empresa.complemento_empresa %}{{ empresa.complemento_empresa }} - {% else %}{% endif %}{{ empresa.logradouro_empresa.bairro.nome_bairro|capitalize_name }}</td>
+        <td style="font-size:13px; text-align:left;">{{ empresa.cnae_principal.codigo_cnae }} - {{ empresa.cnae_principal.descricao_cnae|capitalize_name }}</td>
+        <td style="font-size:13px; text-align:left;">{{empresa.cnae_principal.risco_cnae}}</td>
+        <td style="font-size:13px; text-align:left;">
+            {% if empresa.inspecao_ano_2023 %}
+            {{ empresa.inspecao_ano_2023|date:"d/m/Y" }}
+        {% endif %}
+        </td>
+        <td style="font-size:13px; text-align:left;">
+            {% if empresa.proxima_inspecao %}
+                {{ empresa.proxima_inspecao|date:"d/m/Y" }}
+            {% else %}
+                NÃO PROGRAMADA
+            {% endif %}
+        </td>
+        <td style="font-size:13px;">{{ empresa.inspecao_recente|date:"d/m/Y" }}</td>
+        <td style="font-size:13px;">
+            {% if empresa.mostrar_alvara %}
+                {{ empresa.alvara|date:"d/m/Y" }}
+            {% endif %}
+        </td>
+        <td style="font-size:13px;"></td>
+
+    </tr>
+    {% empty %}
+        <tr>
+            <td colspan="10">Nenhum campo registrado.</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+
+
+    $(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],
+            "pageLength": 9999,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

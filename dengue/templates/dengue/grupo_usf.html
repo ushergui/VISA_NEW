@@ -1,0 +1,83 @@
+{% extends 'bases.html' %}
+{% block extra_css %}
+{% load static %}
+{% load custom_filters %}
+<style>
+    /* Estilos anteriores mantidos... */
+    .custom-table tr td, .custom-table tr th {
+        /* Ajustes mantidos */
+    }
+    h3 {
+        /* Ajustes mantidos */
+    }
+    .small-table {
+        /* Ajustes mantidos */
+    }
+</style>
+{% endblock %}
+
+{% block conteudo %}
+
+{% if termo_pesquisa %}
+<div align="center"><h3>Pacientes notificados no dia {{ termo_pesquisa }}</h3></div>
+<br>
+{% endif %}
+<h4>Notificações por data, digite o dia:</h4>
+<form class="form-inline" action="{% url 'grupo' %}" method="get">
+  <div class="form-group mx-sm-1 mb-2">
+    <input class="form-control-sm" type="text" id="grupo" name="q" placeholder="Digite a data de digitação" size="58">
+  </div>
+  <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+</form>
+
+{% if notificacoes %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped custom-table small-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Endereço</th>
+                        <th>Bairro</th>
+                        <th>USF</th>
+                        <th>Notificadora</th>
+                        <th>Grupo Estimado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notificacao in notificacoes %}
+                    <tr>
+                        <td>{{ notificacao.nome|capitalize_name }}</td>
+                        <td>{{ notificacao.logradouro_paciente.tipo|capitalize_name }} {{ notificacao.logradouro_paciente.nome_logradouro|capitalize_name }}, {{ notificacao.numero_paciente }}</td>
+                        <td>{{ notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
+                        <td>{{ notificacao.usf }}</td>
+                        <td>{{ notificacao.notificadora }}</td>
+                        <td>{{ notificacao.grupo_estimado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center mt-4">
+                <a href="{% url 'grupo_pdf' %}?{{ request.GET.urlencode }}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Gerar PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <p>Nenhuma notificação encontrada para esta data.</p>
+{% endif %}
+<br>
+
+{% endblock %}
+{% block scripts %}
+
+<script src="{% static 'js/jquery.mask.min.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#grupo').mask("00/00/0000");
+});
+</script>
+{% endblock %}

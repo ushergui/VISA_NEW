@@ -156,6 +156,10 @@ class Empresas(models.Model):
         inspecao_recente = Inspecao.objects.filter(protocolo__empresa=self).order_by('-data_inspecao').first()
         return inspecao_recente.data_inspecao if inspecao_recente else None
     
+    def inspecao_2023(self):
+        inspecao_2023 = Inspecao.objects.filter(protocolo__empresa=self, data_inspecao__year=2023).order_by('-data_inspecao').first()
+        return inspecao_2023.data_inspecao if inspecao_2023 else None
+    
     def protocolo_aberto(self):
         return ProtocoloEmpresa.objects.filter(empresa=self).exclude(status_protocolo='4').exists()
     

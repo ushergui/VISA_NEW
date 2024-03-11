@@ -31,6 +31,8 @@
 
             <th style="vertical-align: middle;text-align: center">Nome</th>
             <th style="vertical-align: middle; text-align: center">Notificação</th>
+            <th style="vertical-align: middle; text-align: center">Endereço</th>
+            <th style="vertical-align: middle; text-align: center">Bairro</th>
             <th style="vertical-align: middle; text-align: center">Início de sintomas</th>
             <th style="vertical-align: middle; text-align: center">Semana epidemiológica</th>
             <th style="vertical-align: middle; text-align: center">SINAN</th>
@@ -50,6 +52,8 @@
             <tr>
               <td style="vertical-align: middle;">{{ notificacao.nome|capitalize_name }}</td>
               <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_notificacao|date:"d/m/Y" }}</td>
+              <td style="text-align: center; vertical-align: middle;">{{ notificacao.logradouro_paciente.tipo|capitalize_name }}  {{notificacao.logradouro_paciente.nome_logradouro|capitalize_name }}, {{notificacao.numero_paciente}}</td>
+			  <td style="text-align: center; vertical-align: middle;">{{notificacao.logradouro_paciente.bairro.nome_bairro|capitalize_name }}</td>
               <td style="text-align: center; vertical-align: middle;">{{ notificacao.data_inicio_sintomas|date:"d/m/Y" }}</td>
               <td style="text-align: center; vertical-align: middle;">{{ notificacao.semana_epidemiologica }}</td>
               <td style="text-align: center; vertical-align: middle;">{{ notificacao.sinan }}</td>
@@ -95,9 +99,39 @@
 
 <script src="{% static 'js/jquery.mask.min.js' %}"></script>
 <script>
-$(document).ready(function() {
-        $('#motorista').mask("00/00/0000");
-        $('#agendados').mask("00/00/0000");
-});
-</script>
+
+$(document).ready(function(){
+
+        $("#tabela-listar").DataTable({
+            responsive: true,
+            // "bSort": false,
+            "aaSorting": [],            "pageLength":5555,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Sem dados disponíveis",
+                "info": "Mostrando de _START_ até _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando de 0 até 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros no total)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "loadingRecords": "A carregar dados...",
+                "processing": "A processar...",
+                "search": "Procurar:",
+                "zeroRecords": "Não foram encontrados resultados",
+                "paginate": {
+                    "first": "Primeiro",
+                    "last": "Último",
+                    "next": "Seguinte",
+                    "previous": "Anterior"
+                },
+                "aria": {
+                    "sortAscending": ": ordem crescente",
+                    "sortDescending": ": ordem decrescente"
+                }
+            }
+        });
+
+    });
+	</script>
 {% endblock %}

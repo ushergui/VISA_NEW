@@ -28,6 +28,7 @@ class NotificacaoForm(forms.ModelForm):
             'data_limite_coleta',
             'semana_epidemiologica',
             'sinan',
+            'grupo_estimado',
             'resultado',
             'internacao',
             'obito',
